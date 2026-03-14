@@ -313,14 +313,17 @@
         let cachedSpanishVoice = null;
 
         function initVoices() {
+            if (!('speechSynthesis' in window)) return;
             const voices = window.speechSynthesis.getVoices();
             // ค้นหาเสียงภาษาสเปนมาแคชไว้ เพื่อให้กดแล้วเสียงออกทันทีไม่ต้องรอประมวลผลใหม่
             cachedSpanishVoice = voices.find(v => v.lang.startsWith('es-ES') || v.lang.startsWith('es'));
         }
 
         function speakWord(word) {
-            // หยุดเสียงเดิมที่กำลังเล่นอยู่
-            window.speechSynthesis.cancel();
+            // หยุดเสียงเดิมที่กำลังเล่นอยู่ ป้องกันบั๊กบนมือถือ
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
 
             // พยายามใช้ SpeechSynthesis เป็นอันดับแรก เพราะเสถียรกว่าในเบราว์เซอร์มือถือ
             if ('speechSynthesis' in window) {
@@ -347,13 +350,17 @@
         }
 
         // โหลดเสียงไว้ล่วงหน้า (Chrome ต้องการสิ่งนี้)
-        window.speechSynthesis.onvoiceschanged = initVoices;
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = initVoices;
+        }
 
-        window.onload = () => { 
+        // เปลี่ยนจาก window.onload เป็น DOMContentLoaded 
+        // เพื่อให้ปฏิทินโหลดขึ้นมาทันที ไม่ต้องรอโหลดฟอนต์หรือไอคอนเสร็จก่อน
+        document.addEventListener('DOMContentLoaded', () => { 
             loadState(); 
             renderCalendar(); 
             setTimeout(initVoices, 500); // ดีเลย์โหลดเสียงเพื่อไม่ให้บล็อกการแสดงผลตอนเข้าแอปครั้งแรก
-        };
+        });
     </script>
 </body>
 </html>
