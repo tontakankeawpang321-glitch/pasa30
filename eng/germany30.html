@@ -2,152 +2,149 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Deutsch — Calendar Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Deutsch — Mobile Optimized</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
             background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
-            background-color: #f8fafc;
-            background-image: radial-gradient(#c7d2fe 1px, transparent 1px);
-            background-size: 30px 30px;
+            background-attachment: fixed;
+            -webkit-tap-highlight-color: transparent;
         }
         h1, h2, h3, .font-german {
             font-family: 'Montserrat', 'Sarabun', sans-serif; 
         }
         
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
         
-        .calendar-day { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .calendar-day:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .calendar-day { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s; }
+        .calendar-day:active { transform: scale(0.92); }
         
-        .vocab-card { transition: all 0.2s ease; }
-        .vocab-card:hover { transform: scale(1.02); border-color: #6366f1; }
-
         .glass-effect {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
-        @keyframes goldPulse {
-            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        @keyframes soft-pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
         }
-        .today-mark { animation: goldPulse 2s infinite; }
+        .today-pulse { animation: soft-pulse 2s infinite; }
     </style>
 </head>
-<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-slate-800 p-3 md:p-8 min-h-screen flex flex-col items-center overflow-x-hidden">
 
-    <div class="w-full max-w-4xl space-y-6">
+    <div class="w-full max-w-3xl space-y-4 md:space-y-6">
         
         <!-- Header Section -->
-        <div class="glass-effect rounded-[2.5rem] p-6 md:p-10 shadow-2xl shadow-indigo-100/50">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
-                <div class="flex items-center gap-6 text-center md:text-left">
-                    <div class="text-6xl md:text-7xl drop-shadow-lg animate-pulse" style="animation-duration: 4s;">🏰</div>
+        <div class="glass-effect rounded-3xl md:rounded-[2.5rem] p-5 md:p-10 shadow-xl shadow-indigo-100/50">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-4 md:gap-6 text-center sm:text-left">
+                    <div class="text-5xl md:text-7xl drop-shadow-md">🏰</div>
                     <div>
-                        <h1 class="text-4xl md:text-5xl font-black text-indigo-950 mb-2 tracking-tight">
+                        <h1 class="text-3xl md:text-5xl font-black text-indigo-950 tracking-tight leading-tight">
                             Daily Deutsch
                         </h1>
-                        <p class="text-indigo-600 font-semibold text-lg flex items-center justify-center md:justify-start gap-2">
-                            <i class="ph-bold ph-castle"></i> ท่องศัพท์เยอรมันในปราสาทเทพนิยาย
+                        <p class="text-indigo-600 font-semibold text-sm md:text-lg flex items-center justify-center sm:justify-start gap-1">
+                            <i class="ph-bold ph-castle"></i> <span>ท่องศัพท์ในปราสาทเยอรมัน</span>
                         </p>
                     </div>
                 </div>
 
-                <!-- Stats -->
-                <div class="bg-indigo-900 p-6 rounded-[2rem] w-full md:w-auto text-white shadow-xl flex items-center gap-6 border-b-4 border-amber-500">
-                    <div class="bg-amber-500 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg">
-                        <i class="ph-fill ph-crown"></i>
-                    </div>
-                    <div>
-                        <p class="text-indigo-200 text-xs font-bold uppercase tracking-[0.2em]">Month Progress</p>
-                        <p class="text-4xl font-black">
-                            <span id="summary-completed">0</span><span class="text-xl text-indigo-300 font-medium"> / <span id="summary-total">30</span></span>
-                        </p>
+                <!-- Mini Stats for Mobile -->
+                <div class="bg-indigo-950 px-5 py-4 rounded-2xl w-full sm:w-auto text-white shadow-lg flex items-center justify-between sm:justify-start gap-4 border-b-4 border-amber-500">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-amber-500 w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-md">
+                            <i class="ph-fill ph-crown"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-indigo-200 text-[10px] font-bold uppercase tracking-wider">Progress</p>
+                            <p class="text-xl font-black leading-none"><span id="summary-completed">0</span><span class="text-sm text-indigo-300">/30</span></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Calendar Section -->
-        <div class="glass-effect rounded-[3rem] p-6 md:p-10 shadow-2xl shadow-indigo-100/30">
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-10 gap-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">
-                        <i class="ph-fill ph-map-trifold text-2xl"></i>
+        <div class="glass-effect rounded-3xl md:rounded-[3rem] p-4 md:p-10 shadow-xl shadow-indigo-100/30">
+            <div class="flex flex-col gap-5 mb-6 md:mb-10">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <i class="ph-fill ph-calendar-blank text-indigo-600 text-xl md:text-2xl"></i>
+                        <h2 id="month-year-display" class="text-xl md:text-3xl font-bold text-slate-900">Month Year</h2>
                     </div>
-                    <h2 id="month-year-display" class="text-3xl font-bold text-slate-900 tracking-tight">Month Year</h2>
-                </div>
-                
-                <div class="flex gap-3 bg-slate-100/50 p-2 rounded-2xl">
-                    <button onclick="changeMonth(-1)" class="w-12 h-12 rounded-xl bg-white shadow-sm hover:bg-indigo-600 hover:text-white transition-all">
-                        <i class="ph-bold ph-arrow-left"></i>
-                    </button>
-                    <button onclick="goToToday()" class="px-6 h-12 rounded-xl bg-white shadow-sm hover:bg-indigo-50 font-bold text-indigo-600 transition-all text-sm uppercase tracking-widest">
+                    <button onclick="goToToday()" class="px-4 py-2 rounded-xl bg-indigo-50 font-bold text-indigo-600 text-xs uppercase tracking-widest active:bg-indigo-100 transition-colors">
                         Today
                     </button>
-                    <button onclick="changeMonth(1)" class="w-12 h-12 rounded-xl bg-white shadow-sm hover:bg-indigo-600 hover:text-white transition-all">
+                </div>
+                
+                <div class="flex gap-2 w-full">
+                    <button onclick="changeMonth(-1)" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white transition-all active:scale-95">
+                        <i class="ph-bold ph-arrow-left"></i>
+                    </button>
+                    <button onclick="changeMonth(1)" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 hover:bg-indigo-600 hover:text-white transition-all active:scale-95">
                         <i class="ph-bold ph-arrow-right"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-7 gap-3 md:gap-5 mb-4 text-center font-bold text-slate-400 text-xs uppercase tracking-widest">
+            <div class="grid grid-cols-7 gap-1.5 md:gap-5 mb-3 text-center font-bold text-slate-400 text-[10px] md:text-xs uppercase tracking-widest">
                 <div class="text-rose-500">So</div>
                 <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div>
                 <div class="text-indigo-500">Sa</div>
             </div>
 
-            <div id="calendar-grid" class="grid grid-cols-7 gap-3 md:gap-5">
+            <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 md:gap-4">
                 <!-- JS content -->
             </div>
         </div>
         
-        <p class="text-center text-slate-400 font-medium">
-            💡 เลือกวันที่เพื่อเริ่มเรียนรู้คำศัพท์ (คลิกที่ลำโพงเพื่อฟังสำเนียงต้นฉบับ)
+        <p class="text-center text-slate-400 text-xs md:text-sm font-medium">
+            💡 แตะที่วันที่เพื่อเปิดอ่านคำศัพท์
         </p>
 
     </div>
 
     <!-- Vocab Dialog -->
-    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-indigo-950/40 backdrop-blur-md" onclick="closeDialog()"></div>
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden flex items-center justify-center p-0 md:p-4">
+        <div class="absolute inset-0 bg-indigo-950/60 backdrop-blur-sm" onclick="closeDialog()"></div>
         
-        <div class="relative w-full max-w-3xl bg-white rounded-[3rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-8 border-indigo-50">
+        <div class="relative w-full h-full md:h-auto md:max-w-2xl bg-white md:rounded-[2.5rem] shadow-2xl flex flex-col max-h-screen md:max-h-[90vh] overflow-hidden">
             <!-- Modal Header -->
-            <div class="px-8 py-8 border-b border-slate-100 flex justify-between items-center">
-                <div class="flex items-center gap-5">
-                    <div class="text-5xl">🥨</div>
+            <div class="px-5 py-6 md:px-8 md:py-8 border-b border-slate-100 flex justify-between items-center bg-white sticky top-0 z-20">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl">🥨</div>
                     <div>
-                        <h3 id="dialog-title" class="text-2xl font-black text-indigo-950">วันที่ --/--/----</h3>
-                        <p class="text-slate-500 font-medium italic">Lerne heute 20 neue Wörter!</p>
+                        <h3 id="dialog-title" class="text-xl md:text-2xl font-black text-indigo-950">วันที่ --/--/----</h3>
+                        <p class="text-xs md:text-sm text-slate-500 font-medium italic">Lerne heute 20 neue Wörter!</p>
                     </div>
                 </div>
-                <button onclick="closeDialog()" class="w-12 h-12 flex items-center justify-center bg-slate-100 text-slate-500 rounded-full hover:bg-rose-100 hover:text-rose-500 transition-all">
-                    <i class="ph-bold ph-x text-xl"></i>
+                <button onclick="closeDialog()" class="w-10 h-10 flex items-center justify-center bg-slate-100 text-slate-500 rounded-full active:bg-rose-100 active:text-rose-500 transition-all">
+                    <i class="ph-bold ph-x text-lg"></i>
                 </button>
             </div>
             
             <!-- Modal Body -->
-            <div id="dialog-content" class="p-6 md:p-10 overflow-y-auto custom-scrollbar flex-1 space-y-6 bg-slate-50/50">
+            <div id="dialog-content" class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-4 bg-slate-50/50">
                 <!-- Vocab injected here -->
             </div>
             
             <!-- Modal Footer -->
-            <div class="px-8 py-6 bg-white border-t border-slate-100 flex justify-end items-center gap-4">
-                <button onclick="closeDialog()" class="px-8 py-4 text-slate-400 font-bold hover:text-slate-600 transition-colors">
-                    ไว้คราวหน้า
+            <div class="px-5 py-5 md:px-8 md:py-6 bg-white border-t border-slate-100 flex flex-col sm:flex-row justify-end items-center gap-3">
+                <button id="btn-complete-day" class="w-full sm:w-auto px-10 py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3">
+                    <i class="ph-bold ph-check-circle text-xl"></i> ท่องจำสำเร็จ!
                 </button>
-                <button id="btn-complete-day" class="px-10 py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center gap-3">
-                    <i class="ph-bold ph-check-circle text-2xl"></i> ท่องจำสำเร็จ!
+                <button onclick="closeDialog()" class="w-full sm:w-auto py-3 text-slate-400 font-bold text-sm">
+                    ปิดหน้าต่าง
                 </button>
             </div>
         </div>
@@ -160,7 +157,6 @@
         let currentDate = new Date(); 
         let today = new Date(); 
         let selectedDateString = null; 
-        
         let appState = { completedDates: [] };
 
         function loadState() {
@@ -174,65 +170,26 @@
 
         const vocabPool = [
             { word: "Hallo", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Hallo! Wie geht es dir? (สวัสดี! สบายดีไหม?)" },
-            { word: "Guten Morgen", meaning: "อรุณสวัสดิ์", english: "Good morning", icon: "☀️", example: "Guten Morgen, mein Freund. (อรุณสวัสดิ์ เพื่อนรัก)" },
             { word: "Danke", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Vielen Dank für deine Hilfe. (ขอบคุณมากสำหรับความช่วยเหลือ)" },
-            { word: "Bitte", meaning: "ขอร้อง / ไม่เป็นไร", english: "Please / Welcome", icon: "✨", example: "Bitte schön! (ด้วยความยินดี!)" },
+            { word: "Bitte", meaning: "ขอร้อง/ไม่เป็นไร", english: "Please/Welcome", icon: "✨", example: "Bitte schön! (ด้วยความยินดี!)" },
             { word: "Ja", meaning: "ใช่", english: "Yes", icon: "✅", example: "Ja, das stimmt. (ใช่ นั่นถูกต้องแล้ว)" },
             { word: "Nein", meaning: "ไม่", english: "No", icon: "❌", example: "Nein, danke. (ไม่ครับ ขอบคุณ)" },
-            { word: "Entschuldigung", meaning: "ขอโทษ (ขัดจังหวะ)", english: "Excuse me", icon: "🙇", example: "Entschuldigung, wo ist der Bahnhof? (ขอโทษนะคะ สถานีรถไฟอยู่ที่ไหน?)" },
-            { word: "Tschüss", meaning: "บ๊ายบาย", english: "Bye", icon: "👋", example: "Tschüss! Bis bald. (บ๊ายบาย! เจอกันเร็วๆ นี้)" },
-            { word: "Auf Wiedersehen", meaning: "ลาก่อน (ทางการ)", english: "Goodbye", icon: "🏛️", example: "Auf Wiedersehen, Herr Müller. (ลาก่อนครับ คุณมึลเลอร์)" },
-            { word: "Wie viel kostet das?", meaning: "ราคาเท่าไหร่?", english: "How much is this?", icon: "💰", example: "Wie viel kostet dieses Brot? (ขนมปังนี่ราคาเท่าไหร่?)" },
-            { word: "Ich verstehe nicht", meaning: "ฉันไม่เข้าใจ", english: "I don't understand", icon: "🤔", example: "Es tut mir leid, ich verstehe nicht. (ขอโทษที ฉันไม่เข้าใจ)" },
-            { word: "Lecker", meaning: "อร่อย", english: "Delicious", icon: "😋", example: "Das Essen ist sehr lecker! (อาหารอร่อยมาก!)" },
             { word: "Wasser", meaning: "น้ำ", english: "Water", icon: "💧", example: "Ein Glas Wasser, bitte. (ขอน้ำหนึ่งแก้วครับ)" },
-            { word: "Bier", meaning: "เบียร์", english: "Beer", icon: "🍺", example: "Noch ein Bier, bitte. (ขอเบียร์อีกแก้วครับ)" },
-            { word: "Kaffee", meaning: "กาแฟ", english: "Coffee", icon: "☕", example: "Ich trinke gerne Kaffee. (ฉันชอบดื่มกาแฟ)" },
             { word: "Brot", meaning: "ขนมปัง", english: "Bread", icon: "🍞", example: "Frisches Brot riecht gut. (ขนมปังสดใหม่กลิ่นหอมจัง)" },
-            { word: "Haus", meaning: "บ้าน", english: "House", icon: "🏠", example: "Mein Haus ist klein aber schön. (บ้านของฉันเล็กแต่สวย)" },
-            { word: "Auto", meaning: "รถยนต์", english: "Car", icon: "🚗", example: "Das Auto ist sehr schnell. (รถคันนี้เร็วมาก)" },
             { word: "Freund", meaning: "เพื่อน", english: "Friend", icon: "🤝", example: "Er ist mein bester Freund. (เขาคือเพื่อนที่ดีที่สุดของฉัน)" },
-            { word: "Schule", meaning: "โรงเรียน", english: "School", icon: "🏫", example: "Die Kinder gehen zur Schule. (เด็กๆ ไปโรงเรียน)" },
-            { word: "Arbeit", meaning: "งาน", english: "Work", icon: "💼", example: "Ich habe viel Arbeit heute. (วันนี้ฉันมีงานเยอะมาก)" },
-            { word: "Zeit", meaning: "เวลา", english: "Time", icon: "🕒", example: "Hast du Zeit? (คุณพอจะมีเวลาไหม?)" },
-            { word: "Geld", meaning: "เงิน", english: "Money", icon: "💶", example: "Ich habe kein Geld dabei. (ฉันไม่ได้พกเงินมาเลย)" },
-            { word: "Helfen", meaning: "ช่วยเหลือ", english: "To help", icon: "🆘", example: "Kannst du mir helfen? (คุณช่วยฉันหน่อยได้ไหม?)" },
-            { word: "Sprechen", meaning: "พูด", english: "To speak", icon: "🗣️", example: "Sprechen Sie Englisch? (คุณพูดภาษาอังกฤษได้ไหม?)" },
             { word: "Lernen", meaning: "เรียนรู้", english: "To learn", icon: "📖", example: "Ich lerne Deutsch. (ฉันกำลังเรียนภาษาเยอรมัน)" },
-            { word: "Essen", meaning: "กิน", english: "To eat", icon: "🍽️", example: "Wir essen Pizza. (พวกเรากินพิซซ่ากัน)" },
-            { word: "Trinken", meaning: "ดื่ม", english: "To drink", icon: "🥤", example: "Ich möchte Saft trinken. (ฉันอยากดื่มน้ำผลไม้)" },
-            { word: "Schlafen", meaning: "นอน", english: "To sleep", icon: "😴", example: "Gute Nacht, schlaf gut. (ราตรีสวัสดิ์ หลับฝันดีนะ)" },
-            { word: "Glücklich", meaning: "มีความสุข", english: "Happy", icon: "😊", example: "Heute bin ich sehr glücklich. (วันนี้ฉันมีความสุขมาก)" },
-            { word: "Müde", meaning: "เหนื่อย", english: "Tired", icon: "😫", example: "Ich bin so müde. (ฉันเหนื่อยเหลือเกิน)" },
             { word: "Schön", meaning: "สวย/ดี", english: "Beautiful", icon: "🌸", example: "Das ist ein schöner Tag. (วันนี้เป็นวันที่สวยงาม)" },
-            { word: "Groß", meaning: "ใหญ่", english: "Large/Tall", icon: "🐘", example: "Berlin ist eine große Stadt. (เบอร์ลินเป็นเมืองที่ใหญ่มาก)" },
-            { word: "Klein", meaning: "เล็ก", english: "Small", icon: "🐭", example: "Das Kätzchen ist sehr klein. (ลูกแมวน้อยตัวเล็กมาก)" },
-            { word: "Schnell", meaning: "เร็ว", english: "Fast", icon: "⚡", example: "Lauf schnell! (วิ่งเร็วเข้า!)" },
-            { word: "Langsam", meaning: "ช้า", english: "Slow", icon: "🐢", example: "Bitte sprechen Sie langsam. (กรุณาพูดช้าๆ หน่อยค่ะ)" },
-            { word: "Alt", meaning: "เก่า/แก่", english: "Old", icon: "👴", example: "Das Buch ist sehr alt. (หนังสือเล่มนี้เก่ามาก)" },
-            { word: "Neu", meaning: "ใหม่", english: "New", icon: "🆕", example: "Ich habe ein neues Handy. (ฉันมีมือถือเครื่องใหม่)" },
-            { word: "Heiß", meaning: "ร้อน", english: "Hot", icon: "🔥", example: "Der Tee ist noch heiß. (ชายังร้อนอยู่เลย)" },
-            { word: "Kalt", meaning: "หนาว/เย็น", english: "Cold", icon: "❄️", example: "Im Winter ist es kalt. (ในฤดูหนาวอากาศจะเย็น)" },
-            { word: "Wichtig", meaning: "สำคัญ", english: "Important", icon: "⚠️", example: "Das ist sehr important. (นี่สำคัญมากนะ)" },
-            { word: "Möglich", meaning: "เป็นไปได้", english: "Possible", icon: "🔮", example: "Alles ist möglich. (ทุกอย่างเป็นไปได้)" },
-            { word: "Vielleicht", meaning: "บางที", english: "Maybe", icon: "❓", example: "Vielleicht komme ich morgen. (บางทีฉันอาจจะมาพรุ่งนี้)" },
-            { word: "Immer", meaning: "เสมอ", english: "Always", icon: "🔄", example: "Ich bin immer pünktlich. (ฉันเป็นคนตรงเวลาเสมอ)" },
-            { word: "Nie", meaning: "ไม่เคย", english: "Never", icon: "🚫", example: "Ich rauche nie. (ฉันไม่เคยสูบบุหรี่เลย)" },
-            { word: "Jetzt", meaning: "ตอนนี้", english: "Now", icon: "⌛", example: "Wir müssen jetzt gehen. (พวกเราต้องไปตอนนี้แล้ว)" },
             { word: "Heute", meaning: "วันนี้", english: "Today", icon: "📅", example: "Was machst du heute? (วันนี้คุณทำอะไร?)" },
             { word: "Morgen", meaning: "พรุ่งนี้", english: "Tomorrow", icon: "⏭️", example: "Bis morgen! (เจอกันพรุ่งนี้!)" },
-            { word: "Woche", meaning: "สัปดาห์", english: "Week", icon: "🗓️", example: "Nächste Woche habe ich frei. (สัปดาห์หน้าฉันว่าง)" },
-            { word: "Jahr", meaning: "ปี", english: "Year", icon: "⏳", example: "Ein Jahr hat zwölf Monate. (หนึ่งปีมีสิบสองเดือน)" }
+            { word: "Geld", meaning: "เงิน", english: "Money", icon: "💶", example: "Ich habe kein Geld. (ฉันไม่มีเงิน)" },
+            { word: "Auto", meaning: "รถ", english: "Car", icon: "🚗", example: "Das Auto ist neu. (รถคันนี้ใหม่มาก)" },
+            { word: "Essen", meaning: "กิน/อาหาร", english: "To eat", icon: "🍽️", example: "Ich möchte essen. (ฉันอยากทานอาหาร)" },
+            { word: "Trinken", meaning: "ดื่ม", english: "To drink", icon: "🥤", example: "Wir trinken Saft. (พวกเราดื่มน้ำผลไม้)" },
+            { word: "Groß", meaning: "ใหญ่", english: "Large", icon: "🐘", example: "Das Haus ist groß. (บ้านหลังนี้ใหญ่มาก)" },
+            { word: "Klein", meaning: "เล็ก", english: "Small", icon: "🐭", example: "Der Hundเป็นตัวเล็ก. (สุนัขตัวนี้เล็ก)" },
+            { word: "Schnell", meaning: "เร็ว", english: "Fast", icon: "⚡", example: "Lauf schnell! (วิ่งเร็วเข้า!)" },
+            { word: "Langsam", meaning: "ช้า", english: "Slow", icon: "🐢", example: "Geh langsam. (เดินช้าๆ)" }
         ];
-
-        function shuffleArray(array) {
-            let s = [...array];
-            for (let i = s.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [s[i], s[j]] = [s[j], s[i]];
-            }
-            return s;
-        }
 
         function renderCalendar() {
             const year = currentDate.getFullYear();
@@ -245,7 +202,7 @@
             grid.innerHTML = '';
 
             for (let i = 0; i < firstDay; i++) {
-                grid.innerHTML += `<div class="p-4 rounded-3xl bg-slate-100/30 border border-dashed border-slate-200 opacity-30"></div>`;
+                grid.innerHTML += `<div class="aspect-square md:p-4 rounded-xl md:rounded-3xl bg-slate-100/20 border border-dashed border-slate-200"></div>`;
             }
 
             let completedCount = 0;
@@ -255,25 +212,23 @@
                 const isT = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear());
                 if (done) completedCount++;
 
-                let cls = "calendar-day relative flex flex-col items-center justify-center p-4 rounded-[2rem] border-2 cursor-pointer min-h-[100px] md:min-h-[120px] ";
-                let inner = `<span class="text-2xl font-black ${isT ? 'text-white' : 'text-slate-800'}">${d}</span>`;
+                let cls = "calendar-day relative flex flex-col items-center justify-center aspect-square rounded-2xl md:rounded-[2rem] border-2 cursor-pointer shadow-sm ";
+                let inner = `<span class="text-lg md:text-2xl font-black ${isT ? 'text-white' : 'text-slate-800'}">${d}</span>`;
 
                 if (done) {
-                    cls += "bg-indigo-50 border-indigo-200 text-indigo-700 shadow-inner";
-                    inner += `<i class="ph-fill ph-seal-check text-indigo-500 text-3xl mt-2 animate-pulse"></i>`;
+                    cls += "bg-indigo-50 border-indigo-200 text-indigo-700";
+                    inner += `<i class="ph-fill ph-seal-check text-indigo-500 text-xl md:text-3xl mt-1"></i>`;
                 } else if (isT) {
-                    cls += "bg-indigo-600 border-indigo-500 today-mark shadow-2xl";
-                    inner += `<span class="text-[10px] font-bold text-indigo-200 mt-1 uppercase">Today</span>`;
+                    cls += "bg-indigo-600 border-indigo-500 today-pulse shadow-lg";
                 } else {
-                    cls += "bg-white border-slate-100 hover:border-indigo-300 shadow-sm";
-                    inner += `<i class="ph-duotone ph-castle text-slate-200 text-2xl mt-2"></i>`;
+                    cls += "bg-white border-slate-100 active:border-indigo-300";
+                    inner += `<i class="ph-duotone ph-castle text-slate-200 text-lg md:text-2xl mt-1"></i>`;
                 }
 
                 grid.innerHTML += `<div class="${cls}" onclick="openDayDialog(${year}, ${month}, ${d})">${inner}</div>`;
             }
 
             document.getElementById('summary-completed').innerText = completedCount;
-            document.getElementById('summary-total').innerText = daysInMonth;
         }
 
         function changeMonth(dir) {
@@ -294,28 +249,23 @@
             const content = document.getElementById('dialog-content');
             content.innerHTML = '';
 
-            shuffleArray(vocabPool).slice(0, VOCAB_PER_SESSION).forEach((v, i) => {
+            vocabPool.forEach((v, i) => {
                 content.innerHTML += `
-                    <div class="vocab-card p-6 bg-white rounded-[2rem] shadow-sm border-2 border-slate-50 flex gap-6 items-start relative overflow-hidden group">
-                        <div class="w-14 h-14 bg-indigo-900 text-amber-400 rounded-2xl flex items-center justify-center font-black text-xl shrink-0">
+                    <div class="p-5 bg-white rounded-2xl border-2 border-slate-50 flex gap-4 items-start shadow-sm">
+                        <div class="w-10 h-10 bg-indigo-900 text-amber-400 rounded-xl flex items-center justify-center font-black text-sm shrink-0">
                             ${i + 1}
                         </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="text-2xl font-black text-slate-800 flex items-center gap-3">
-                                    <span class="text-3xl">${v.icon}</span> ${v.word}
-                                </h4>
-                                <button onclick="speak('${v.word}')" class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start mb-1">
+                                <h4 class="text-lg font-black text-slate-800 truncate pr-2">${v.icon} ${v.word}</h4>
+                                <button onclick="speak('${v.word}')" class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-lg active:bg-indigo-600 active:text-white shrink-0">
                                     <i class="ph-fill ph-speaker-high"></i>
                                 </button>
                             </div>
-                            <div class="flex gap-2 mb-4">
-                                <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">🇩🇪 ${v.word}</span>
-                                <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">🇹🇭 ${v.meaning}</span>
-                            </div>
-                            <div class="bg-slate-100 p-4 rounded-2xl italic text-slate-600 text-sm border-l-4 border-amber-400">
+                            <p class="text-sm font-bold text-indigo-600 mb-2">🇹🇭 ${v.meaning}</p>
+                            <p class="text-xs text-slate-500 italic leading-relaxed border-l-2 border-amber-400 pl-2">
                                 "${v.example}"
-                            </div>
+                            </p>
                         </div>
                     </div>
                 `;
@@ -323,7 +273,7 @@
 
             const btn = document.getElementById('btn-complete-day');
             if (isDone) {
-                btn.innerHTML = `<i class="ph-bold ph-crown text-amber-400"></i> ทบทวนเสร็จแล้ว!`;
+                btn.innerHTML = `<i class="ph-bold ph-star text-amber-400"></i> ทบทวนแล้ว!`;
                 btn.onclick = closeDialog;
             } else {
                 btn.innerHTML = `<i class="ph-bold ph-check-circle"></i> ท่องจำสำเร็จ!`;
@@ -350,11 +300,11 @@
 
         function speak(text) {
             const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=de&client=tw-ob`;
-            new Audio(url).play().catch(() => {
+            const audio = new Audio(url);
+            audio.play().catch(() => {
                 if ('speechSynthesis' in window) {
                     const u = new SpeechSynthesisUtterance(text);
                     u.lang = 'de-DE';
-                    u.rate = 0.9;
                     window.speechSynthesis.speak(u);
                 }
             });
