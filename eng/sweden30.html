@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ท่องสวีเดน — Calendar Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- ปรับลดน้ำหนักฟอนต์ที่โหลดเพื่อให้หน้าเว็บเบาและโหลดไวขึ้น -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&family=Fredoka:wght@400;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- Phosphor Icons for UI -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -30,6 +31,9 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #7dd3fc; border-radius: 10px; border: 2px solid #f0f9ff; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
         
+        /* ป้องกันการเลื่อนทะลุไปพื้นหลังเวลาไถคำศัพท์บนมือถือ */
+        .overscroll-contain { overscroll-behavior: contain; }
+
         /* Playful animations */
         .calendar-day { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .calendar-day:hover { transform: translateY(-4px) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.15), 0 4px 6px -2px rgba(56, 189, 248, 0.1); }
@@ -54,29 +58,31 @@
         .today-pulse { animation: softPulse 2s infinite; }
     </style>
 </head>
-<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+<!-- ปรับ Padding ให้ชิดขอบมากขึ้นบนหน้าจอมือถือ -->
+<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-screen flex flex-col items-center">
 
-    <div class="w-full max-w-4xl space-y-6">
+    <div class="w-full max-w-4xl space-y-4 sm:space-y-6">
         
         <!-- Header & Summary Section -->
-        <div class="bg-white/80 backdrop-blur-lg rounded-[2rem] p-6 md:p-8 shadow-xl shadow-sky-100/50 border border-white">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <!-- ลดความโค้งและ Padding บนมือถือให้ประหยัดพื้นที่ -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl shadow-sky-100/50 border border-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6">
                 <!-- Title & Mascot -->
-                <div class="flex items-center gap-4">
-                    <div class="text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🦊</div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="text-4xl sm:text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🦊</div>
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-400 mb-1">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-400 mb-1">
                             Svenska Vocab
                         </h1>
-                        <p class="text-slate-500 font-medium text-sm md:text-base flex items-center gap-1">
+                        <p class="text-slate-500 font-medium text-xs sm:text-sm md:text-base flex items-center gap-1">
                             ท่องศัพท์สวีเดนวันละ 20 คำ สไตล์นอร์ดิก! 🇸🇪
                         </p>
                     </div>
                 </div>
 
                 <!-- Monthly Summary Card -->
-                <div class="bg-gradient-to-tr from-yellow-400 to-amber-500 p-5 rounded-3xl w-full md:w-auto flex items-center gap-5 shadow-lg shadow-amber-200 text-white transform hover:scale-105 transition-transform duration-300">
-                    <div class="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30">
+                <div class="bg-gradient-to-tr from-yellow-400 to-amber-500 p-4 sm:p-5 rounded-[1.5rem] sm:rounded-3xl w-full md:w-auto flex items-center gap-4 sm:gap-5 shadow-lg shadow-amber-200 text-white transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white/20 backdrop-blur-sm w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-inner border border-white/30">
                         👑
                     </div>
                     <div>
@@ -91,13 +97,13 @@
         </div>
 
         <!-- Calendar Section -->
-        <div class="bg-white/90 backdrop-blur-lg rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-sky-100/40 border border-white">
+        <div class="bg-white/90 backdrop-blur-lg rounded-[1.5rem] sm:rounded-[2.5rem] p-4 sm:p-6 md:p-8 shadow-xl shadow-sky-100/40 border border-white">
             
             <!-- Calendar Header (Month Navigation) -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="text-3xl">📅</div>
-                    <h2 id="month-year-display" class="text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="text-2xl sm:text-3xl">📅</div>
+                    <h2 id="month-year-display" class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
                 </div>
                 
                 <div class="flex gap-2 bg-sky-50 p-1.5 rounded-2xl">
@@ -136,39 +142,39 @@
     <!-- Dialog / Modal for Vocabulary -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-blue-900/30 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
+        <div class="absolute inset-0 bg-blue-900/40 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
         
-        <!-- Modal Content -->
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-3xl bg-[#f8fafc] rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-4 border-white">
+        <!-- Modal Content: ขยายเต็มจอมากขึ้นบนมือถือ -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[98%] sm:w-[95%] max-w-3xl bg-[#f8fafc] rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col max-h-[95vh] sm:max-h-[90vh] overflow-hidden border-2 sm:border-4 border-white">
             
             <!-- Modal Header -->
-            <div class="px-8 py-6 border-b border-sky-100 bg-white flex justify-between items-center relative z-10">
-                <div class="flex items-center gap-4">
-                    <div class="text-4xl">🦊</div>
+            <div class="px-4 sm:px-8 py-4 sm:py-6 border-b border-sky-100 bg-white flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="text-3xl sm:text-4xl">🦊</div>
                     <div>
-                        <h3 id="dialog-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-500">วันที่ --/--/----</h3>
-                        <p class="text-sm text-slate-500 mt-1 font-medium">ได้เวลา Fika และท่องศัพท์แล้ว! (20 คำ)</p>
+                        <h3 id="dialog-title" class="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-500">วันที่ --/--/----</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">ได้เวลา Fika และท่องศัพท์แล้ว! (20 คำ)</p>
                     </div>
                 </div>
-                <button onclick="closeDialog()" class="text-slate-400 hover:text-blue-500 bg-slate-100 hover:bg-sky-50 p-3 rounded-full transition-all active:scale-90">
-                    <i class="ph-bold ph-x text-xl"></i>
+                <button onclick="closeDialog()" class="text-slate-400 hover:text-blue-500 bg-slate-100 hover:bg-sky-50 p-2 sm:p-3 rounded-full transition-all active:scale-90">
+                    <i class="ph-bold ph-x text-lg sm:text-xl"></i>
                 </button>
             </div>
             
-            <!-- Modal Body (Scrollable Vocab List) -->
-            <div id="dialog-content" class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+            <!-- Modal Body (Scrollable Vocab List) : เพิ่ม overscroll-contain -->
+            <div id="dialog-content" class="p-3 sm:p-4 md:p-8 overflow-y-auto custom-scrollbar overscroll-contain flex-1 space-y-3 sm:space-y-4">
                 <!-- Vocab list will be injected here -->
             </div>
             
             <!-- Modal Footer -->
-            <div class="px-8 py-5 border-t border-sky-100 bg-white flex justify-between items-center gap-3">
-                <div class="text-3xl hidden md:block">🇸🇪</div>
-                <div class="flex gap-3 w-full md:w-auto justify-end">
-                    <button onclick="closeDialog()" class="px-6 py-3 text-slate-600 font-bold hover:bg-sky-50 hover:text-blue-700 rounded-2xl transition-colors">
+            <div class="px-4 sm:px-8 py-4 border-t border-sky-100 bg-white flex justify-between items-center gap-3">
+                <div class="text-2xl sm:text-3xl hidden md:block">🇸🇪</div>
+                <div class="flex gap-2 sm:gap-3 w-full md:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-slate-600 font-bold hover:bg-sky-50 hover:text-blue-700 rounded-xl sm:rounded-2xl transition-colors">
                         ปิดไว้ก่อน
                     </button>
-                    <button id="btn-complete-day" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-sky-500 text-white font-bold hover:from-blue-600 hover:to-sky-600 rounded-2xl shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg">
-                        <i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!
+                    <button id="btn-complete-day" class="px-5 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-sky-500 text-white font-bold hover:from-blue-600 hover:to-sky-600 rounded-xl sm:rounded-2xl shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center gap-2 text-sm sm:text-lg w-full sm:w-auto justify-center">
+                        <i class="ph-bold ph-check-circle text-lg sm:text-xl"></i> ท่องเสร็จแล้ว!
                     </button>
                 </div>
             </div>
@@ -289,10 +295,10 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate(); 
             
             const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
+            let gridHTML = ''; // ใช้งาน String เพื่อความลื่นไหล (ลดการอัปเดต DOM ซ้ำซ้อน)
 
             for (let i = 0; i < firstDayIndex; i++) {
-                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[1.5rem] bg-sky-50/30 border border-dashed border-sky-200 opacity-40"></div>`;
+                gridHTML += `<div class="p-2 md:p-4 rounded-[1rem] sm:rounded-[1.5rem] bg-sky-50/30 border border-dashed border-sky-200 opacity-40"></div>`;
             }
 
             let completedThisMonth = 0;
@@ -304,7 +310,8 @@
                 
                 if (isCompleted) completedThisMonth++;
 
-                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-5 rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px]";
+                // ปรับความสูงขั้นต่ำ (min-h) ให้เตี้ยลงบนมือถือ จะได้ไม่ต้องไถหน้าจอเยอะ
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-2 sm:p-3 md:p-5 rounded-[1rem] sm:rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[70px] sm:min-h-[90px] md:min-h-[110px]";
                 
                 let stateClasses = "";
                 let indicatorHTML = "";
@@ -312,22 +319,21 @@
                 if (isCompleted) {
                     stateClasses = "bg-amber-50 border-amber-200 text-amber-800 shadow-sm";
                     indicatorHTML = `
-                        <div class="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-sm z-10 animate-bounce" style="animation-duration: 2s;">👑</div>
-                        <i class="ph-fill ph-check-circle text-amber-400 text-2xl md:text-3xl mt-1 opacity-60"></i>
+                        <div class="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-7 sm:h-7 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-[10px] sm:text-sm z-10 animate-bounce" style="animation-duration: 2s;">👑</div>
+                        <i class="ph-fill ph-check-circle text-amber-400 text-xl sm:text-2xl md:text-3xl mt-0.5 sm:mt-1 opacity-60"></i>
                     `;
                 } else if (isToday) {
                     stateClasses = "bg-gradient-to-b from-blue-400 to-sky-500 border-transparent text-white shadow-lg shadow-blue-500/40 today-pulse";
                     indicatorHTML = `
-                        <span class="text-[10px] md:text-xs font-bold bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm text-white">วันนี้</span>
+                        <span class="text-[9px] sm:text-[10px] md:text-xs font-bold bg-white/20 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mt-1 sm:mt-2 backdrop-blur-sm text-white leading-tight">วันนี้</span>
                     `;
                 } else {
                     stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-sky-300";
-                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-2xl md:text-3xl mt-1 group-hover:text-blue-400 transition-colors"></i>`;
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-xl sm:text-2xl md:text-3xl mt-0.5 sm:mt-1 group-hover:text-blue-400 transition-colors"></i>`;
                 }
 
-                // Check for Sunday/Saturday colors
                 const dayOfWeek = new Date(year, month, day).getDay();
-                let textStyle = "font-extrabold text-xl md:text-2xl font-english";
+                let textStyle = "font-extrabold text-lg sm:text-xl md:text-2xl font-english";
                 if (!isToday && !isCompleted) {
                     if (dayOfWeek === 0) textStyle += " text-rose-500";
                     else if (dayOfWeek === 6) textStyle += " text-blue-500";
@@ -339,8 +345,11 @@
                         ${indicatorHTML}
                     </div>
                 `;
-                grid.innerHTML += cardHTML;
+                gridHTML += cardHTML;
             }
+            
+            // อัปเดต DOM รอบเดียวเพื่อความลื่นไหล
+            grid.innerHTML = gridHTML;
 
             // Animate number change
             const completedEl = document.getElementById('summary-completed');
@@ -376,53 +385,55 @@
             title.innerText = `วันที่ ${displayDate}`;
 
             const vocabList = getRandomVocab();
-            content.innerHTML = '';
+            let contentHTML = ''; // ใช้งาน String เพื่อเรนเดอร์คำศัพท์ได้ลื่นและไวขึ้น
             
             vocabList.forEach((v, index) => {
-                // ดึงเฉพาะตัวหนังสือสวีเดนมาใช้เป็นเสียงอ่าน (ตัดส่วนวงเล็บคำอ่านภาษาไทยออก)
                 const targetWordOnly = v.word.split(' (')[0];
 
                 const itemHTML = `
-                    <div class="vocab-card p-5 bg-white border-2 border-sky-50 rounded-[2rem] hover:border-sky-300 hover:shadow-xl hover:shadow-sky-100/50 transition-all flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                    <div class="vocab-card p-4 sm:p-5 bg-white border-2 border-sky-50 rounded-[1.5rem] sm:rounded-[2rem] hover:border-sky-300 hover:shadow-xl hover:shadow-sky-100/50 transition-all flex flex-col md:flex-row gap-3 sm:gap-4 items-start relative overflow-hidden group">
                         
                         <!-- Cute background blob -->
                         <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-sky-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-                        <div class="blob-bg text-blue-700 w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm relative z-10 font-english">
+                        <div class="blob-bg text-blue-700 w-12 h-12 sm:w-14 sm:h-14 rounded-[1rem] sm:rounded-2xl flex items-center justify-center font-extrabold text-lg sm:text-xl shrink-0 shadow-sm relative z-10 font-english">
                             ${index + 1}
                         </div>
                         
                         <div class="flex-1 relative z-10 w-full">
                             <div class="flex justify-between items-start w-full">
-                                <h4 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-2 flex flex-wrap items-center gap-2 font-target tracking-wide w-full pr-12">
-                                    <span class="text-2xl md:text-3xl drop-shadow-sm mr-1">${v.icon}</span> 
+                                <h4 class="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-800 mb-1 sm:mb-2 flex flex-wrap items-center gap-1.5 sm:gap-2 font-target tracking-wide w-full pr-12">
+                                    <span class="text-xl sm:text-2xl md:text-3xl drop-shadow-sm">${v.icon}</span> 
                                     <span>${v.word}</span>
                                 </h4>
-                                <button onclick="speakWord('${targetWordOnly}')" class="absolute top-0 right-0 bg-sky-50 text-blue-600 hover:bg-blue-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียงสวีเดน">
-                                    <i class="ph-fill ph-speaker-high text-lg"></i>
+                                <button onclick="speakWord('${targetWordOnly}')" class="absolute top-0 right-0 bg-sky-50 text-blue-600 hover:bg-blue-500 hover:text-white p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-colors shadow-sm" title="ฟังเสียงสวีเดน">
+                                    <i class="ph-fill ph-speaker-high text-base sm:text-lg"></i>
                                 </button>
                             </div>
                             
-                            <div class="flex flex-wrap gap-2 mb-3 mt-1">
-                                <span class="text-blue-700 font-bold bg-blue-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 border border-blue-100">
+                            <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3 mt-1">
+                                <span class="text-blue-700 font-bold bg-blue-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 border border-blue-100">
                                     🇹🇭 ${v.meaning}
                                 </span>
-                                <span class="text-sky-600 font-bold bg-sky-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 font-english border border-sky-100">
+                                <span class="text-sky-600 font-bold bg-sky-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 font-english border border-sky-100">
                                     🇬🇧 ${v.english}
                                 </span>
                             </div>
                             
-                            <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 relative mt-3">
-                                <i class="ph-fill ph-quotes text-amber-200/50 text-4xl absolute -top-2 -left-1"></i>
-                                <p class="text-sm md:text-base text-slate-600 relative z-10 font-target pl-4 leading-relaxed">
+                            <div class="bg-amber-50/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-amber-100 relative mt-2 sm:mt-3">
+                                <i class="ph-fill ph-quotes text-amber-200/50 text-3xl sm:text-4xl absolute -top-1 sm:-top-2 -left-1"></i>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-600 relative z-10 font-target pl-3 sm:pl-4 leading-relaxed">
                                     ${v.example}
                                 </p>
                             </div>
                         </div>
                     </div>
                 `;
-                content.innerHTML += itemHTML;
+                contentHTML += itemHTML;
             });
+            
+            // อัปเดต DOM รอบเดียว
+            content.innerHTML = contentHTML;
 
             if (isCompleted) {
                 btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-xl"></i> ทบทวนเสร็จแล้ว (Bra jobbat!)`;
