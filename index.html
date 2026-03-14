@@ -124,15 +124,15 @@
         .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="min-h-screen pt-12 pb-32 md:pt-20"> <!-- Increased bottom padding for nav -->
+<body class="min-h-screen pt-8 md:pt-20 pb-24 md:pb-32"> <!-- ปรับ padding ให้เข้ากับมือถือมากขึ้น -->
 
-    <div class="max-w-4xl mx-auto px-6">
+    <div class="max-w-4xl mx-auto px-4 md:px-6">
         
         <!-- ============================================== -->
         <!-- VIEW 1: VOCABULARY (คลังคำศัพท์)                  -->
         <!-- ============================================== -->
         <div id="view-vocab" class="fade-entry block">
-            <header class="text-center mb-12">
+            <header class="text-center mb-10 md:mb-12">
                 <h2 class="text-xs uppercase tracking-[0.5em] mb-4 opacity-60 font-bold text-slate-500">Est. 2025</h2>
                 <h1 class="text-5xl md:text-7xl font-bold mb-2 tracking-tight italic">Crow Studio</h1>
                 <div class="header-line"></div>
@@ -154,28 +154,28 @@
         <!-- VIEW 2: TRANSLATE (แปลภาษา)                      -->
         <!-- ============================================== -->
         <div id="view-translate" class="fade-entry hidden">
-            <header class="text-center mb-8">
-                <h1 class="text-4xl md:text-5xl font-bold mb-2 tracking-tight italic">แปลภาษา</h1>
+            <header class="text-center mb-6 md:mb-8">
+                <h1 class="text-3xl md:text-5xl font-bold mb-2 tracking-tight italic">แปลภาษา</h1>
                 <div class="header-line"></div>
             </header>
 
-            <div class="glass-panel rounded-2xl p-4 md:p-6 mx-auto max-w-3xl">
+            <div class="glass-panel rounded-2xl p-3 md:p-6 mx-auto max-w-3xl">
                 
                 <!-- Language Select Controls -->
                 <div class="flex items-center justify-between bg-white/40 border border-slate-300 rounded-lg p-2 mb-4">
-                    <select id="lang-source" class="classic-select bg-transparent outline-none flex-1 text-center font-bold text-sm md:text-base cursor-pointer py-2 text-slate-800">
+                    <select id="lang-source" class="classic-select bg-transparent outline-none flex-1 text-center font-bold text-sm md:text-base cursor-pointer py-1.5 md:py-2 text-slate-800">
                         <option value="th">Thai</option>
                         <option value="en">English</option>
                         <!-- Populated by JS -->
                     </select>
                     
-                    <button id="btn-swap-lang" class="p-2 hover:bg-slate-200/50 rounded-full mx-2 transition-colors border border-slate-300 bg-white shadow-sm" title="สลับภาษา">
-                        <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <button id="btn-swap-lang" class="p-2 hover:bg-slate-200/50 rounded-full mx-1 md:mx-2 transition-colors border border-slate-300 bg-white shadow-sm" title="สลับภาษา">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                         </svg>
                     </button>
                     
-                    <select id="lang-target" class="classic-select bg-transparent outline-none flex-1 text-center font-bold text-sm md:text-base cursor-pointer py-2 text-slate-800">
+                    <select id="lang-target" class="classic-select bg-transparent outline-none flex-1 text-center font-bold text-sm md:text-base cursor-pointer py-1.5 md:py-2 text-slate-800">
                         <option value="en">English</option>
                         <option value="th">Thai</option>
                         <!-- Populated by JS -->
@@ -183,23 +183,32 @@
                 </div>
 
                 <!-- Input / Output Areas -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                     <!-- Source Input -->
-                    <div class="relative">
-                        <textarea id="text-source" class="w-full h-48 p-4 bg-white/60 border border-slate-300 rounded-xl outline-none resize-none text-lg md:text-xl placeholder:text-slate-400 placeholder:italic focus:border-slate-500 transition-colors" placeholder="ป้อนข้อความ..."></textarea>
-                        <button id="btn-translate" class="absolute bottom-4 right-4 bg-slate-800 text-white px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-slate-700 active:scale-95 transition-all shadow-md">
+                    <div class="relative flex flex-col">
+                        <!-- ปรับความสูงสำหรับมือถือ (h-36) และคอมพิวเตอร์ (h-48) เพิ่ม pb-16 ไม่ให้ข้อความทับปุ่ม -->
+                        <textarea id="text-source" class="w-full h-36 md:h-48 p-4 pb-16 bg-white/60 border border-slate-300 rounded-xl outline-none resize-none text-base md:text-xl placeholder:text-slate-400 placeholder:italic focus:border-slate-500 transition-colors shadow-inner" placeholder="ป้อนข้อความ..."></textarea>
+                        
+                        <!-- ปุ่มไมโครโฟนพิมพ์ด้วยเสียง -->
+                        <button id="btn-mic" class="absolute bottom-3 left-3 bg-slate-200 text-slate-700 p-2.5 rounded-full hover:bg-slate-300 active:scale-95 transition-all shadow-sm z-10" title="พิมพ์ด้วยเสียง">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                        </button>
+
+                        <button id="btn-translate" class="absolute bottom-3 right-3 bg-slate-800 text-white px-4 py-2.5 md:px-5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-slate-700 active:scale-95 transition-all shadow-md z-10">
                             แปลภาษา
                         </button>
                     </div>
                     
                     <!-- Target Output -->
-                    <div class="relative">
-                        <div id="text-target" class="w-full h-48 p-4 bg-slate-100/50 border border-slate-300 rounded-xl overflow-y-auto text-lg md:text-xl text-slate-800 italic">
+                    <div class="relative flex flex-col">
+                        <div id="text-target" class="w-full h-36 md:h-48 p-4 bg-slate-100/50 border border-slate-300 rounded-xl overflow-y-auto text-base md:text-xl text-slate-800 italic shadow-inner">
                             <span class="text-slate-400 opacity-60">คำแปลจะปรากฏที่นี่...</span>
                         </div>
                         
                         <!-- Loading Indicator -->
-                        <div id="translate-loading" class="hidden absolute inset-0 bg-slate-100/80 rounded-xl flex items-center justify-center">
+                        <div id="translate-loading" class="hidden absolute inset-0 bg-slate-100/80 rounded-xl flex items-center justify-center z-20">
                             <svg class="animate-spin h-8 w-8 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -211,28 +220,28 @@
         </div>
 
         <!-- Shared Footer -->
-        <footer class="text-center py-12 opacity-40 border-t border-slate-300 mt-12">
+        <footer class="text-center py-8 md:py-12 opacity-40 border-t border-slate-300 mt-8 md:mt-12">
             <p class="text-[10px] uppercase tracking-[0.3em]">
                 &copy; 2025 Crow Studio &bull; Archive Reference
             </p>
         </footer>
     </div>
 
-    <!-- Chat Interface (Adjusted position to not overlap bottom nav) -->
-    <div id="chat-widget" class="fixed bottom-24 right-6 z-50 flex flex-col items-end">
-        <div id="chat-box" class="hidden w-[calc(100vw-3rem)] sm:w-[320px] h-[400px] mb-4 rounded-lg overflow-hidden glass-panel flex flex-col shadow-2xl">
-            <div class="p-4 border-b border-slate-300 flex items-center justify-between bg-slate-100/50">
+    <!-- Chat Interface -->
+    <div id="chat-widget" class="fixed bottom-20 md:bottom-24 right-4 md:right-6 z-50 flex flex-col items-end">
+        <div id="chat-box" class="hidden w-[calc(100vw-2rem)] sm:w-[320px] h-[350px] md:h-[400px] mb-4 rounded-lg overflow-hidden glass-panel flex flex-col shadow-2xl">
+            <div class="p-3 md:p-4 border-b border-slate-300 flex items-center justify-between bg-slate-100/50">
                 <span class="text-xs font-bold tracking-tighter uppercase italic">Librarian Assistant</span>
                 <button onclick="toggleChat()" class="text-xl leading-none hover:opacity-50">×</button>
             </div>
             
-            <div id="chat-window" class="flex-1 p-6 overflow-y-auto space-y-4 text-sm italic leading-relaxed bg-white/30">
+            <div id="chat-window" class="flex-1 p-4 md:p-6 overflow-y-auto space-y-4 text-sm italic leading-relaxed bg-white/30">
                 <div class="text-slate-500">
                     "ยินดีต้อนรับสู่หอจดหมายเหตุ Crow Studio มีข้อมูลส่วนไหนที่คุณต้องการให้ผมค้นหาให้เป็นพิเศษไหมครับ?"
                 </div>
             </div>
 
-            <div class="p-4 border-t border-slate-200">
+            <div class="p-3 md:p-4 border-t border-slate-200">
                 <div class="flex items-center space-x-2">
                     <input type="text" id="user-input" placeholder="เขียนข้อความ..." class="chat-input flex-1 outline-none text-xs px-3 py-2 rounded border-slate-300">
                     <button id="send-btn" class="font-bold text-xs hover:underline uppercase text-slate-800">ส่ง</button>
@@ -251,10 +260,10 @@
     <!-- BOTTOM NAVIGATION BAR                            -->
     <!-- ============================================== -->
     <nav class="fixed bottom-0 left-0 w-full bg-[#f4f1ea] border-t border-slate-300 z-50 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-        <div class="flex justify-around items-center h-16 max-w-md mx-auto">
+        <div class="flex justify-around items-center h-14 md:h-16 max-w-md mx-auto">
             <!-- Tab 1: Vocab -->
             <button onclick="switchTab('vocab')" id="tab-btn-vocab" class="flex-1 flex flex-col items-center justify-center h-full opacity-100 transition-all text-slate-800">
-                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-5 h-5 md:w-6 md:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
                 </svg>
                 <span class="text-[10px] font-bold">คำศัพท์ 30 วัน</span>
@@ -262,7 +271,7 @@
             
             <!-- Tab 2: Translate -->
             <button onclick="switchTab('translate')" id="tab-btn-translate" class="flex-1 flex flex-col items-center justify-center h-full opacity-40 transition-all hover:opacity-70 text-slate-800">
-                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-5 h-5 md:w-6 md:h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
                 </svg>
                 <span class="text-[10px] font-bold">แปลภาษา</span>
@@ -272,53 +281,48 @@
 
     <script>
         // --- 1. Data & State Setup ---
-        // เพิ่มรหัสภาษา (transCode) สำหรับใช้กับ API แปลภาษา
         const languages = [
-            { id: 'th', name: 'Thailand', transCode: 'th', url: 'eng/thai30.html' },
-            { id: 'us', name: 'USA', transCode: 'en',  url: 'https://tontakankeawpang321-glitch.github.io/pasa30/eng/us30.html' },
-            { id: 'gb', name: 'Britain', transCode: 'en',url: 'eng/uk30.html' },
-            { id: 'cn', name: 'China', transCode: 'zh', url: 'eng/Ch30.html' },
-            { id: 'jp', name: 'Japan', transCode: 'ja',  url: 'eng/Jp30.html' },
-            { id: 'kr', name: 'Korea', transCode: 'ko',url: 'eng/ko.html' },
-            { id: 'vn', name: 'Vietnam', transCode: 'vi', url: 'eng/vien30.html' },
-            { id: 'mm', name: 'Myanmar', transCode: 'my',url: 'eng/Ma30.html' },
-            { id: 'kh', name: 'Cambodia', transCode: 'km',url: 'eng/cambodian30.html' },
-            { id: 'ru', name: 'Russia', transCode: 'ru', url: 'eng/rusia30.html' },
-            { id: 'de', name: 'Germany', transCode: 'de',url: 'eng/germany30.html' },
-            { id: 'es', name: 'Spain', transCode: 'es', url: 'eng/spain30.html' },
-            { id: 'fr', name: 'France', transCode: 'fr', url: 'eng/freanch30.html' },
-            { id: 'it', name: 'Italy', transCode: 'it', url: 'eng/italy30.html' },
-            { id: 'in', name: 'India', transCode: 'hi', url: 'eng/india30.html' },
-            { id: 'id', name: 'Indonesia', transCode: 'id', url: 'eng/indoenesia30.html' },
-            { id: 'pt', name: 'Portugal', transCode: 'pt', url: 'eng/protukas30.html' },
-            { id: 'nl', name: 'Netherlands', transCode: 'nl', url: 'eng/netherland30.html' },
-            { id: 'tr', name: 'Turkey', transCode: 'tr', url: 'eng/turky30.html' },
-            { id: 'sa', name: 'Saudi Arabia', transCode: 'ar', url: 'eng/saui30.html' },
-            { id: 'br', name: 'Brazil', transCode: 'pt', url: 'eng/brazile30.html' },
-            { id: 'se', name: 'Sweden', transCode: 'sv', url: 'eng/sweden30.html' },
-            { id: 'pl', name: 'Poland', transCode: 'pl', url: 'eng/poland30.html.html' },
-            { id: 'ph', name: 'Philippines', transCode: 'tl', url: 'eng/philipinn30.html' },
+            { id: 'th', name: 'Thailand', transCode: 'th', url: '#' },
+            { id: 'us', name: 'USA', transCode: 'en', url: 'https://sites.google.com/view/pasa30one/%E0%B8%AD%E0%B9%80%E0%B8%A1%E0%B8%A3%E0%B8%81%E0%B8%B2-us' },
+            { id: 'gb', name: 'Britain', transCode: 'en', url: 'https://sites.google.com/view/pasa30one/%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B8%AD%E0%B8%87%E0%B8%81%E0%B8%A4%E0%B8%A9-uk' },
+            { id: 'cn', name: 'China', transCode: 'zh', url: 'https://sites.google.com/view/pasa30one/%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B8%88%E0%B8%99-ch' },
+            { id: 'jp', name: 'Japan', transCode: 'ja', url: 'https://sites.google.com/view/pasa30one/%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B8%8D%E0%B8%9B%E0%B8%99-jp' },
+            { id: 'kr', name: 'Korea', transCode: 'ko', url: 'https://sites.google.com/view/pasa30one/%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%80%E0%B8%A1%E0%B8%A3%E0%B8%81%E0%B8%B2-us' },
+            { id: 'vn', name: 'Vietnam', transCode: 'vi', url: 'https://sites.google.com/view/pasa30one/%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%80%E0%B8%A7%E0%B8%A2%E0%B8%94%E0%B8%99%E0%B8%B2%E0%B8%A1-vein' },
+            { id: 'mm', name: 'Myanmar', transCode: 'my', url: 'https://sites.google.com/view/pasa30one/%E0%B8%9E%E0%B8%A1%E0%B8%B2-ma' },
+            { id: 'kh', name: 'Cambodia', transCode: 'km', url: 'https://sites.google.com/view/pasa30one/%E0%B8%81%E0%B8%A1%E0%B8%9E%E0%B8%8A%E0%B8%B2-kom' },
+            { id: 'ru', name: 'Russia', transCode: 'ru', url: 'https://sites.google.com/view/pasa30one/%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B8%A3%E0%B8%AA%E0%B9%80%E0%B8%8B%E0%B8%A2-rus' },
+            { id: 'de', name: 'Germany', transCode: 'de', url: 'https://sites.google.com/view/pasa30one/%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B9%80%E0%B8%A2%E0%B8%AD%E0%B8%A3%E0%B8%A1%E0%B8%99-ge' },
+            { id: 'es', name: 'Spain', transCode: 'es', url: 'https://sites.google.com/view/pasa30one/%E0%B8%A0%E0%B8%B2%E0%B8%A9%E0%B8%B2%E0%B8%AA%E0%B9%80%E0%B8%9B%E0%B8%99-sp' },
+            { id: 'fr', name: 'France', transCode: 'fr', url: '#' },
+            { id: 'it', name: 'Italy', transCode: 'it', url: '#' },
+            { id: 'in', name: 'India', transCode: 'hi', url: '#' },
+            { id: 'id', name: 'Indonesia', transCode: 'id', url: '#' },
+            { id: 'pt', name: 'Portugal', transCode: 'pt', url: '#' },
+            { id: 'nl', name: 'Netherlands', transCode: 'nl', url: '#' },
+            { id: 'tr', name: 'Turkey', transCode: 'tr', url: '#' },
+            { id: 'sa', name: 'Saudi Arabia', transCode: 'ar', url: '#' },
+            { id: 'br', name: 'Brazil', transCode: 'pt', url: '#' },
+            { id: 'se', name: 'Sweden', transCode: 'sv', url: '#' },
+            { id: 'pl', name: 'Poland', transCode: 'pl', url: '#' },
+            { id: 'ph', name: 'Philippines', transCode: 'tl', url: '#' }
         ];
 
         // --- 2. Navigation Logic ---
         function switchTab(tabId) {
-            // Views
             const viewVocab = document.getElementById('view-vocab');
             const viewTranslate = document.getElementById('view-translate');
-            // Buttons
             const btnVocab = document.getElementById('tab-btn-vocab');
             const btnTranslate = document.getElementById('tab-btn-translate');
 
             if (tabId === 'vocab') {
                 viewVocab.classList.remove('hidden');
                 viewTranslate.classList.add('hidden');
-                
                 btnVocab.classList.replace('opacity-40', 'opacity-100');
                 btnTranslate.classList.replace('opacity-100', 'opacity-40');
             } else if (tabId === 'translate') {
                 viewVocab.classList.add('hidden');
                 viewTranslate.classList.remove('hidden');
-                
                 btnTranslate.classList.replace('opacity-40', 'opacity-100');
                 btnVocab.classList.replace('opacity-100', 'opacity-40');
             }
@@ -355,7 +359,6 @@
 
         renderGrid(languages);
 
-
         // --- 4. Translate Feature Setup ---
         const selSource = document.getElementById('lang-source');
         const selTarget = document.getElementById('lang-target');
@@ -364,8 +367,8 @@
         const textTarget = document.getElementById('text-target');
         const btnTranslate = document.getElementById('btn-translate');
         const translateLoading = document.getElementById('translate-loading');
+        const btnMic = document.getElementById('btn-mic');
 
-        // Populate language dropdowns (removing duplicates for dropdown)
         function populateLangDropdowns() {
             const uniqueLangs = [];
             const map = new Map();
@@ -375,29 +378,21 @@
                     uniqueLangs.push({ code: item.transCode, name: item.name });
                 }
             }
-            
-            // Sort alphabetically by name
             uniqueLangs.sort((a,b) => a.name.localeCompare(b.name));
-
             let optionsHTML = '';
             uniqueLangs.forEach(l => {
                 optionsHTML += `<option value="${l.code}">${l.name}</option>`;
             });
-
-            // Set custom options
             selSource.innerHTML = `<option value="th">Thailand</option><option value="en">English (US/UK)</option>` + optionsHTML;
             selTarget.innerHTML = `<option value="en">English (US/UK)</option><option value="th">Thailand</option>` + optionsHTML;
         }
         
         populateLangDropdowns();
 
-        // Swap Languages
         btnSwap.addEventListener('click', () => {
             const tempVal = selSource.value;
             selSource.value = selTarget.value;
             selTarget.value = tempVal;
-            
-            // Swap text if any exists
             if(textSource.value.trim() && textTarget.innerText.trim() !== 'คำแปลจะปรากฏที่นี่...') {
                 const tempText = textSource.value;
                 textSource.value = textTarget.innerText;
@@ -405,7 +400,6 @@
             }
         });
 
-        // Translate Logic (Using free MyMemory API for demo purposes)
         btnTranslate.addEventListener('click', async () => {
             const textToTranslate = textSource.value.trim();
             if (!textToTranslate) return;
@@ -413,12 +407,10 @@
             const fromLang = selSource.value;
             const toLang = selTarget.value;
 
-            // Show loading
             translateLoading.classList.remove('hidden');
             textTarget.innerHTML = '';
 
             try {
-                // Using a public free translation API for demonstration
                 const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=${fromLang}|${toLang}`);
                 const data = await res.json();
                 
@@ -430,10 +422,60 @@
             } catch (error) {
                 textTarget.innerHTML = `<span class="text-red-500">ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์แปลภาษาได้</span>`;
             } finally {
-                // Hide loading
                 translateLoading.classList.add('hidden');
             }
         });
+
+        // --- 4.1 Speech to Text (พิมพ์ด้วยเสียง) ---
+        let recognition = null;
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                btnMic.classList.remove('bg-slate-200', 'text-slate-700');
+                btnMic.classList.add('bg-red-500', 'text-white', 'animate-pulse');
+                textSource.placeholder = "กำลังฟังเสียงของคุณ...";
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                textSource.value += (textSource.value ? ' ' : '') + transcript;
+            };
+
+            recognition.onerror = function(event) {
+                console.error("เกิดข้อผิดพลาดในการรับเสียง", event.error);
+                resetMicUI();
+            };
+
+            recognition.onend = function() {
+                resetMicUI();
+            };
+
+            btnMic.addEventListener('click', () => {
+                let langCode = selSource.value;
+                if (langCode === 'th') langCode = 'th-TH';
+                else if (langCode === 'en') langCode = 'en-US';
+                
+                recognition.lang = langCode;
+
+                try {
+                    recognition.start();
+                } catch (e) {
+                    recognition.stop();
+                }
+            });
+        } else {
+            btnMic.style.display = 'none'; // ซ่อนปุ่มถ้าเบราว์เซอร์ไม่รองรับ
+        }
+
+        function resetMicUI() {
+            btnMic.classList.add('bg-slate-200', 'text-slate-700');
+            btnMic.classList.remove('bg-red-500', 'text-white', 'animate-pulse');
+            textSource.placeholder = "ป้อนข้อความ...";
+        }
 
 
         // --- 5. Chatbot Setup ---
