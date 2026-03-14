@@ -169,26 +169,26 @@
         }
 
         const vocabPool = [
-            { word: "Hallo", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Hallo! Wie geht es dir? (สวัสดี! สบายดีไหม?)" },
-            { word: "Danke", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Vielen Dank für deine Hilfe. (ขอบคุณมากสำหรับความช่วยเหลือ)" },
-            { word: "Bitte", meaning: "ขอร้อง/ไม่เป็นไร", english: "Please/Welcome", icon: "✨", example: "Bitte schön! (ด้วยความยินดี!)" },
-            { word: "Ja", meaning: "ใช่", english: "Yes", icon: "✅", example: "Ja, das stimmt. (ใช่ นั่นถูกต้องแล้ว)" },
-            { word: "Nein", meaning: "ไม่", english: "No", icon: "❌", example: "Nein, danke. (ไม่ครับ ขอบคุณ)" },
-            { word: "Wasser", meaning: "น้ำ", english: "Water", icon: "💧", example: "Ein Glas Wasser, bitte. (ขอน้ำหนึ่งแก้วครับ)" },
-            { word: "Brot", meaning: "ขนมปัง", english: "Bread", icon: "🍞", example: "Frisches Brot riecht gut. (ขนมปังสดใหม่กลิ่นหอมจัง)" },
-            { word: "Freund", meaning: "เพื่อน", english: "Friend", icon: "🤝", example: "Er ist mein bester Freund. (เขาคือเพื่อนที่ดีที่สุดของฉัน)" },
-            { word: "Lernen", meaning: "เรียนรู้", english: "To learn", icon: "📖", example: "Ich lerne Deutsch. (ฉันกำลังเรียนภาษาเยอรมัน)" },
-            { word: "Schön", meaning: "สวย/ดี", english: "Beautiful", icon: "🌸", example: "Das ist ein schöner Tag. (วันนี้เป็นวันที่สวยงาม)" },
-            { word: "Heute", meaning: "วันนี้", english: "Today", icon: "📅", example: "Was machst du heute? (วันนี้คุณทำอะไร?)" },
-            { word: "Morgen", meaning: "พรุ่งนี้", english: "Tomorrow", icon: "⏭️", example: "Bis morgen! (เจอกันพรุ่งนี้!)" },
-            { word: "Geld", meaning: "เงิน", english: "Money", icon: "💶", example: "Ich habe kein Geld. (ฉันไม่มีเงิน)" },
-            { word: "Auto", meaning: "รถ", english: "Car", icon: "🚗", example: "Das Auto ist neu. (รถคันนี้ใหม่มาก)" },
-            { word: "Essen", meaning: "กิน/อาหาร", english: "To eat", icon: "🍽️", example: "Ich möchte essen. (ฉันอยากทานอาหาร)" },
-            { word: "Trinken", meaning: "ดื่ม", english: "To drink", icon: "🥤", example: "Wir trinken Saft. (พวกเราดื่มน้ำผลไม้)" },
-            { word: "Groß", meaning: "ใหญ่", english: "Large", icon: "🐘", example: "Das Haus ist groß. (บ้านหลังนี้ใหญ่มาก)" },
-            { word: "Klein", meaning: "เล็ก", english: "Small", icon: "🐭", example: "Der Hundเป็นตัวเล็ก. (สุนัขตัวนี้เล็ก)" },
-            { word: "Schnell", meaning: "เร็ว", english: "Fast", icon: "⚡", example: "Lauf schnell! (วิ่งเร็วเข้า!)" },
-            { word: "Langsam", meaning: "ช้า", english: "Slow", icon: "🐢", example: "Geh langsam. (เดินช้าๆ)" }
+            { word: "Hallo", pronunciation: "ฮัล-โล", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Hallo! Wie geht es dir? (สวัสดี! สบายดีไหม?)" },
+            { word: "Danke", pronunciation: "ดัง-เคอะ", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Vielen Dank für deine Hilfe. (ขอบคุณมากสำหรับความช่วยเหลือ)" },
+            { word: "Bitte", pronunciation: "บิท-เทอะ", meaning: "ขอร้อง/ไม่เป็นไร", english: "Please/Welcome", icon: "✨", example: "Bitte schön! (ด้วยความยินดี!)" },
+            { word: "Ja", pronunciation: "ยา", meaning: "ใช่", english: "Yes", icon: "✅", example: "Ja, das stimmt. (ใช่ นั่นถูกต้องแล้ว)" },
+            { word: "Nein", pronunciation: "นายน์", meaning: "ไม่", english: "No", icon: "❌", example: "Nein, danke. (ไม่ครับ ขอบคุณ)" },
+            { word: "Wasser", pronunciation: "วาส-เซอร์", meaning: "น้ำ", english: "Water", icon: "💧", example: "Ein Glas Wasser, bitte. (ขอน้ำหนึ่งแก้วครับ)" },
+            { word: "Brot", pronunciation: "โบรท", meaning: "ขนมปัง", english: "Bread", icon: "🍞", example: "Frisches Brot riecht gut. (ขนมปังสดใหม่กลิ่นหอมจัง)" },
+            { word: "Freund", pronunciation: "ฟรอยนท์", meaning: "เพื่อน", english: "Friend", icon: "🤝", example: "Er ist mein bester Freund. (เขาคือเพื่อนที่ดีที่สุดของฉัน)" },
+            { word: "Lernen", pronunciation: "แลร์-เนิน", meaning: "เรียนรู้", english: "To learn", icon: "📖", example: "Ich lerne Deutsch. (ฉันกำลังเรียนภาษาเยอรมัน)" },
+            { word: "Schön", pronunciation: "เชิน", meaning: "สวย/ดี", english: "Beautiful", icon: "🌸", example: "Das ist ein schöner Tag. (วันนี้เป็นวันที่สวยงาม)" },
+            { word: "Heute", pronunciation: "ฮอย-เทอะ", meaning: "วันนี้", english: "Today", icon: "📅", example: "Was machst du heute? (วันนี้คุณทำอะไร?)" },
+            { word: "Morgen", pronunciation: "มอร์-เกิน", meaning: "พรุ่งนี้", english: "Tomorrow", icon: "⏭️", example: "Bis morgen! (เจอกันพรุ่งนี้!)" },
+            { word: "Geld", pronunciation: "เกลท์", meaning: "เงิน", english: "Money", icon: "💶", example: "Ich habe kein Geld. (ฉันไม่มีเงิน)" },
+            { word: "Auto", pronunciation: "เอา-โท", meaning: "รถ", english: "Car", icon: "🚗", example: "Das Auto ist neu. (รถคันนี้ใหม่มาก)" },
+            { word: "Essen", pronunciation: "เอส-เซิน", meaning: "กิน/อาหาร", english: "To eat", icon: "🍽️", example: "Ich möchte essen. (ฉันอยากทานอาหาร)" },
+            { word: "Trinken", pronunciation: "ทริน-เคิน", meaning: "ดื่ม", english: "To drink", icon: "🥤", example: "Wir trinken Saft. (พวกเราดื่มน้ำผลไม้)" },
+            { word: "Groß", pronunciation: "โกรส", meaning: "ใหญ่", english: "Large", icon: "🐘", example: "Das Haus ist groß. (บ้านหลังนี้ใหญ่มาก)" },
+            { word: "Klein", pronunciation: "ไคลน์", meaning: "เล็ก", english: "Small", icon: "🐭", example: "Der Hund ist klein. (สุนัขตัวนี้เล็ก)" },
+            { word: "Schnell", pronunciation: "ชเนล", meaning: "เร็ว", english: "Fast", icon: "⚡", example: "Lauf schnell! (วิ่งเร็วเข้า!)" },
+            { word: "Langsam", pronunciation: "ลัง-ซาม", meaning: "ช้า", english: "Slow", icon: "🐢", example: "Geh langsam. (เดินช้าๆ)" }
         ];
 
         function renderCalendar() {
@@ -262,6 +262,7 @@
                                     <i class="ph-fill ph-speaker-high"></i>
                                 </button>
                             </div>
+                            <p class="text-sm font-medium text-slate-500 mb-1">[${v.pronunciation}]</p>
                             <p class="text-sm font-bold text-indigo-600 mb-2">🇹🇭 ${v.meaning}</p>
                             <p class="text-xs text-slate-500 italic leading-relaxed border-l-2 border-amber-400 pl-2">
                                 "${v.example}"
