@@ -2,8 +2,10 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>ท่องจีน — Calendar Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Phosphor Icons for UI -->
@@ -16,6 +18,7 @@
             background-color: #fff1f2;
             background-image: radial-gradient(#fecdd3 1px, transparent 1px);
             background-size: 20px 20px;
+            -webkit-tap-highlight-color: transparent; /* ทำให้ปุ่มกดบนมือถือดูเนียนขึ้น */
         }
         h1, h2, h3, .font-english {
             font-family: 'Fredoka', 'Sarabun', sans-serif;
@@ -54,36 +57,36 @@
         .today-pulse { animation: softPulse 2s infinite; }
     </style>
 </head>
-<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-slate-800 p-3 sm:p-4 md:p-8 min-h-screen flex flex-col items-center">
 
-    <div class="w-full max-w-4xl space-y-6">
+    <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
         <!-- Header & Summary Section -->
-        <div class="bg-white/80 backdrop-blur-lg rounded-[2rem] p-6 md:p-8 shadow-xl shadow-rose-100/50 border border-white">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="bg-white/80 backdrop-blur-lg rounded-[2rem] p-5 md:p-8 shadow-xl shadow-rose-100/50 border border-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
                 <!-- Title & Mascot -->
-                <div class="flex items-center gap-4">
-                    <div class="text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🐼</div>
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="text-4xl sm:text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🐼</div>
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400 mb-1">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400 mb-1 leading-tight">
                             Daily Chinese Vocab
                         </h1>
-                        <p class="text-slate-500 font-medium text-sm md:text-base flex items-center gap-1">
+                        <p class="text-slate-500 font-medium text-xs sm:text-sm md:text-base flex items-center gap-1">
                             ท่องศัพท์วันละ 20 คำ กับน้องแพนด้า! 🎋
                         </p>
                     </div>
                 </div>
 
                 <!-- Monthly Summary Card -->
-                <div class="bg-gradient-to-tr from-amber-400 to-red-400 p-5 rounded-3xl w-full md:w-auto flex items-center gap-5 shadow-lg shadow-red-200 text-white transform hover:scale-105 transition-transform duration-300">
-                    <div class="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30">
+                <div class="bg-gradient-to-tr from-amber-400 to-red-400 p-4 md:p-5 rounded-[1.5rem] md:rounded-3xl w-full md:w-auto flex items-center gap-4 shadow-lg shadow-red-200 text-white transform md:hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white/20 backdrop-blur-sm w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center text-2xl md:text-3xl shadow-inner border border-white/30 shrink-0">
                         🏆
                     </div>
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-red-50 mb-1">สรุปการเรียนเดือนนี้</p>
-                        <p class="text-3xl font-extrabold leading-none">
+                        <p class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-red-50 mb-0.5 md:mb-1">สรุปการเรียนเดือนนี้</p>
+                        <p class="text-2xl md:text-3xl font-extrabold leading-none">
                             <span id="summary-completed">0</span>
-                            <span class="text-xl font-medium text-red-100">/ <span id="summary-total">30</span> วัน</span>
+                            <span class="text-lg md:text-xl font-medium text-red-100">/ <span id="summary-total">30</span> วัน</span>
                         </p>
                     </div>
                 </div>
@@ -91,37 +94,37 @@
         </div>
 
         <!-- Calendar Section -->
-        <div class="bg-white/90 backdrop-blur-lg rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-rose-100/40 border border-white">
+        <div class="bg-white/90 backdrop-blur-lg rounded-[2rem] md:rounded-[2.5rem] p-4 sm:p-6 md:p-8 shadow-xl shadow-rose-100/40 border border-white">
             
             <!-- Calendar Header (Month Navigation) -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="text-3xl">🗓️</div>
-                    <h2 id="month-year-display" class="text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 md:mb-8 gap-4">
+                <div class="flex items-center gap-2 md:gap-3">
+                    <div class="text-2xl md:text-3xl">🗓️</div>
+                    <h2 id="month-year-display" class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
                 </div>
                 
-                <div class="flex gap-2 bg-slate-100 p-1.5 rounded-2xl">
-                    <button onclick="changeMonth(-1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-500 transition-all active:scale-95">
+                <div class="flex gap-1.5 md:gap-2 bg-slate-100 p-1 md:p-1.5 rounded-2xl w-full sm:w-auto justify-between sm:justify-start">
+                    <button onclick="changeMonth(-1)" class="p-2 sm:p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-500 transition-all active:scale-95 flex-1 sm:flex-none flex justify-center">
                         <i class="ph-bold ph-caret-left text-lg"></i>
                     </button>
-                    <button onclick="goToToday()" class="px-5 py-2 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-700 font-bold transition-all active:scale-95 text-sm">
+                    <button onclick="goToToday()" class="px-4 sm:px-5 py-2 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-700 font-bold transition-all active:scale-95 text-xs sm:text-sm flex-[2] sm:flex-none text-center">
                         กลับมาวันนี้
                     </button>
-                    <button onclick="changeMonth(1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-500 transition-all active:scale-95">
+                    <button onclick="changeMonth(1)" class="p-2 sm:p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-500 transition-all active:scale-95 flex-1 sm:flex-none flex justify-center">
                         <i class="ph-bold ph-caret-right text-lg"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Days of Week -->
-            <div class="grid grid-cols-7 gap-2 md:gap-3 mb-3 text-center font-bold text-slate-400 text-xs md:text-sm uppercase tracking-wider">
+            <div class="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 mb-3 text-center font-bold text-slate-400 text-[10px] sm:text-xs md:text-sm uppercase tracking-wider">
                 <div class="text-red-400">Sun</div>
                 <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
                 <div class="text-blue-400">Sat</div>
             </div>
 
             <!-- Calendar Grid -->
-            <div id="calendar-grid" class="grid grid-cols-7 gap-2 md:gap-3">
+            <div id="calendar-grid" class="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3">
                 <!-- Days will be generated by JS -->
             </div>
         </div>
@@ -139,36 +142,36 @@
         <div class="absolute inset-0 bg-red-900/30 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
         
         <!-- Modal Content -->
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-3xl bg-[#fffafb] rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-4 border-white">
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] sm:w-[90%] max-w-3xl bg-[#fffafb] rounded-[2rem] md:rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-2 md:border-4 border-white">
             
             <!-- Modal Header -->
-            <div class="px-8 py-6 border-b border-rose-100 bg-white flex justify-between items-center relative z-10">
-                <div class="flex items-center gap-4">
-                    <div class="text-4xl">🏮</div>
+            <div class="px-5 py-4 md:px-8 md:py-6 border-b border-rose-100 bg-white flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="text-3xl md:text-4xl">🏮</div>
                     <div>
-                        <h3 id="dialog-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">วันที่ --/--/----</h3>
-                        <p class="text-sm text-slate-500 mt-1 font-medium">มาเก็บศัพท์เข้าสมองกันเถอะ! (20 คำ)</p>
+                        <h3 id="dialog-title" class="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">วันที่ --/--/----</h3>
+                        <p class="text-xs md:text-sm text-slate-500 mt-0.5 md:mt-1 font-medium">มาเก็บศัพท์เข้าสมองกันเถอะ! (20 คำ)</p>
                     </div>
                 </div>
-                <button onclick="closeDialog()" class="text-slate-400 hover:text-rose-500 bg-slate-100 hover:bg-rose-50 p-3 rounded-full transition-all active:scale-90">
-                    <i class="ph-bold ph-x text-xl"></i>
+                <button onclick="closeDialog()" class="text-slate-400 hover:text-rose-500 bg-slate-100 hover:bg-rose-50 p-2 md:p-3 rounded-full transition-all active:scale-90 shrink-0">
+                    <i class="ph-bold ph-x text-lg md:text-xl"></i>
                 </button>
             </div>
             
             <!-- Modal Body (Scrollable Vocab List) -->
-            <div id="dialog-content" class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+            <div id="dialog-content" class="p-3 sm:p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-3 md:space-y-4">
                 <!-- Vocab list will be injected here -->
             </div>
             
             <!-- Modal Footer -->
-            <div class="px-8 py-5 border-t border-rose-100 bg-white flex justify-between items-center gap-3">
+            <div class="px-4 py-4 md:px-8 md:py-5 border-t border-rose-100 bg-white flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div class="text-3xl hidden md:block">🎉</div>
-                <div class="flex gap-3 w-full md:w-auto justify-end">
-                    <button onclick="closeDialog()" class="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-2xl transition-colors">
+                <div class="flex gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-4 py-2.5 md:px-6 md:py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-xl md:rounded-2xl transition-colors text-sm md:text-base flex-1 sm:flex-none">
                         ปิดไว้ก่อน
                     </button>
-                    <button id="btn-complete-day" class="px-8 py-3 bg-gradient-to-r from-rose-500 to-orange-400 text-white font-bold hover:from-rose-600 hover:to-orange-500 rounded-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg">
-                        <i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!
+                    <button id="btn-complete-day" class="px-5 py-2.5 md:px-8 md:py-3 bg-gradient-to-r from-rose-500 to-orange-400 text-white font-bold hover:from-rose-600 hover:to-orange-500 rounded-xl md:rounded-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm md:text-lg flex-[2] sm:flex-none">
+                        <i class="ph-bold ph-check-circle text-lg md:text-xl"></i> ท่องเสร็จแล้ว!
                     </button>
                 </div>
             </div>
@@ -289,10 +292,10 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate(); 
             
             const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
+            let gridHTML = '';
 
             for (let i = 0; i < firstDayIndex; i++) {
-                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[1.5rem] bg-rose-50/50 border border-dashed border-rose-200 opacity-40"></div>`;
+                gridHTML += `<div class="p-1 sm:p-2 md:p-4 rounded-xl md:rounded-[1.5rem] bg-rose-50/50 border border-dashed border-rose-200 opacity-40"></div>`;
             }
 
             let completedThisMonth = 0;
@@ -304,7 +307,7 @@
                 
                 if (isCompleted) completedThisMonth++;
 
-                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-5 rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px]";
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-2 sm:p-3 md:p-5 rounded-xl md:rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[60px] sm:min-h-[80px] md:min-h-[110px]";
                 
                 let stateClasses = "";
                 let indicatorHTML = "";
@@ -312,35 +315,36 @@
                 if (isCompleted) {
                     stateClasses = "bg-amber-50 border-amber-200 text-amber-800 shadow-sm";
                     indicatorHTML = `
-                        <div class="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-sm z-10 animate-bounce" style="animation-duration: 2s;">🌟</div>
-                        <i class="ph-fill ph-check-circle text-amber-400 text-2xl md:text-3xl mt-1 opacity-60"></i>
+                        <div class="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 w-5 h-5 md:w-7 md:h-7 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-[10px] md:text-sm z-10 animate-bounce" style="animation-duration: 2s;">🌟</div>
+                        <i class="ph-fill ph-check-circle text-amber-400 text-lg sm:text-xl md:text-3xl mt-0.5 md:mt-1 opacity-60"></i>
                     `;
                 } else if (isToday) {
-                    stateClasses = "bg-gradient-to-b from-rose-400 to-orange-400 border-transparent text-white shadow-lg shadow-rose-400/40 today-pulse";
+                    stateClasses = "bg-gradient-to-b from-rose-400 to-orange-400 border-transparent text-white shadow-md md:shadow-lg shadow-rose-400/40 today-pulse";
                     indicatorHTML = `
-                        <span class="text-[10px] md:text-xs font-bold bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm">วันนี้</span>
+                        <span class="text-[8px] sm:text-[10px] md:text-xs font-bold bg-white/20 px-2 py-0.5 md:px-3 md:py-1 rounded-full mt-1 md:mt-2 backdrop-blur-sm">วันนี้</span>
                     `;
                 } else {
                     stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-rose-300";
-                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-2xl md:text-3xl mt-1 group-hover:text-rose-400 transition-colors"></i>`;
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-lg sm:text-xl md:text-3xl mt-0.5 md:mt-1 group-hover:text-rose-400 transition-colors"></i>`;
                 }
 
                 // Check for Sunday/Saturday colors
                 const dayOfWeek = new Date(year, month, day).getDay();
-                let textStyle = "font-extrabold text-xl md:text-2xl font-english";
+                let textStyle = "font-extrabold text-base sm:text-lg md:text-2xl font-english";
                 if (!isToday && !isCompleted) {
                     if (dayOfWeek === 0) textStyle += " text-red-500";
                     else if (dayOfWeek === 6) textStyle += " text-blue-500";
                 }
 
-                const cardHTML = `
+                gridHTML += `
                     <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
                         <span class="${textStyle}">${day}</span>
                         ${indicatorHTML}
                     </div>
                 `;
-                grid.innerHTML += cardHTML;
             }
+            
+            grid.innerHTML = gridHTML;
 
             // Animate number change
             const completedEl = document.getElementById('summary-completed');
@@ -376,53 +380,53 @@
             title.innerText = `วันที่ ${displayDate}`;
 
             const vocabList = getRandomVocab();
-            content.innerHTML = '';
+            let contentHTML = '';
             
             vocabList.forEach((v, index) => {
                 // ดึงเฉพาะตัวอักษรจีนหน้าวงเล็บมาใช้ให้ระบบอ่าน
                 const chineseWordOnly = v.word.split(' (')[0];
 
-                const itemHTML = `
-                    <div class="vocab-card p-5 bg-white border-2 border-slate-100 rounded-[2rem] hover:border-rose-300 hover:shadow-xl hover:shadow-rose-100/50 transition-all flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                contentHTML += `
+                    <div class="vocab-card p-4 md:p-5 bg-white border-2 border-slate-100 rounded-2xl md:rounded-[2rem] hover:border-rose-300 hover:shadow-xl hover:shadow-rose-100/50 transition-all flex flex-col md:flex-row gap-3 md:gap-4 items-start relative overflow-hidden group">
                         
                         <!-- Cute background blob -->
-                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-rose-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div class="absolute -right-10 -bottom-10 w-24 h-24 md:w-32 md:h-32 bg-rose-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-                        <div class="blob-bg text-rose-600 w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm relative z-10 font-english">
+                        <div class="blob-bg text-rose-600 w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center font-extrabold text-lg md:text-xl shrink-0 shadow-sm relative z-10 font-english">
                             ${index + 1}
                         </div>
                         
                         <div class="flex-1 relative z-10 w-full">
-                            <div class="flex justify-between items-start w-full">
-                                <h4 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-2 flex flex-wrap items-center gap-2 font-chinese tracking-wide w-full pr-12">
-                                    <span class="text-2xl md:text-3xl drop-shadow-sm mr-1">${v.icon}</span> 
-                                    <span>${v.word}</span>
+                            <div class="flex justify-between items-start w-full gap-2">
+                                <h4 class="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-800 mb-1.5 md:mb-2 flex flex-wrap items-center gap-1.5 md:gap-2 font-chinese tracking-wide w-full pr-8 md:pr-12">
+                                    <span class="text-xl md:text-3xl drop-shadow-sm">${v.icon}</span> 
+                                    <span class="leading-tight">${v.word}</span>
                                 </h4>
-                                <button onclick="speakWord('${chineseWordOnly}')" class="absolute top-0 right-0 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียงจีน (Google TTS)">
-                                    <i class="ph-fill ph-speaker-high text-lg"></i>
+                                <button onclick="speakWord('${chineseWordOnly}')" class="absolute top-0 right-0 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white p-1.5 md:p-2 rounded-lg md:rounded-xl transition-colors shadow-sm shrink-0" title="ฟังเสียงจีน (Google TTS)">
+                                    <i class="ph-fill ph-speaker-high text-base md:text-lg"></i>
                                 </button>
                             </div>
                             
-                            <div class="flex flex-wrap gap-2 mb-3 mt-1">
-                                <span class="text-rose-700 font-bold bg-rose-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 border border-rose-100">
+                            <div class="flex flex-wrap gap-1.5 md:gap-2 mb-2 md:mb-3 mt-0.5 md:mt-1">
+                                <span class="text-rose-700 font-bold bg-rose-50 px-2 py-1 md:px-3 md:py-1.5 rounded-md md:rounded-lg text-xs md:text-sm flex items-center gap-1 md:gap-1.5 border border-rose-100">
                                     🇹🇭 ${v.meaning}
                                 </span>
-                                <span class="text-amber-700 font-bold bg-amber-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 font-english border border-amber-100">
+                                <span class="text-amber-700 font-bold bg-amber-50 px-2 py-1 md:px-3 md:py-1.5 rounded-md md:rounded-lg text-xs md:text-sm flex items-center gap-1 md:gap-1.5 font-english border border-amber-100">
                                     🇬🇧 ${v.english}
                                 </span>
                             </div>
                             
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative mt-3">
-                                <i class="ph-fill ph-quotes text-slate-200 text-4xl absolute -top-2 -left-1"></i>
-                                <p class="text-sm md:text-base text-slate-600 relative z-10 font-chinese pl-4">
+                            <div class="bg-slate-50 p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-100 relative mt-2 md:mt-3">
+                                <i class="ph-fill ph-quotes text-slate-200 text-2xl md:text-4xl absolute -top-1 -left-1 md:-top-2 md:-left-1"></i>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-600 relative z-10 font-chinese pl-3 md:pl-4 leading-relaxed">
                                     ${v.example}
                                 </p>
                             </div>
                         </div>
                     </div>
                 `;
-                content.innerHTML += itemHTML;
             });
+            content.innerHTML = contentHTML;
 
             if (isCompleted) {
                 btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-xl"></i> ทบทวนเสร็จแล้ว (เยี่ยมมาก!)`;
@@ -453,8 +457,8 @@
                 
                 // Show cute alert
                 const alert = document.createElement('div');
-                alert.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-green-400";
-                alert.innerHTML = `<span class="text-2xl">🎉</span> เก่งมาก! สะสมดาวได้อีก 1 ดวง`;
+                alert.className = "fixed top-5 md:top-10 left-1/2 transform -translate-x-1/2 bg-white px-4 md:px-6 py-3 md:py-4 rounded-full shadow-2xl flex items-center gap-2 md:gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-green-400 text-sm md:text-base w-11/12 max-w-sm justify-center";
+                alert.innerHTML = `<span class="text-xl md:text-2xl">🎉</span> เก่งมาก! สะสมดาวได้อีก 1 ดวง`;
                 document.body.appendChild(alert);
                 setTimeout(() => alert.remove(), 3000);
 
