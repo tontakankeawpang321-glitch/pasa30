@@ -411,24 +411,28 @@
                 // ยกเลิกเสียงที่ค้างอยู่ คิวเก่าจะถูกล้าง ทำให้กดฟังคำใหม่ได้ลื่นไหลทันที
                 window.speechSynthesis.cancel();
 
-                const utterance = new SpeechSynthesisUtterance(word);
-                utterance.lang = 'en-GB'; 
-                utterance.rate = 0.9; 
+                // แก้บั๊ก Android: หน่วงเวลาเล็กน้อยเพื่อให้คำสั่ง cancel ทำงานเสร็จก่อนสั่ง speak ใหม่
+                setTimeout(() => {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = 'en-GB'; 
+                    utterance.rate = 0.9; 
 
-                // ค้นหาเสียง UK English ที่มีในเครื่องโดยตรง (สำคัญสำหรับ Safari บน iOS/Mac)
-                const voices = window.speechSynthesis.getVoices();
-                const ukVoice = voices.find(voice => 
-                    voice.lang === 'en-GB' || 
-                    voice.lang === 'en_GB' || 
-                    voice.name.includes('UK') || 
-                    voice.name.includes('British')
-                );
-                
-                if (ukVoice) {
-                    utterance.voice = ukVoice;
-                }
+                    // ค้นหาเสียง UK English ที่มีในเครื่องโดยตรง (ปรับให้รองรับตัวพิมพ์เล็ก/ใหญ่บน Android)
+                    const voices = window.speechSynthesis.getVoices();
+                    const ukVoice = voices.find(voice => 
+                        voice.lang.toLowerCase() === 'en-gb' || 
+                        voice.lang.toLowerCase() === 'en_gb' || 
+                        voice.name.includes('UK') || 
+                        voice.name.includes('British') ||
+                        voice.name.toLowerCase().includes('en-gb')
+                    );
+                    
+                    if (ukVoice) {
+                        utterance.voice = ukVoice;
+                    }
 
-                window.speechSynthesis.speak(utterance);
+                    window.speechSynthesis.speak(utterance);
+                }, 50); // ดีเลย์ 50 มิลลิวินาที (เร็วมากจนคนกดไม่รู้สึก แต่ช่วยแก้บั๊ก Android ได้)
             } else {
                 alert("ขออภัย เบราว์เซอร์นี้ไม่รองรับระบบเสียงอ่านครับ");
             }
