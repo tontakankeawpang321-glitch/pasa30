@@ -43,14 +43,6 @@
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.6);
         }
-
-        /* ป้องกันข้อความล้นบนมือถือ */
-        .text-responsive {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
     </style>
 </head>
 <body class="text-slate-800 p-3 md:p-6 min-h-screen flex flex-col items-center overflow-x-hidden">
@@ -121,7 +113,6 @@
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
         
         <div class="relative w-full max-w-lg bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
-            <!-- Pull Bar for Mobile -->
             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-3 sm:hidden"></div>
 
             <div class="px-6 py-5 border-b border-slate-50 flex justify-between items-start">
@@ -168,56 +159,56 @@
         }
 
         const vocabPool = [
-            { word: "Halo", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Halo, selamat pagi!" },
-            { word: "Terima kasih", meaning: "ขอบคุณ", english: "Thank you", icon: "🤝", example: "Terima kasih atas bantuannya." },
-            { word: "Sama-sama", meaning: "ยินดีครับ/ค่ะ", english: "You're welcome", icon: "😊", example: "Sama-sama, senang bisa membantu." },
-            { word: "Maaf", meaning: "ขอโทษ", english: "Sorry", icon: "🙏", example: "Maaf, saya terlambat." },
-            { word: "Permisi", meaning: "ขออนุญาต", english: "Excuse me", icon: "🚶", example: "Permisi, boleh saya lewat?" },
-            { word: "Apa kabar?", meaning: "สบายดีไหม?", english: "How are you?", icon: "✨", example: "Halo teman, apa kabar hari ini?" },
-            { word: "Kabar baik", meaning: "สบายดี", english: "I'm fine", icon: "👍", example: "Kabar baik, terima kasih!" },
-            { word: "Siapa nama Anda?", meaning: "คุณชื่ออะไร?", english: "What's your name?", icon: "📛", example: "Siapa nama Anda?" },
-            { word: "Nama saya...", meaning: "ฉันชื่อ...", english: "My name is...", icon: "👤", example: "Nama saya Budi." },
-            { word: "Berapa harganya?", meaning: "ราคาเท่าไหร่?", english: "How much?", icon: "💰", example: "Berapa harganya baju ini?" },
-            { word: "Mahal sekali", meaning: "แพงมาก", english: "Too expensive", icon: "💸", example: "Wah, itu mahal sekali!" },
-            { word: "Bisa kurang?", meaning: "ลดหน่อยได้ไหม?", english: "Discount?", icon: "📉", example: "Harganya bisa kurang sedikit?" },
-            { word: "Saya mau makan", meaning: "ฉันอยากกินข้าว", english: "I want to eat", icon: "🍽️", example: "Saya lapar, saya mau makan." },
-            { word: "Enak sekali", meaning: "อร่อยมาก", english: "Very delicious", icon: "😋", example: "Nasi goreng ini enak sekali!" },
-            { word: "Pedas", meaning: "เผ็ด", english: "Spicy", icon: "🌶️", example: "Sambal ini sangat pedas!" },
-            { word: "Minum", meaning: "ดื่ม", english: "Drink", icon: "🥤", example: "Saya mau minum air putih." },
-            { word: "Kopi", meaning: "กาแฟ", english: "Coffee", icon: "☕", example: "Satu kopi susu, tolong." },
-            { word: "Pasar", meaning: "ตลาด", english: "Market", icon: "🛒", example: "Ayo pergi ke pasar." },
-            { word: "Dimana toilet?", meaning: "ห้องน้ำอยู่ไหน?", english: "Where's toilet?", icon: "🚽", example: "Permisi, dimana toilet?" },
-            { word: "Cantik", meaning: "สวย", english: "Beautiful", icon: "🌸", example: "Pemandangan ini sangat cantik." },
-            { word: "Selamat pagi", meaning: "สวัสดีตอนเช้า", english: "Good morning", icon: "☀️", example: "Selamat pagi, matahari terbit." },
-            { word: "Selamat malam", meaning: "สวัสดีตอนกลางคืน", english: "Good night", icon: "🌙", example: "Selamat malam, selamat tidur." },
-            { word: "Jalan-jalan", meaning: "ไปเที่ยว", english: "Sightseeing", icon: "🚲", example: "Besok kita jalan-jalan." },
-            { word: "Pantai", meaning: "ชายหาด", english: "Beach", icon: "🏖️", example: "Pantai di Bali sangat indah." },
-            { word: "Hati-hati", meaning: "ระวังตัวด้วย", english: "Be careful", icon: "⚠️", example: "Hati-hati di jalan ya!" },
-            { word: "Semangat", meaning: "สู้ๆ", english: "Keep going", icon: "🔥", example: "Ayo tetap semangat belajar!" },
-            { word: "Bagus", meaning: "ดี / เยี่ยม", english: "Good", icon: "👌", example: "Pekerjaan Anda sangat bagus." },
-            { word: "Suka", meaning: "ชอบ", english: "Like", icon: "❤️", example: "Saya suka lagu Indonesia." },
-            { word: "Tidak", meaning: "ไม่", english: "No", icon: "❌", example: "Tidak, saya tidak merokok." },
-            { word: "Ya", meaning: "ใช่", english: "Yes", icon: "✅", example: "Ya, saya mengerti sekarang." },
-            { word: "Kiri", meaning: "ซ้าย", english: "Left", icon: "⬅️", example: "Belok kiri setelah lampu." },
-            { word: "Kanan", meaning: "ขวา", english: "Right", icon: "➡️", example: "Rumah saya di sebelah kanan." },
-            { word: "Lurus", meaning: "ตรงไป", english: "Straight", icon: "⬆️", example: "Jalan lurus saja terus." },
-            { word: "Tunggu", meaning: "รอ", english: "Wait", icon: "⏳", example: "Tunggu sebentar." },
-            { word: "Sekarang", meaning: "ตอนนี้", english: "Now", icon: "⏰", example: "Kita berangkat sekarang." },
-            { word: "Besok", meaning: "พรุ่งนี้", english: "Tomorrow", icon: "📅", example: "Sampai jumpa besok!" },
-            { word: "Cepat", meaning: "เร็ว", english: "Fast", icon: "⚡", example: "Jangan lari terlalu cepat." },
-            { word: "Pelan-pelan", meaning: "ช้าๆ", english: "Slowly", icon: "🐢", example: "Bicara pelan-pelan." },
-            { word: "Panas", meaning: "ร้อน", english: "Hot", icon: "🥵", example: "Hari ini sangat panas." },
-            { word: "Dingin", meaning: "หนาว", english: "Cold", icon: "🥶", example: "Air ini sangat dingin." },
-            { word: "Beli", meaning: "ซื้อ", english: "Buy", icon: "🛍️", example: "Saya ingin beli oleh-oleh." },
-            { word: "Cinta", meaning: "รัก", english: "Love", icon: "🤟", example: "Saya cinta Indonesia." },
-            { word: "Ganteng", meaning: "หล่อ", english: "Handsome", icon: "😎", example: "Aktor itu sangat ganteng." },
-            { word: "Lucu", meaning: "น่ารัก/ตลก", english: "Cute", icon: "😆", example: "Kucing itu sangat lucu." },
-            { word: "Haus", meaning: "หิวน้ำ", english: "Thirsty", icon: "🥤", example: "Saya haus sekali." },
-            { word: "Mengerti", meaning: "เข้าใจ", english: "Understand", icon: "💡", example: "Apakah Anda mengerti?" },
-            { word: "Belajar", meaning: "เรียน", english: "Learn", icon: "📚", example: "Mari kita belajar Bahasa." },
-            { word: "Tidur", meaning: "นอน", english: "Sleep", icon: "😴", example: "Waktunya untuk tidur." },
-            { word: "Hujan", meaning: "ฝนตก", english: "Rain", icon: "🌧️", example: "Di luar hujan deras." },
-            { word: "Bantu", meaning: "ช่วย", english: "Help", icon: "🆘", example: "Tolong bantu saya." }
+            { word: "Halo", phonetic: "ฮาโล", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Halo, selamat pagi!" },
+            { word: "Terima kasih", phonetic: "เตรีมา กาซี", meaning: "ขอบคุณ", english: "Thank you", icon: "🤝", example: "Terima kasih atas bantuannya." },
+            { word: "Sama-sama", phonetic: "ซามา ซามา", meaning: "ยินดีครับ/ค่ะ", english: "You're welcome", icon: "😊", example: "Sama-sama, senang bisa membantu." },
+            { word: "Maaf", phonetic: "มาอัฟ", meaning: "ขอโทษ", english: "Sorry", icon: "🙏", example: "Maaf, saya terlambat." },
+            { word: "Permisi", phonetic: "เปอร์มีซี", meaning: "ขออนุญาต", english: "Excuse me", icon: "🚶", example: "Permisi, boleh saya lewat?" },
+            { word: "Apa kabar?", phonetic: "อาปา กาบาร์?", meaning: "สบายดีไหม?", english: "How are you?", icon: "✨", example: "Halo teman, apa kabar hari ini?" },
+            { word: "Kabar baik", phonetic: "กาบาร์ ไบก์", meaning: "สบายดี", english: "I'm fine", icon: "👍", example: "Kabar baik, terima kasih!" },
+            { word: "Siapa nama Anda?", phonetic: "เซียปา นามา อันดา?", meaning: "คุณชื่ออะไร?", english: "What's your name?", icon: "📛", example: "Siapa nama Anda?" },
+            { word: "Nama saya...", phonetic: "นามา ซายา...", meaning: "ฉันชื่อ...", english: "My name is...", icon: "👤", example: "Nama saya Budi." },
+            { word: "Berapa harganya?", phonetic: "เบอราปา ฮาร์กานยา?", meaning: "ราคาเท่าไหร่?", english: "How much?", icon: "💰", example: "Berapa harganya baju ini?" },
+            { word: "Mahal sekali", phonetic: "มาฮัล เซอกาลี", meaning: "แพงมาก", english: "Too expensive", icon: "💸", example: "Wah, itu mahal sekali!" },
+            { word: "Bisa kurang?", phonetic: "บีซา กูรัง?", meaning: "ลดหน่อยได้ไหม?", english: "Discount?", icon: "📉", example: "Harganya bisa kurang sedikit?" },
+            { word: "Saya mau makan", phonetic: "ซายา เมา มากัน", meaning: "ฉันอยากกินข้าว", english: "I want to eat", icon: "🍽️", example: "Saya lapar, saya mau makan." },
+            { word: "Enak sekali", phonetic: "เอนัก เซอกาลี", meaning: "อร่อยมาก", english: "Very delicious", icon: "😋", example: "Nasi goreng ini enak sekali!" },
+            { word: "Pedas", phonetic: "เปอดัส", meaning: "เผ็ด", english: "Spicy", icon: "🌶️", example: "Sambal ini sangat pedas!" },
+            { word: "Minum", phonetic: "มีนุม", meaning: "ดื่ม", english: "Drink", icon: "🥤", example: "Saya mau minum air putih." },
+            { word: "Kopi", phonetic: "โกปี", meaning: "กาแฟ", english: "Coffee", icon: "☕", example: "Satu kopi susu, tolong." },
+            { word: "Pasar", phonetic: "ปาซาร์", meaning: "ตลาด", english: "Market", icon: "🛒", example: "Ayo pergi ke pasar." },
+            { word: "Dimana toilet?", phonetic: "ดีมานา ตอยเลต?", meaning: "ห้องน้ำอยู่ไหน?", english: "Where's toilet?", icon: "🚽", example: "Permisi, dimana toilet?" },
+            { word: "Cantik", phonetic: "จันติก", meaning: "สวย", english: "Beautiful", icon: "🌸", example: "Pemandangan ini sangat cantik." },
+            { word: "Selamat pagi", phonetic: "เซอละมัต ปากี", meaning: "สวัสดีตอนเช้า", english: "Good morning", icon: "☀️", example: "Selamat pagi, matahari terbit." },
+            { word: "Selamat malam", phonetic: "เซอละมัต มาลัม", meaning: "สวัสดีตอนกลางคืน", english: "Good night", icon: "🌙", example: "Selamat malam, selamat tidur." },
+            { word: "Jalan-jalan", phonetic: "จาลัน-จาลัน", meaning: "ไปเที่ยว", english: "Sightseeing", icon: "🚲", example: "Besokเราไปเดินเล่นกัน." },
+            { word: "Pantai", phonetic: "ปันไต", meaning: "ชายหาด", english: "Beach", icon: "🏖️", example: "Pantai di Bali sangat indah." },
+            { word: "Hati-hati", phonetic: "ฮาตี-ฮาตี", meaning: "ระวังตัวด้วย", english: "Be careful", icon: "⚠️", example: "Hati-hati di jalan ya!" },
+            { word: "Semangat", phonetic: "เซอมังงัต", meaning: "สู้ๆ", english: "Keep going", icon: "🔥", example: "Ayo tetap semangat belajar!" },
+            { word: "Bagus", phonetic: "บากุส", meaning: "ดี / เยี่ยม", english: "Good", icon: "👌", example: "Pekerjaan Anda sangat bagus." },
+            { word: "Suka", phonetic: "ซูกา", meaning: "ชอบ", english: "Like", icon: "❤️", example: "Saya suka lagu Indonesia." },
+            { word: "Tidak", phonetic: "ตีดัก", meaning: "ไม่", english: "No", icon: "❌", example: "Tidak, saya tidak merokok." },
+            { word: "Ya", phonetic: "ยา", meaning: "ใช่", english: "Yes", icon: "✅", example: "Ya, saya mengerti sekarang." },
+            { word: "Kiri", phonetic: "กีรี", meaning: "ซ้าย", english: "Left", icon: "⬅️", example: "Belok kiri setelah lampu." },
+            { word: "Kanan", phonetic: "กานัน", meaning: "ขวา", english: "Right", icon: "➡️", example: "Rumah saya di sebelah kanan." },
+            { word: "Lurus", phonetic: "ลูรุส", meaning: "ตรงไป", english: "Straight", icon: "⬆️", example: "Jalan lurus saja terus." },
+            { word: "Tunggu", phonetic: "ตุงกู", meaning: "รอ", english: "Wait", icon: "⏳", example: "Tunggu sebentar." },
+            { word: "Sekarang", phonetic: "เซอการัง", meaning: "ตอนนี้", english: "Now", icon: "⏰", example: "Kita berangkat sekarang." },
+            { word: "Besok", phonetic: "เบอซก", meaning: "พรุ่งนี้", english: "Tomorrow", icon: "📅", example: "Sampai jumpa besok!" },
+            { word: "Cepat", phonetic: "เจอปัต", meaning: "เร็ว", english: "Fast", icon: "⚡", example: "Jangan lari terlalu cepat." },
+            { word: "Pelan-pelan", phonetic: "เปอลัน-เปอลัน", meaning: "ช้าๆ", english: "Slowly", icon: "🐢", example: "Bicara pelan-pelan." },
+            { word: "Panas", phonetic: "ปานัส", meaning: "ร้อน", english: "Hot", icon: "🥵", example: "Hari ini sangat panas." },
+            { word: "Dingin", phonetic: "ดีงืน", meaning: "หนาว / เย็น", english: "Cold", icon: "🥶", example: "Air ini sangat dingin." },
+            { word: "Beli", phonetic: "เบอลี", meaning: "ซื้อ", english: "Buy", icon: "🛍️", example: "Saya ingin beli oleh-oleh." },
+            { word: "Cinta", phonetic: "จินตา", meaning: "รัก", english: "Love", icon: "🤟", example: "Saya cinta Indonesia." },
+            { word: "Ganteng", phonetic: "กันเต็ง", meaning: "หล่อ", english: "Handsome", icon: "😎", example: "Aktor itu sangat ganteng." },
+            { word: "Lucu", phonetic: "ลูจู", meaning: "น่ารัก/ตลก", english: "Cute", icon: "😆", example: "Kucing itu sangat lucu." },
+            { word: "Haus", phonetic: "ฮาอุส", meaning: "หิวน้ำ", english: "Thirsty", icon: "🥤", example: "Saya haus sekali." },
+            { word: "Mengerti", phonetic: "เมองือร์ตี", meaning: "เข้าใจ", english: "Understand", icon: "💡", example: "Apakah Anda mengerti?" },
+            { word: "Belajar", phonetic: "เบอลาจาร์", meaning: "เรียน", english: "Learn", icon: "📚", example: "Mari kita belajar Bahasa." },
+            { word: "Tidur", phonetic: "ตีดุร์", meaning: "นอน", english: "Sleep", icon: "😴", example: "Waktunya untuk tidur." },
+            { word: "Hujan", phonetic: "ฮูจัน", meaning: "ฝนตก", english: "Rain", icon: "🌧️", example: "Di luar hujan deras." },
+            { word: "Bantu", phonetic: "บันตู", meaning: "ช่วย", english: "Help", icon: "🆘", example: "Tolong bantu saya." }
         ];
 
         function shuffle(a) {
@@ -286,10 +277,11 @@
                     <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl shadow-sm shrink-0">${v.icon}</div>
                     <div class="flex-1">
                         <div class="flex justify-between items-start">
-                            <h4 class="font-bold text-slate-800">${v.word}</h4>
+                            <h4 class="font-bold text-slate-800 text-lg">${v.word}</h4>
                             <button onclick="speak('${v.word}')" class="text-red-500 p-1 active:scale-125 transition-transform"><i class="ph-fill ph-speaker-high"></i></button>
                         </div>
-                        <p class="text-xs text-slate-500 font-semibold mt-0.5">🇹🇭 ${v.meaning} | 🇬🇧 ${v.english}</p>
+                        <p class="text-[11px] text-red-500 font-bold -mt-1 mb-1">อ่านว่า: [ ${v.phonetic} ]</p>
+                        <p class="text-xs text-slate-500 font-semibold">🇹🇭 ${v.meaning} | 🇬🇧 ${v.english}</p>
                         <p class="text-[10px] italic text-slate-400 mt-1">"${v.example}"</p>
                     </div>
                 </div>
