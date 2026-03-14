@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Italian — ปฏิทินเรียนภาษาอิตาลี</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for UI -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', 'Sarabun', sans-serif;
+            /* พื้นหลังสีครีมสไตล์อิตาลีอุ่นๆ */
+            background: linear-gradient(135deg, #fffcf2 0%, #fff7ed 100%);
+            background-color: #fffcf2;
+            background-image: radial-gradient(#fbbf24 0.5px, transparent 0.5px);
+            background-size: 30px 30px;
+        }
+        h1, h2, .font-serif {
+            font-family: 'Playfair Display', serif; 
+        }
+        .font-target {
+            font-family: 'Montserrat', sans-serif;
+            word-break: keep-all;
+        }
+        
+        /* Custom scrollbar - โทนแดงส้มอิตาเลียน */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #fff7ed; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ef4444; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+        
+        /* Playful animations */
+        .calendar-day { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .calendar-day:hover { transform: scale(1.05); z-index: 10; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        
+        .vocab-card { transition: all 0.2s ease-in-out; }
+        .vocab-card:hover { transform: translateX(5px); border-left-color: #10b981; }
+
+        /* เปลี่ยนสี Blob ให้เป็นสีเขียว-ขาว-แดง */
+        .blob-bg {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23FEE2E2' d='M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.4,-46.3C91,-33.5,97.2,-18.1,97.1,-3.1C97,12,90.6,26.7,81.3,39.4C72,52.2,59.8,63.1,45.8,71.3C31.8,79.5,15.9,85.1,0.2,84.7C-15.5,84.4,-31,78.2,-45.1,69.9C-59.2,61.6,-71.9,51.2,-81.1,38.2C-90.3,25.2,-96,9.6,-95.2,-5.7C-94.4,-21.1,-87.1,-36,-76.3,-47.9C-65.5,-59.8,-51.2,-68.6,-36.8,-75.4C-22.4,-82.2,-7.9,-87,3.9,-93.8C15.7,-100.6,30.6,-83.6,44.7,-76.4Z' transform='translate(100 100)' /%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .today-pulse { animation: pulse-red 2s infinite; }
+    </style>
+</head>
+<body class="text-stone-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <div class="w-full max-w-4xl space-y-8">
+        
+        <!-- Header & Summary Section -->
+        <div class="bg-white rounded-[2.5rem] p-6 md:p-10 shadow-2xl shadow-stone-200 border border-stone-100 overflow-hidden relative">
+            <div class="absolute top-0 left-0 w-2 h-full bg-emerald-600"></div>
+            <div class="absolute top-0 right-0 w-2 h-full bg-rose-600"></div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
+                <!-- Title & Mascot -->
+                <div class="flex items-center gap-6">
+                    <div class="text-6xl md:text-7xl animate-bounce drop-shadow-xl" style="animation-duration: 4s;">👨‍🍳</div>
+                    <div>
+                        <h1 class="text-4xl md:text-5xl font-black text-stone-900 mb-2">
+                            Daily Italian
+                        </h1>
+                        <p class="text-stone-500 font-semibold text-sm md:text-base flex items-center gap-2">
+                            <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs">Imparare</span>
+                            ท่องศัพท์อิตาลีวันละ 20 คำ กับเชฟอิตาเลียน! 🇮🇹
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Monthly Summary Card -->
+                <div class="bg-stone-900 p-6 rounded-[2rem] w-full md:w-auto flex items-center gap-6 shadow-xl text-white transform hover:rotate-1 transition-transform cursor-default">
+                    <div class="bg-rose-500 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg rotate-3">
+                        🇮🇹
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400 mb-1">Obiettivo del Mese</p>
+                        <p class="text-4xl font-black leading-none">
+                            <span id="summary-completed" class="text-emerald-400">0</span>
+                            <span class="text-xl font-light text-stone-500">/ <span id="summary-total">30</span></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="bg-white rounded-[3rem] p-6 md:p-10 shadow-2xl shadow-stone-200 border border-stone-100">
+            
+            <!-- Calendar Header (Month Navigation) -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-10 gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-2xl shadow-sm">🗓️</div>
+                    <h2 id="month-year-display" class="text-3xl md:text-4xl font-black text-stone-800 tracking-tight">Month Year</h2>
+                </div>
+                
+                <div class="flex gap-3 bg-stone-50 p-2 rounded-3xl border border-stone-100">
+                    <button onclick="changeMonth(-1)" class="p-3 rounded-2xl bg-white shadow-sm hover:bg-rose-500 hover:text-white text-stone-600 transition-all active:scale-90">
+                        <i class="ph-bold ph-arrow-left text-xl"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-6 py-2 rounded-2xl bg-white shadow-sm hover:shadow-md text-stone-800 font-bold transition-all active:scale-95 text-sm uppercase tracking-wider">
+                        Oggi (วันนี้)
+                    </button>
+                    <button onclick="changeMonth(1)" class="p-3 rounded-2xl bg-white shadow-sm hover:bg-rose-500 hover:text-white text-stone-600 transition-all active:scale-90">
+                        <i class="ph-bold ph-arrow-right text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Days of Week -->
+            <div class="grid grid-cols-7 gap-3 md:gap-4 mb-6 text-center font-black text-stone-400 text-xs md:text-sm uppercase tracking-[0.15em]">
+                <div class="text-rose-500">Dom</div>
+                <div>Lun</div><div>Mar</div><div>Mer</div><div>Gio</div><div>Ven</div>
+                <div class="text-emerald-600">Sab</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-3 md:gap-5">
+                <!-- Days will be generated by JS -->
+            </div>
+        </div>
+        
+        <!-- Footer info -->
+        <div class="text-center text-stone-400 text-sm font-semibold uppercase tracking-widest pb-10">
+            <p>Fatto con ❤️ in Italia | สู้ๆ นะนักเรียน!</p>
+        </div>
+
+    </div>
+
+    <!-- Dialog / Modal for Vocabulary -->
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-stone-900/60 backdrop-blur-md transition-opacity" onclick="closeDialog()"></div>
+        
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-4xl bg-white rounded-[3rem] shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="px-10 py-8 border-b border-stone-100 bg-white flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-6">
+                    <div class="text-5xl">🍕</div>
+                    <div>
+                        <h3 id="dialog-title" class="text-3xl font-black text-stone-900 tracking-tight">Giorno --</h3>
+                        <p class="text-base text-stone-500 mt-1 font-medium">มาเก็บคำศัพท์ภาษาอิตาลีกัน! (Vocabolario del giorno)</p>
+                    </div>
+                </div>
+                <button onclick="closeDialog()" class="text-stone-400 hover:text-rose-500 bg-stone-100 hover:bg-rose-50 p-4 rounded-full transition-all active:scale-90">
+                    <i class="ph-bold ph-x text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable Vocab List) -->
+            <div id="dialog-content" class="p-6 md:p-10 overflow-y-auto custom-scrollbar flex-1 space-y-6 bg-stone-50/50">
+                <!-- Vocab list will be injected here -->
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="px-10 py-8 border-t border-stone-100 bg-white flex justify-between items-center gap-3">
+                <div class="text-4xl hidden md:block">🍦</div>
+                <div class="flex gap-4 w-full md:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-8 py-4 text-stone-500 font-bold hover:bg-stone-50 rounded-2xl transition-colors">
+                        ไว้ทีหลัง
+                    </button>
+                    <button id="btn-complete-day" class="px-10 py-4 bg-stone-900 text-white font-bold hover:bg-stone-800 rounded-2xl shadow-xl transition-all active:scale-95 flex items-center gap-3 text-lg">
+                        <i class="ph-bold ph-check-circle text-2xl text-emerald-400"></i> Finito! (เรียนเสร็จแล้ว)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants & Variables ---
+        const VOCAB_PER_SESSION = 20;
+        const MONTH_NAMES = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+        
+        let currentDate = new Date(); 
+        let today = new Date(); 
+        let selectedDateString = null; 
+        
+        let appState = {
+            completedDates: [] 
+        };
+
+        function loadState() {
+            const saved = localStorage.getItem('italian_calendar_v1');
+            if (saved) {
+                appState = JSON.parse(saved);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('italian_calendar_v1', JSON.stringify(appState));
+        }
+
+        // --- Vocabulary Pool (ภาษาอิตาลี) ---
+        const vocabPool = [
+            { word: "Ciao (เชา)", meaning: "สวัสดี / ลาก่อน", english: "Hello / Goodbye", icon: "👋", example: "Ciao! Come stai? (สวัสดี! สบายดีไหม?)" },
+            { word: "Grazie (กราตเซีย)", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Grazie mille per l'aiuto. (ขอบคุณมากๆ สำหรับความช่วยเหลือ)" },
+            { word: "Buongiorno (บวนจอร์โน)", meaning: "สวัสดีตอนเช้า", english: "Good morning", icon: "☀️", example: "Buongiorno a tutti! (สวัสดีตอนเช้าทุกคน!)" },
+            { word: "Buonasera (บวนนาเซรา)", meaning: "สวัสดีตอนเย็น", english: "Good evening", icon: "🌆", example: "Buonasera, vorrei un tavolo. (สวัสดีตอนเย็นครับ ขอโต๊ะหนึ่งที่)" },
+            { word: "Per favore (เปร์ ฟาวอเร)", meaning: "ได้โปรด / กรุณา", english: "Please", icon: "🥺", example: "Un caffè, per favore. (ขอกาแฟแก้วหนึ่งครับ)" },
+            { word: "Prego (เปรโก)", meaning: "ไม่เป็นไร / เชิญครับ", english: "You're welcome / Please (go ahead)", icon: "🤲", example: "Grazie! - Prego. (ขอบคุณ! - ไม่เป็นไรครับ)" },
+            { word: "Sì (ซี)", meaning: "ใช่", english: "Yes", icon: "✅", example: "Sì, parlo un po' d'italiano. (ใช่ ฉันพูดอิตาลีได้นิดหน่อย)" },
+            { word: "No (โน)", meaning: "ไม่", english: "No", icon: "❌", example: "No, non capisco. (ไม่ ฉันไม่เข้าใจ)" },
+            { word: "Mi scusi (มี สกูซี)", meaning: "ขอโทษ (สุภาพ)", english: "Excuse me", icon: "🙇", example: "Mi scusi, dov'è il bagno? (ขอโทษนะคะ ห้องน้ำอยู่ที่ไหน?)" },
+            { word: "Dov'è...? (โดเว...)", meaning: "อยู่ที่ไหน...?", english: "Where is...?", icon: "📍", example: "Dov'è la stazione? (สถานีรถไฟอยู่ที่ไหน?)" },
+            { word: "Quanto costa? (กวนโต กอสตา?)", meaning: "ราคาเท่าไหร่?", english: "How much is it?", icon: "💰", example: "Quanto costa questo gelato? (ไอศกรีมนี้ราคาเท่าไหร่?)" },
+            { word: "Il conto (อิล กอนโต)", meaning: "เช็คบิล", english: "The bill", icon: "🧾", example: "Il conto, per favore. (เก็บเงินด้วยครับ)" },
+            { word: "Acqua (อักกวา)", meaning: "น้ำ", english: "Water", icon: "💧", example: "Vorrei un bicchiere d'acqua. (ฉันขอเสนอตัวรับน้ำเปล่าสักแก้ว)" },
+            { word: "Vino (วีโน)", meaning: "ไวน์", english: "Wine", icon: "🍷", example: "Un bicchiere di vino rosso, grazie. (ไวน์แดงหนึ่งแก้ว ขอบคุณครับ)" },
+            { word: "Pane (ปาเน)", meaning: "ขนมปัง", english: "Bread", icon: "🥖", example: "Il pane è fresco. (ขนมปังสดใหม่มาก)" },
+            { word: "Pasta (ปัสตา)", meaning: "พาสต้า", english: "Pasta", icon: "🍝", example: "Amo la pasta italiana. (ฉันรักพาสต้าอิตาลี)" },
+            { word: "Pizza (ปิซซ่า)", meaning: "พิซซ่า", english: "Pizza", icon: "🍕", example: "Una pizza Margherita, per favore. (ขอพิซซ่ามาร์เกริต้าหนึ่งที่ครับ)" },
+            { word: "Gelato (เจลาโต)", meaning: "ไอศกรีมเจลาโต", english: "Gelato", icon: "🍦", example: "Prendiamo un gelato! (ไปกินเจลาโตกันเถอะ!)" },
+            { word: "Caffè (กัฟเฟ่)", meaning: "กาแฟ", english: "Coffee", icon: "☕", example: "Un caffè espresso, per favore. (ขอเอสเปรสโซหนึ่งที่ครับ)" },
+            { word: "Bello / Bella (เบลโล / เบลลา)", meaning: "สวย / หล่อ", english: "Beautiful / Handsome", icon: "✨", example: "Che bella città! (ช่างเป็นเมืองที่สวยงามอะไรอย่างนี้!)" },
+            { word: "Amore (อามอเร)", meaning: "ความรัก", english: "Love", icon: "❤️", example: "Ti amo, amore mio. (ฉันรักเธอ ยอดรักของฉัน)" },
+            { word: "Famiglia (ฟามิลเลีย)", meaning: "ครอบครัว", english: "Family", icon: "🏠", example: "La mia famiglia è grande. (ครอบครัวของฉันใหญ่มาก)" },
+            { word: "Amico / Amica (อามีโก / อามีกา)", meaning: "เพื่อน", english: "Friend", icon: "🤝", example: "Lui è il mio migliore amico. (เขาคือเพื่อนที่ดีที่สุดของฉัน)" },
+            { word: "Mangiare (มันจาเร)", meaning: "กิน", english: "To eat", icon: "🍴", example: "Voglio mangiare qualcosa di buono. (ฉันอยากกินอะไรอร่อยๆ สักหน่อย)" },
+            { word: "Bere (เบเร)", meaning: "ดื่ม", english: "To drink", icon: "🥤", example: "Cosa vuoi bere? (คุณอยากดื่มอะไรไหม?)" },
+            { word: "Andare (อันดาเร)", meaning: "ไป", english: "To go", icon: "🚶", example: "Andiamo al cinema. (พวกเราไปดูหนังกันเถอะ)" },
+            { word: "Vedere (เวเดเร)", meaning: "เห็น / ดู", english: "To see", icon: "👀", example: "Voglio vedere il Colosseo. (ฉันอยากเห็นโคลอสเซียม)" },
+            { word: "Dormire (ดอร์มีเร)", meaning: "นอน", english: "To sleep", icon: "😴", example: "Ho bisogno di dormire. (ฉันต้องนอนแล้วล่ะ)" },
+            { word: "Parlo (ปาร์โล)", meaning: "ฉันพูด", english: "I speak", icon: "🗣️", example: "Parlo un po' di italiano. (ฉันพูดอิตาลีได้นิดหน่อย)" },
+            { word: "Capisco (กาปิสโก)", meaning: "ฉันเข้าใจ", english: "I understand", icon: "💡", example: "Ora capisco tutto. (ตอนนี้ฉันเข้าใจทุกอย่างแล้ว)" },
+            { word: "Aiuto! (อายูโต!)", meaning: "ช่วยด้วย!", english: "Help!", icon: "🆘", example: "Aiuto! Ho perso il portafoglio. (ช่วยด้วย! ฉันทำกระเป๋าตังค์หาย)" },
+            { word: "Oggi (ออจจี)", meaning: "วันนี้", english: "Today", icon: "📅", example: "Oggi è una bella giornata. (วันนี้เป็นวันที่ดีวันหนึ่ง)" },
+            { word: "Domani (โดมานี)", meaning: "พรุ่งนี้", english: "Tomorrow", icon: "🌅", example: "A domani! (เจอกันพรุ่งนี้นะ!)" },
+            { word: "Stazione (สตัตซิโอเน)", meaning: "สถานี", english: "Station", icon: "🚉", example: "La stazione è vicina. (สถานีรถไฟอยู่ใกล้ๆ นี้)" },
+            { word: "Aeroporto (อาเอโรปอร์โต)", meaning: "สนามบิน", english: "Airport", icon: "✈️", example: "L'aeroporto di Roma è grande. (สนามบินที่โรมใหญ่มาก)" },
+            { word: "Treno (เตรโน)", meaning: "รถไฟ", english: "Train", icon: "🚆", example: "Il treno parte alle dieci. (รถไฟออกตอนสิบโมง)" },
+            { word: "Piazza (ปิอัซซา)", meaning: "จัตุรัส", english: "Square", icon: "🏛️", example: "Ci vediamo in piazza. (เจอกันที่จัตุรัสนะ)" },
+            { word: "Chiesa (เกียซา)", meaning: "โบสถ์", english: "Church", icon: "⛪", example: "Questa chiesa è antica. (โบสถ์แห่งนี้เก่าแก่มาก)" },
+            { word: "Mare (มาเร)", meaning: "ทะเล", english: "Sea", icon: "🌊", example: "Andiamo al mare? (พวกเราไปทะเลกันไหม?)" },
+            { word: "Sole (โซเล)", meaning: "ดวงอาทิตย์", english: "Sun", icon: "☀️", example: "C'è un bel sole oggi. (วันนี้แดดดีมาก)" },
+            { word: "Luna (ลูนา)", meaning: "ดวงจันทร์", english: "Moon", icon: "🌙", example: "Guarda la luna! (ดูดวงจันทร์สิ!)" },
+            { word: "Tempo (เตมโป)", meaning: "เวลา / อากาศ", english: "Time / Weather", icon: "🕒", example: "Non ho tempo oggi. (วันนี้ฉันไม่มีเวลาเลย)" },
+            { word: "Soldi (โซลดี้)", meaning: "เงิน", english: "Money", icon: "💸", example: "Non ho molti soldi. (ฉันไม่มีเงินเยอะหรอกนะ)" },
+            { word: "Lavoro (ลาโวโร)", meaning: "งาน", english: "Work", icon: "💼", example: "Vado al lavoro. (ฉันไปทำงานก่อนนะ)" },
+            { word: "Scuola (สกูโอลา)", meaning: "โรงเรียน", english: "School", icon: "🏫", example: "I bambini vanno a scuola. (เด็กๆ ไปโรงเรียน)" },
+            { word: "Libro (ลีโบร)", meaning: "หนังสือ", english: "Book", icon: "📖", example: "Leggo un libro interessante. (ฉันกำลังอ่านหนังสือที่น่าสนใจอยู่)" },
+            { word: "Città (ชิตตา)", meaning: "เมือง", english: "City", icon: "🏙️", example: "Roma è una città eterna. (โรมคือเมืองนิรันดร์)" },
+            { word: "Italia (อิตาเลีย)", meaning: "ประเทศอิตาลี", english: "Italy", icon: "🇮🇹", example: "L'Italia è famosa per l'arte. (อิตาลีมีชื่อเสียงด้านศิลปะ)" },
+            { word: "Arrivederci (อาร์ริเวเดร์ชิ)", meaning: "ลาก่อน (ทางการ)", english: "Goodbye (formal)", icon: "👋", example: "Arrivederci, a presto! (ลาก่อน แล้วพบกันใหม่เร็วๆ นี้!)" },
+            { word: "Buon appetito (บวน อัปเปตีโต)", meaning: "ทานให้อร่อยนะ", english: "Enjoy your meal", icon: "🍽️", example: "Buon appetito a tutti! (ขอให้ทุกคนทานให้อร่อยนะ!)" }
+        ];
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function getRandomVocab() {
+            const shuffled = shuffleArray(vocabPool);
+            return shuffled.slice(0, Math.min(VOCAB_PER_SESSION, shuffled.length));
+        }
+
+        // --- Calendar Logic ---
+        function getFormatDateString(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('month-year-display').innerText = `${MONTH_NAMES[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[2rem] bg-stone-50/50 border border-stone-100 opacity-20"></div>`;
+            }
+
+            let completedThisMonth = 0;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = getFormatDateString(year, month, day);
+                const isCompleted = appState.completedDates.includes(dateString);
+                const isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                
+                if (isCompleted) completedThisMonth++;
+
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-4 md:p-6 rounded-[2.2rem] border-2 cursor-pointer select-none min-h-[100px] md:min-h-[130px] shadow-sm transition-all";
+                let stateClasses = "";
+                let indicatorHTML = "";
+
+                if (isCompleted) {
+                    stateClasses = "bg-emerald-50 border-emerald-100 text-emerald-800";
+                    indicatorHTML = `<div class="mt-2 text-emerald-500 font-black text-[10px] tracking-widest uppercase">Bravissimo!</div>`;
+                } else if (isToday) {
+                    stateClasses = "bg-rose-500 border-transparent text-white shadow-xl today-pulse z-10 scale-105";
+                    indicatorHTML = `<span class="text-[9px] font-black bg-white/30 px-3 py-1 rounded-full mt-2 backdrop-blur-sm uppercase">Oggi</span>`;
+                } else {
+                    stateClasses = "bg-white border-stone-100 text-stone-700 hover:border-rose-300";
+                    indicatorHTML = `<i class="ph-duotone ph-student text-stone-100 text-2xl mt-1 opacity-0 group-hover:opacity-100 transition-opacity"></i>`;
+                }
+
+                const dayOfWeek = new Date(year, month, day).getDay();
+                let textStyle = "font-black text-2xl md:text-3xl";
+                if (!isToday && !isCompleted) {
+                    if (dayOfWeek === 0) textStyle += " text-rose-400";
+                    else if (dayOfWeek === 6) textStyle += " text-emerald-500";
+                }
+
+                grid.innerHTML += `
+                    <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
+                        <span class="${textStyle}">${day}</span>
+                        ${indicatorHTML}
+                    </div>
+                `;
+            }
+
+            const completedEl = document.getElementById('summary-completed');
+            completedEl.innerText = completedThisMonth;
+            document.getElementById('summary-total').innerText = daysInMonth;
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // --- Dialog & Interaction ---
+        function openDayDialog(year, month, day) {
+            selectedDateString = getFormatDateString(year, month, day);
+            const isCompleted = appState.completedDates.includes(selectedDateString);
+
+            const dialog = document.getElementById('vocab-dialog');
+            const title = document.getElementById('dialog-title');
+            const content = document.getElementById('dialog-content');
+            const btnComplete = document.getElementById('btn-complete-day');
+
+            title.innerText = `Giorno ${day} ${MONTH_NAMES[month]}`;
+
+            const vocabList = getRandomVocab();
+            content.innerHTML = '';
+            
+            vocabList.forEach((v, index) => {
+                const targetWordOnly = v.word.split(' (')[0];
+
+                content.innerHTML += `
+                    <div class="vocab-card p-6 bg-white border-2 border-stone-50 rounded-[2.5rem] hover:border-rose-200 hover:shadow-xl transition-all flex flex-col md:flex-row gap-6 items-start relative overflow-hidden group">
+                        <div class="blob-bg text-rose-500 w-16 h-16 rounded-[1.5rem] flex items-center justify-center font-black text-2xl shrink-0 shadow-sm relative z-10">
+                            ${index + 1}
+                        </div>
+                        
+                        <div class="flex-1 relative z-10 w-full">
+                            <div class="flex justify-between items-start w-full mb-2">
+                                <h4 class="text-2xl md:text-3xl font-black text-stone-900 flex flex-wrap items-center gap-3 font-target">
+                                    <span class="text-4xl drop-shadow-sm">${v.icon}</span> 
+                                    <span>${v.word}</span>
+                                </h4>
+                                <button onclick="speakWord('${targetWordOnly}')" class="bg-stone-50 text-stone-600 hover:bg-emerald-600 hover:text-white p-3 rounded-2xl transition-all shadow-sm active:scale-90">
+                                    <i class="ph-fill ph-speaker-high text-xl"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="text-emerald-700 font-bold bg-emerald-50 px-4 py-2 rounded-xl text-sm border border-emerald-100">🇹🇭 ${v.meaning}</span>
+                                <span class="text-stone-500 font-bold bg-stone-100 px-4 py-2 rounded-xl text-sm border border-stone-200">🇬🇧 ${v.english}</span>
+                            </div>
+                            
+                            <div class="bg-stone-50 p-5 rounded-[1.5rem] border border-stone-100 relative italic">
+                                <p class="text-stone-600 font-medium leading-relaxed">"${v.example}"</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (isCompleted) {
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-yellow-300 text-2xl"></i> Bravissimo! (ทบทวนเสร็จแล้ว)`;
+                btnComplete.onclick = closeDialog;
+            } else {
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-2xl text-emerald-400"></i> Finito! (เรียนเสร็จแล้ว)`;
+                btnComplete.onclick = markDayAsComplete;
+            }
+
+            dialog.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('dialog-content').scrollTop = 0;
+        }
+
+        function closeDialog() {
+            document.getElementById('vocab-dialog').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            selectedDateString = null;
+        }
+
+        function markDayAsComplete() {
+            if (selectedDateString && !appState.completedDates.includes(selectedDateString)) {
+                appState.completedDates.push(selectedDateString);
+                saveState();
+                renderCalendar();
+            }
+            closeDialog();
+        }
+
+        function speakWord(word) {
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=it&client=tw-ob`;
+            const audio = new Audio(url);
+            audio.play().catch(() => {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = 'it-IT';
+                    utterance.rate = 0.9;
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
+
+        window.onload = () => {
+            loadState();
+            renderCalendar();
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") closeDialog();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bahasa Indonesia — Calendar Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary: #ef4444; /* Red */
+            --secondary: #1e293b; /* Dark Slate */
+            --accent: #f97316; /* Orange */
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Sarabun', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff7ed 100%);
+            background-color: #fffaf0;
+            /* ลาย Batik เบาๆ พื้นหลัง */
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23fca5a5' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .calendar-day { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .calendar-day:hover { transform: scale(1.05); z-index: 10; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #fee2e2; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #f87171; border-radius: 10px; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .mascot-float { animation: float 4s ease-in-out infinite; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <div class="w-full max-w-4xl space-y-6">
+        
+        <!-- Header Section -->
+        <header class="glass-card rounded-[2.5rem] p-6 md:p-10 shadow-2xl shadow-red-100/50">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="flex items-center gap-6">
+                    <div class="text-6xl md:text-7xl mascot-float">🐒</div>
+                    <div>
+                        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-2">
+                            Daily <span class="text-red-500">Bahasa</span>
+                        </h1>
+                        <p class="text-slate-500 font-semibold flex items-center gap-2">
+                            <i class="ph-bold ph-map-pin text-orange-500"></i>
+                            เรียนภาษาอินโดนีเซียกับพี่ลิงวันละ 20 คำ
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-6 rounded-[2rem] w-full md:w-auto text-white shadow-xl flex items-center gap-5 border-t-4 border-red-500">
+                    <div class="bg-red-500 w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-lg">
+                        🇮🇩
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mb-1">ความคืบหน้า</p>
+                        <p class="text-3xl font-black">
+                            <span id="summary-completed" class="text-red-400">0</span>
+                            <span class="text-lg font-bold text-slate-500">/ <span id="summary-total">31</span> วัน</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Calendar Card -->
+        <main class="bg-white rounded-[3rem] p-6 md:p-10 shadow-2xl shadow-slate-200 border border-slate-50">
+            
+            <!-- Controls -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-10 gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600">
+                        <i class="ph-fill ph-calendar-blank text-2xl"></i>
+                    </div>
+                    <h2 id="month-year-display" class="text-2xl md:text-3xl font-black text-slate-800">Month Year</h2>
+                </div>
+                
+                <div class="flex gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                    <button onclick="changeMonth(-1)" class="p-3 rounded-xl bg-white shadow-sm hover:bg-red-500 hover:text-white text-slate-600 transition-all">
+                        <i class="ph-bold ph-arrow-left"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-6 py-2 rounded-xl bg-white shadow-sm hover:bg-slate-800 hover:text-white text-slate-800 font-bold transition-all text-sm uppercase tracking-wider">
+                        วันนี้
+                    </button>
+                    <button onclick="changeMonth(1)" class="p-3 rounded-xl bg-white shadow-sm hover:bg-red-500 hover:text-white text-slate-600 transition-all">
+                        <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="grid grid-cols-7 gap-3 md:gap-4 mb-4 text-center font-black text-slate-400 text-xs md:text-sm uppercase tracking-widest">
+                <div class="text-red-500">Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div class="text-blue-500">Sab</div>
+            </div>
+
+            <div id="calendar-grid" class="grid grid-cols-7 gap-3 md:gap-4">
+                <!-- JS generated -->
+            </div>
+        </main>
+        
+        <footer class="text-center pb-10">
+            <p class="text-slate-400 font-medium">✨ เคล็ดลับ: กดที่วันที่เพื่อเริ่มสะสมคำศัพท์อินโดนีเซีย</p>
+        </footer>
+
+    </div>
+
+    <!-- Modal Dialog -->
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity" onclick="closeDialog()"></div>
+        
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-4xl bg-white rounded-[3rem] shadow-2xl flex flex-col max-h-[85vh] overflow-hidden border-8 border-white">
+            
+            <div class="px-8 py-8 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
+                <div class="flex items-center gap-5">
+                    <div class="text-5xl">🥥</div>
+                    <div>
+                        <h3 id="dialog-title" class="text-2xl font-black text-slate-900">วันที่ --/--/----</h3>
+                        <p class="text-sm text-slate-500 font-bold uppercase tracking-wider">Mari Belajar! (มาเรียนกันเถอะ)</p>
+                    </div>
+                </div>
+                <button onclick="closeDialog()" class="w-12 h-12 flex items-center justify-center bg-white rounded-2xl text-slate-400 hover:text-red-500 shadow-sm transition-all">
+                    <i class="ph-bold ph-x text-2xl"></i>
+                </button>
+            </div>
+            
+            <div id="dialog-content" class="p-6 md:p-10 overflow-y-auto custom-scrollbar flex-1 space-y-6 bg-white">
+                <!-- Vocab injected here -->
+            </div>
+            
+            <div class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-end items-center gap-4">
+                <button onclick="closeDialog()" class="px-8 py-4 text-slate-500 font-bold hover:text-slate-800 transition-colors">
+                    ยกเลิก
+                </button>
+                <button id="btn-complete-day" class="px-10 py-4 bg-red-500 text-white font-black rounded-2xl shadow-xl shadow-red-200 hover:bg-red-600 transition-all active:scale-95 flex items-center gap-3 text-lg uppercase tracking-wider">
+                    <i class="ph-bold ph-check-circle text-2xl"></i> บันทึกการเรียน
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const VOCAB_PER_SESSION = 20;
+        const MONTH_NAMES = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        
+        let currentDate = new Date(); 
+        let today = new Date(); 
+        let selectedDateString = null; 
+        
+        let appState = {
+            completedDates: [] 
+        };
+
+        function loadState() {
+            const saved = localStorage.getItem('indonesian_vocab_tracker_v1');
+            if (saved) { appState = JSON.parse(saved); }
+        }
+
+        function saveState() {
+            localStorage.setItem('indonesian_vocab_tracker_v1', JSON.stringify(appState));
+        }
+
+        const vocabPool = [
+            { word: "Halo (ฮาโล)", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Halo, selamat pagi! (สวัสดีครับ อรุณสวัสดิ์!)" },
+            { word: "Terima kasih (เตรีมา กาซี)", meaning: "ขอบคุณ", english: "Thank you", icon: "🤝", example: "Terima kasih atas bantuannya. (ขอบคุณสำหรับความช่วยเหลือครับ)" },
+            { word: "Sama-sama (ซามา-ซามา)", meaning: "ยินดีครับ/ค่ะ", english: "You're welcome", icon: "😊", example: "Sama-sama, senang bisa membantu. (ยินดีครับ ยินดีที่ได้ช่วย)" },
+            { word: "Maaf (มาอัฟ)", meaning: "ขอโทษ", english: "Sorry", icon: "🙏", example: "Maaf, saya terlambat. (ขอโทษครับ ผมมาสาย)" },
+            { word: "Permisi (เปอร์มีซี)", meaning: "ขออนุญาต / ขอทาง", english: "Excuse me", icon: "🚶", example: "Permisi, boleh saya lewat? (ขอโทษนะคะ ขอทางหน่อยได้ไหม?)" },
+            { word: "Apa kabar? (อาปา กาบาร์?)", meaning: "สบายดีไหม?", english: "How are you?", icon: "✨", example: "Halo teman, apa kabar hari ini? (สวัสดีเพื่อน วันนี้เป็นยังไงบ้าง?)" },
+            { word: "Kabar baik (กาบาร์ ไบก์)", meaning: "สบายดี", english: "I'm fine", icon: "👍", example: "Kabar baik, terima kasih! (สบายดี ขอบคุณครับ!)" },
+            { word: "Siapa nama Anda? (เซียปา นามา อันดา?)", meaning: "คุณชื่ออะไร?", english: "What is your name?", icon: "📛", example: "Senang bertemu Anda, siapa nama Anda? (ยินดีที่ได้รู้จัก คุณชื่ออะไรคะ?)" },
+            { word: "Nama saya... (นามา ซายา...)", meaning: "ฉันชื่อ...", english: "My name is...", icon: "👤", example: "Nama saya Budi. (ผมชื่อบูดี)" },
+            { word: "Berapa harganya? (เบอราปา ฮาร์กานยา?)", meaning: "ราคาเท่าไหร่?", english: "How much is it?", icon: "💰", example: "Berapa harganya baju ini? (เสื้อตัวนี้ราคาเท่าไหร่คะ?)" },
+            { word: "Mahal sekali (มาฮัล เซอกาลี)", meaning: "แพงมาก", english: "Too expensive", icon: "💸", example: "Wah, itu mahal sekali! (ว้าว นั่นแพงมากเลย!)" },
+            { word: "Bisa kurang? (บีซา กูรัง?)", meaning: "ลดหน่อยได้ไหม?", english: "Can you discount?", icon: "📉", example: "Harganya bisa kurang sedikit? (ลดราคาลงนิดหนึ่งได้ไหมครับ?)" },
+            { word: "Saya mau makan (ซายา เมา มากัน)", meaning: "ฉันอยากกินข้าว", english: "I want to eat", icon: "🍽️", example: "Saya lapar, saya mau makan sekarang. (ฉันหิวแล้ว ฉันอยากกินข้าวตอนนี้เลย)" },
+            { word: "Enak sekali (เอนัก เซอกาลี)", meaning: "อร่อยมาก", english: "Very delicious", icon: "😋", example: "Nasi goreng ini enak sekali! (ข้าวผัดนี้อร่อยมากเลย!)" },
+            { word: "Pedas (เปอดัส)", meaning: "เผ็ด", english: "Spicy", icon: "🌶️", example: "Sambal ini sangat pedas! (น้ำพริกนี้เผ็ดมากๆ!)" },
+            { word: "Minum (มีนุม)", meaning: "ดื่ม", english: "Drink", icon: "🥤", example: "Saya mau minum air putih. (ฉันอยากดื่มน้ำเปล่า)" },
+            { word: "Kopi (โกปี)", meaning: "กาแฟ", english: "Coffee", icon: "☕", example: "Satu kopi susu, tolong. (ขอกาแฟนมหนึ่งที่ครับ)" },
+            { word: "Pasar (ปาซาร์)", meaning: "ตลาด", english: "Market", icon: "🛒", example: "Ayo pergi ke pasar tradisional. (ไปตลาดสดกันเถอะ)" },
+            { word: "Dimana toilet? (ดีมานา ตอยเลต?)", meaning: "ห้องน้ำอยู่ที่ไหน?", english: "Where is the toilet?", icon: "🚽", example: "Permisi, dimana toilet umum? (ขอโทษครับ ห้องน้ำสาธารณะอยู่ไหน?)" },
+            { word: "Cantik (จันติก)", meaning: "สวย", english: "Beautiful", icon: "🌸", example: "Pemandangan ini sangat cantik. (วิวนี้สวยงามมาก)" },
+            { word: "Selamat pagi (เซอละมัต ปากี)", meaning: "สวัสดีตอนเช้า", english: "Good morning", icon: "☀️", example: "Selamat pagi, matahari sudah terbit. (อรุณสวัสดิ์ พระอาทิตย์ขึ้นแล้ว)" },
+            { word: "Selamat malam (เซอละมัต มาลัม)", meaning: "สวัสดีตอนกลางคืน", english: "Good night", icon: "🌙", example: "Selamat malam, selamat tidur. (ราตรีสวัสดิ์ หลับฝันดีนะ)" },
+            { word: "Jalan-jalan (จาลัน-จาลัน)", meaning: "ไปเที่ยว / เดินเล่น", english: "Sightseeing", icon: "🚲", example: "Besok kita jalan-jalan ke pantai. (พรุ่งนี้เราไปเที่ยวทะเลกัน)" },
+            { word: "Pantai (ปันไต)", meaning: "ชายหาด", english: "Beach", icon: "🏖️", example: "Pantai di Bali sangat indah. (ชายหาดที่บาหลีสวยมาก)" },
+            { word: "Hati-hati (ฮาตี-ฮาตี)", meaning: "ระวังตัวด้วย", english: "Be careful", icon: "⚠️", example: "Hati-hati di jalan ya! (เดินทางปลอดภัย ระวังตัวด้วยนะ!)" },
+            { word: "Semangat (เซอมังงัต)", meaning: "สู้ๆ / มีพลัง", english: "Spirited / Keep going", icon: "🔥", example: "Ayo tetap semangat belajar! (มาสู้ๆ กับการเรียนกันต่อเถอะ!)" },
+            { word: "Bagus (บากุส)", meaning: "ดี / เยี่ยม", english: "Good", icon: "👌", example: "Pekerjaan Anda sangat bagus. (งานของคุณทำออกมาได้ดีมาก)" },
+            { word: "Suka (ซูกา)", meaning: "ชอบ", english: "Like", icon: "❤️", example: "Saya suka lagu Indonesia. (ฉันชอบเพลงอินโดนีเซีย)" },
+            { word: "Tidak (ตีดัก)", meaning: "ไม่", english: "No", icon: "❌", example: "Tidak, saya tidak merokok. (ไม่ครับ ผมไม่สูบบุหรี่)" },
+            { word: "Ya (ยา)", meaning: "ใช่ / ครับ / ค่ะ", english: "Yes", icon: "✅", example: "Ya, saya mengerti sekarang. (ใช่ครับ ตอนนี้ผมเข้าใจแล้ว)" },
+            { word: "Kiri (กีรี)", meaning: "ซ้าย", english: "Left", icon: "⬅️", example: "Belok kiri setelah lampu merah. (เลี้ยวซ้ายหลังไฟแดงครับ)" },
+            { word: "Kanan (กานัน)", meaning: "ขวา", english: "Right", icon: "➡️", example: "Rumah saya ada di sebelah kanan. (บ้านของฉันอยู่ทางขวามือ)" },
+            { word: "Lurus (ลูรุส)", meaning: "ตรงไป", english: "Straight", icon: "⬆️", example: "Jalan lurus saja terus. (เดินตรงไปเรื่อยๆ เลยครับ)" },
+            { word: "Tunggu (ตุงกู)", meaning: "รอ", english: "Wait", icon: "⏳", example: "Tunggu sebentar, saya sedang siap-siap. (รอแป๊บนหนึ่ง ฉันกำลังเตรียมตัว)" },
+            { word: "Sekarang (เซอการัง)", meaning: "ตอนนี้", english: "Now", icon: "⏰", example: "Kita berangkat sekarang juga. (พวกเราออกเดินทางตอนนี้เลย)" },
+            { word: "Besok (เบอซก)", meaning: "พรุ่งนี้", english: "Tomorrow", icon: "📅", example: "Sampai jumpa besok pagi! (ไว้พบกันใหม่พรุ่งนี้เช้านะ!)" },
+            { word: "Cepat (เจอปัต)", meaning: "เร็ว", english: "Fast", icon: "⚡", example: "Jangan lari terlalu cepat. (อย่าวิ่งเร็วเกินไป)" },
+            { word: "Pelan-pelan (เปอลัน-เปอลัน)", meaning: "ช้าๆ", english: "Slowly", icon: "🐢", example: "Bicara pelan-pelan, tolong. (กรุณาพูดช้าๆ หน่อยครับ)" },
+            { word: "Panas (ปานัส)", meaning: "ร้อน", english: "Hot (Temp)", icon: "🥵", example: "Hari ini cuaca sangat panas. (วันนี้อากาศร้อนมาก)" },
+            { word: "Dingin (ดีงืน)", meaning: "หนาว / เย็น", english: "Cold", icon: "🥶", example: "Air ini sangat dingin. (น้ำนี้เย็นมาก)" },
+            { word: "Beli (เบอลี)", meaning: "ซื้อ", english: "Buy", icon: "🛍️", example: "Saya ingin beli oleh-oleh. (ฉันอยากซื้อของฝาก)" },
+            { word: "Cinta (จินตา)", meaning: "รัก", english: "Love", icon: "🤟", example: "Saya cinta Indonesia. (ฉันรักอินโดนีเซีย)" },
+            { word: "Ganteng (กันเต็ง)", meaning: "หล่อ", english: "Handsome", icon: "😎", example: "Aktor itu sangat ganteng. (นักแสดงคนนั้นหล่อมาก)" },
+            { word: "Lucu (ลูจู)", meaning: "ตลก / น่ารัก", english: "Funny / Cute", icon: "😆", example: "Kucing itu sangat lucu. (แมวตัวนั้นน่ารัก/ตลกมาก)" },
+            { word: "Haus (ฮาอุส)", meaning: "กระหายน้ำ", english: "Thirsty", icon: "🥤", example: "Saya haus sekali, butuh air. (ฉันหิวน้ำมาก ต้องการน้ำ)" },
+            { word: "Mengerti (เมองือร์ตี)", meaning: "เข้าใจ", english: "Understand", icon: "💡", example: "Apakah Anda mengerti maksud saya? (คุณเข้าใจที่ผมพูดไหม?)" },
+            { word: "Belajar (เบอลาจาร์)", meaning: "เรียน", english: "Learn", icon: "📚", example: "Mari kita belajar Bahasa Indonesia. (พวกเรามาเรียนภาษาอินโดนีเซียกัน)" },
+            { word: "Tidur (ตีดุร์)", meaning: "นอน", english: "Sleep", icon: "😴", example: "Waktunya untuk tidur. (ได้เวลานอนแล้ว)" },
+            { word: "Hujan (ฮูจัน)", meaning: "ฝนตก", english: "Rain", icon: "🌧️", example: "Di luar sedang hujan deras. (ข้างนอกฝนกำลังตกหนัก)" },
+            { word: "Bantu (บันตู)", meaning: "ช่วย", english: "Help", icon: "🆘", example: "Tolong bantu saya mengangkat ini. (ช่วยผมยกอันนี้หน่อยครับ)" }
+        ];
+
+        function shuffle(array) {
+            let s = [...array];
+            for (let i = s.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [s[i], s[j]] = [s[j], s[i]];
+            }
+            return s;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            document.getElementById('month-year-display').innerText = `${MONTH_NAMES[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div class="p-4 rounded-3xl bg-slate-50 opacity-20 border border-slate-100"></div>`;
+            }
+
+            let completedCount = 0;
+            for (let d = 1; d <= lastDate; d++) {
+                const ds = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const isDone = appState.completedDates.includes(ds);
+                const isToday = (d === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                if (isDone) completedCount++;
+
+                let cls = "calendar-day relative flex flex-col items-center justify-center p-4 rounded-[2rem] border-2 cursor-pointer min-h-[100px] shadow-sm";
+                let inner = `<span class="text-2xl font-black">${d}</span>`;
+
+                if (isDone) {
+                    cls += " bg-red-50 border-red-200 text-red-600";
+                    inner += `<i class="ph-fill ph-crown text-2xl mt-1 text-orange-400"></i>`;
+                } else if (isToday) {
+                    cls += " bg-slate-900 border-slate-900 text-white shadow-xl scale-110 z-10";
+                    inner += `<span class="text-[10px] font-bold uppercase mt-1 text-red-400">Hari ini</span>`;
+                } else {
+                    cls += " bg-white border-slate-100 text-slate-400 hover:border-red-400 hover:text-red-500 hover:shadow-md";
+                }
+
+                grid.innerHTML += `<div class="${cls}" onclick="openDayDialog(${year}, ${month}, ${d})">${inner}</div>`;
+            }
+
+            document.getElementById('summary-completed').innerText = completedCount;
+            document.getElementById('summary-total').innerText = lastDate;
+        }
+
+        function changeMonth(dir) { currentDate.setMonth(currentDate.getMonth() + dir); renderCalendar(); }
+        function goToToday() { currentDate = new Date(); renderCalendar(); }
+
+        function openDayDialog(y, m, d) {
+            selectedDateString = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const isDone = appState.completedDates.includes(selectedDateString);
+            
+            document.getElementById('dialog-title').innerText = `${d} ${MONTH_NAMES[m]} ${y}`;
+            const content = document.getElementById('dialog-content');
+            const list = shuffle(vocabPool).slice(0, VOCAB_PER_SESSION);
+            
+            content.innerHTML = list.map((v, i) => `
+                <div class="group p-6 bg-slate-50 rounded-[2rem] border-2 border-transparent hover:border-red-200 hover:bg-white transition-all">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:shadow-md transition-all shrink-0">
+                            ${v.icon}
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="text-2xl font-black text-slate-800">${v.word}</h4>
+                                <button onclick="speak('${v.word.split(' (')[0]}')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-colors shadow-sm">
+                                    <i class="ph-fill ph-speaker-high text-xl"></i>
+                                </button>
+                            </div>
+                            <div class="flex gap-2 mb-4">
+                                <span class="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-bold">🇮🇩 ${v.meaning}</span>
+                                <span class="px-3 py-1 bg-slate-200 text-slate-600 rounded-lg text-sm font-bold">🇬🇧 ${v.english}</span>
+                            </div>
+                            <div class="p-4 bg-white/50 rounded-2xl italic text-slate-500 text-sm border border-slate-100">
+                                "${v.example}"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const btn = document.getElementById('btn-complete-day');
+            if (isDone) {
+                btn.innerHTML = `<i class="ph-bold ph-star text-2xl"></i> ทบทวนแล้ว!`;
+                btn.className = "px-10 py-4 bg-orange-500 text-white font-black rounded-2xl shadow-xl shadow-orange-100 hover:bg-orange-600 transition-all flex items-center gap-3 text-lg";
+                btn.onclick = closeDialog;
+            } else {
+                btn.innerHTML = `<i class="ph-bold ph-check-circle text-2xl"></i> บันทึกการเรียน`;
+                btn.className = "px-10 py-4 bg-red-500 text-white font-black rounded-2xl shadow-xl shadow-red-100 hover:bg-red-600 transition-all flex items-center gap-3 text-lg";
+                btn.onclick = markComplete;
+            }
+
+            document.getElementById('vocab-dialog').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('dialog-content').scrollTop = 0;
+        }
+
+        function closeDialog() {
+            document.getElementById('vocab-dialog').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function markComplete() {
+            if (selectedDateString && !appState.completedDates.includes(selectedDateString)) {
+                appState.completedDates.push(selectedDateString);
+                saveState();
+                renderCalendar();
+            }
+            closeDialog();
+        }
+
+        function speak(text) {
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=id&client=tw-ob`;
+            new Audio(url).play().catch(() => {
+                if ('speechSynthesis' in window) {
+                    const u = new SpeechSynthesisUtterance(text);
+                    u.lang = 'id-ID';
+                    window.speechSynthesis.speak(u);
+                }
+            });
+        }
+
+        window.onload = () => { loadState(); renderCalendar(); };
+    </script>
+</body>
+</html>

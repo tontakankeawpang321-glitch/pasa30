@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ท่องอังกฤษ — Calendar Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for UI -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            /* พื้นหลังสีพาสเทลน่ารักๆ */
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            background-color: #f3f8ff;
+            background-image: radial-gradient(#e0eaff 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        h1, h2, h3, .font-english {
+            font-family: 'Fredoka', 'Sarabun', sans-serif; /* ฟอนต์อังกฤษหัวกลมๆ น่ารัก */
+        }
+        
+        /* Custom scrollbar for dialog */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a2b1c6; }
+        
+        /* Playful animations */
+        .calendar-day { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .calendar-day:hover { transform: translateY(-4px) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .calendar-day:active { transform: translateY(0) scale(0.95); }
+        
+        .vocab-card { transition: all 0.2s ease-in-out; }
+        .vocab-card:hover { transform: translateY(-3px) scale(1.01); }
+
+        .blob-bg {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23E0E7FF' d='M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.4,-46.3C91,-33.5,97.2,-18.1,97.1,-3.1C97,12,90.6,26.7,81.3,39.4C72,52.2,59.8,63.1,45.8,71.3C31.8,79.5,15.9,85.1,0.2,84.7C-15.5,84.4,-31,78.2,-45.1,69.9C-59.2,61.6,-71.9,51.2,-81.1,38.2C-90.3,25.2,-96,9.6,-95.2,-5.7C-94.4,-21.1,-87.1,-36,-76.3,-47.9C-65.5,-59.8,-51.2,-68.6,-36.8,-75.4C-22.4,-82.2,-7.9,-87,3.9,-93.8C15.7,-100.6,30.6,-83.6,44.7,-76.4Z' transform='translate(100 100)' /%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Pulse animation for 'Today' */
+        @keyframes softPulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        .today-pulse { animation: softPulse 2s infinite; }
+    </style>
+</head>
+<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <div class="w-full max-w-4xl space-y-6">
+        
+        <!-- Header & Summary Section -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-[2rem] p-6 md:p-8 shadow-xl shadow-indigo-100/50 border border-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Title & Mascot -->
+                <div class="flex items-center gap-4">
+                    <div class="text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🦉</div>
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-500 mb-1">
+                            Daily English Vocab
+                        </h1>
+                        <p class="text-slate-500 font-medium text-sm md:text-base flex items-center gap-1">
+                            ท่องศัพท์วันละ 20 คำ กับน้องฮูก! 🌟 
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Monthly Summary Card -->
+                <div class="bg-gradient-to-tr from-pink-400 to-orange-400 p-5 rounded-3xl w-full md:w-auto flex items-center gap-5 shadow-lg shadow-orange-200 text-white transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30">
+                        🐻
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-pink-50 mb-1">สรุปการเรียนเดือนนี้</p>
+                        <p class="text-3xl font-extrabold leading-none">
+                            <span id="summary-completed">0</span>
+                            <span class="text-xl font-medium text-pink-100">/ <span id="summary-total">30</span> วัน</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="bg-white/90 backdrop-blur-lg rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-indigo-100/40 border border-white">
+            
+            <!-- Calendar Header (Month Navigation) -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">🗓️</div>
+                    <h2 id="month-year-display" class="text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
+                </div>
+                
+                <div class="flex gap-2 bg-slate-100 p-1.5 rounded-2xl">
+                    <button onclick="changeMonth(-1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-indigo-50 hover:text-indigo-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-left text-lg"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-5 py-2 rounded-xl bg-white shadow-sm hover:shadow hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 font-bold transition-all active:scale-95 text-sm">
+                        กลับมาวันนี้
+                    </button>
+                    <button onclick="changeMonth(1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-indigo-50 hover:text-indigo-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Days of Week -->
+            <div class="grid grid-cols-7 gap-2 md:gap-3 mb-3 text-center font-bold text-slate-400 text-xs md:text-sm uppercase tracking-wider">
+                <div class="text-rose-400">Sun</div>
+                <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
+                <div class="text-blue-400">Sat</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2 md:gap-3">
+                <!-- Days will be generated by JS -->
+            </div>
+        </div>
+        
+        <!-- Footer info -->
+        <div class="text-center text-slate-400 text-sm font-medium">
+            <p>💡 Tip: กดที่วันที่เพื่อเริ่มท่องศัพท์ได้เลย!</p>
+        </div>
+
+    </div>
+
+    <!-- Dialog / Modal for Vocabulary -->
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-indigo-900/30 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
+        
+        <!-- Modal Content -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-3xl bg-[#f8fafc] rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-4 border-white">
+            
+            <!-- Modal Header -->
+            <div class="px-8 py-6 border-b border-slate-200/60 bg-white flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl">🦊</div>
+                    <div>
+                        <h3 id="dialog-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">วันที่ --/--/----</h3>
+                        <p class="text-sm text-slate-500 mt-1 font-medium">มาเก็บศัพท์เข้าสมองกันเถอะ! (20 คำ)</p>
+                    </div>
+                </div>
+                <button onclick="closeDialog()" class="text-slate-400 hover:text-rose-500 bg-slate-100 hover:bg-rose-50 p-3 rounded-full transition-all active:scale-90">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable Vocab List) -->
+            <div id="dialog-content" class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+                <!-- Vocab list will be injected here -->
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="px-8 py-5 border-t border-slate-200/60 bg-white flex justify-between items-center gap-3">
+                <div class="text-3xl hidden md:block">🎉</div>
+                <div class="flex gap-3 w-full md:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-2xl transition-colors">
+                        ปิดไว้ก่อน
+                    </button>
+                    <button id="btn-complete-day" class="px-8 py-3 bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold hover:from-indigo-600 hover:to-violet-600 rounded-2xl shadow-lg shadow-indigo-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg">
+                        <i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants & Variables ---
+        const VOCAB_PER_SESSION = 20;
+        const MONTH_NAMES = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        
+        let currentDate = new Date(); 
+        let today = new Date(); 
+        let selectedDateString = null; 
+        
+        // --- State Management (Local Storage) ---
+        let appState = {
+            completedDates: [] 
+        };
+
+        function loadState() {
+            const saved = localStorage.getItem('english_calendar_v1');
+            if (saved) {
+                appState = JSON.parse(saved);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('english_calendar_v1', JSON.stringify(appState));
+        }
+
+        // --- Vocabulary Pool ---
+        const vocabPool = [
+            { word: "Absolutely", meaning: "อย่างแน่นอน, อย่างแท้จริง", example: "I absolutely agree with your point." },
+            { word: "Bizarre", meaning: "แปลกประหลาด", example: "That's a bizarre story." },
+            { word: "Crucial", meaning: "สำคัญมาก, วิกฤต", example: "Water is crucial for survival." },
+            { word: "Determine", meaning: "ตัดสินใจ, กำหนด", example: "We need to determine the cause of the problem." },
+            { word: "Emphasize", meaning: "เน้นย้ำ", example: "The teacher emphasized the importance of reading." },
+            { word: "Fascinating", meaning: "น่าหลงใหล, น่าสนใจมาก", example: "The museum had a fascinating exhibit." },
+            { word: "Genuine", meaning: "แท้จริง, จริงใจ", example: "She showed genuine interest in my project." },
+            { word: "Hesitate", meaning: "ลังเล", example: "Don't hesitate to call me if you need help." },
+            { word: "Implement", meaning: "นำไปปฏิบัติ, ทำให้มีผล", example: "We will implement the new policy next month." },
+            { word: "Justify", meaning: "แสดงให้เห็นถึงเหตุผล, พิสูจน์ว่าถูกต้อง", example: "Can you justify your decision?" },
+            { word: "Knowledgeable", meaning: "มีความรู้มาก", example: "He is very knowledgeable about history." },
+            { word: "Literally", meaning: "อย่างแท้จริง, ตามตัวอักษร", example: "I was literally starving." },
+            { word: "Maintain", meaning: "รักษาไว้, บำรุง", example: "It's important to maintain a healthy diet." },
+            { word: "Negotiate", meaning: "เจรจาต่อรอง", example: "They are trying to negotiate a peace treaty." },
+            { word: "Observe", meaning: "สังเกต", example: "Observe how the birds build their nests." },
+            { word: "Persuade", meaning: "ชักชวน, โน้มน้าว", example: "I tried to persuade him to come with us." },
+            { word: "Significant", meaning: "สำคัญ, มีความหมาย", example: "There was a significant change in the weather." },
+            { word: "Tolerate", meaning: "อดทน, ยอมรับ", example: "I will not tolerate bad behavior." },
+            { word: "Utilize", meaning: "ใช้ประโยชน์", example: "We must utilize all available resources." },
+            { word: "Vulnerable", meaning: "อ่อนแอ, เปราะบาง", example: "Elderly people are particularly vulnerable to the virus." },
+            { word: "Accommodate", meaning: "จัดให้เหมาะสม, ให้ที่พัก", example: "The hotel can accommodate up to 500 guests." },
+            { word: "Beneficial", meaning: "เป็นประโยชน์", example: "Exercise is beneficial to your health." },
+            { word: "Consequence", meaning: "ผลลัพธ์, ผลที่ตามมา", example: "He must face the consequences of his actions." },
+            { word: "Dilemma", meaning: "สภาวะกลืนไม่เข้าคายไม่ออก", example: "I'm in a dilemma about which job offer to accept." },
+            { word: "Evaluate", meaning: "ประเมินผล", example: "The teacher will evaluate your performance." },
+            { word: "Flaw", meaning: "ข้อบกพร่อง, ตำหนิ", example: "There is a minor flaw in this design." },
+            { word: "Grasp", meaning: "จับ, เข้าใจ", example: "I finally grasped the concept of the lesson." },
+            { word: "Hypothesis", meaning: "สมมติฐาน", example: "The scientists are testing a new hypothesis." },
+            { word: "Interpret", meaning: "ตีความ, แปล", example: "How do you interpret this poem?" },
+            { word: "Jeopardize", meaning: "ทำให้ตกอยู่ในอันตราย", example: "His mistake could jeopardize the entire project." },
+            { word: "Lucrative", meaning: "ได้กำไรดี", example: "She runs a very lucrative business." },
+            { word: "Mandatory", meaning: "บังคับ, จำเป็นต้องทำ", example: "Attendance at the meeting is mandatory." },
+            { word: "Notorious", meaning: "มีชื่อเสียงในทางไม่ดี", example: "The city is notorious for its traffic jams." },
+            { word: "Obsolete", meaning: "ล้าสมัย, เลิกใช้แล้ว", example: "Typewriters are now largely obsolete." },
+            { word: "Prominent", meaning: "โดดเด่น, มีชื่อเสียง", example: "He is a prominent figure in the tech industry." },
+            { word: "Retrieve", meaning: "ได้กลับคืนมา, กู้คืน", example: "I need to retrieve my data from the broken hard drive." },
+            { word: "Spontaneous", meaning: "เกิดขึ้นเอง, ไม่ได้เตรียมตัว", example: "We took a spontaneous trip to the beach." },
+            { word: "Tedious", meaning: "น่าเบื่อ, ยืดเยื้อ", example: "Data entry can be a very tedious task." },
+            { word: "Unanimous", meaning: "เป็นเอกฉันท์", example: "The committee reached a unanimous decision." },
+            { word: "Verify", meaning: "ตรวจสอบความถูกต้อง", example: "Please verify your account via email." },
+            { word: "Abundant", meaning: "มากมาย, อุดมสมบูรณ์", example: "There is an abundant supply of water." },
+            { word: "Banish", meaning: "เนรเทศ, ขจัดออกไป", example: "He was banished from the country." },
+            { word: "Candid", meaning: "ตรงไปตรงมา, เปิดเผย", example: "Give me your candid opinion." },
+            { word: "Deceive", meaning: "หลอกลวง", example: "He tried to deceive me into giving him money." },
+            { word: "Endure", meaning: "อดทน, คงอยู่", example: "She had to endure a lot of pain." },
+            { word: "Feasible", meaning: "เป็นไปได้, สามารถทำได้", example: "Is this plan practically feasible?" },
+            { word: "Glimpse", meaning: "มองแวบเดียว, เหลือบเห็น", example: "I caught a glimpse of her in the crowd." },
+            { word: "Hinder", meaning: "ขัดขวาง, เป็นอุปสรรค", example: "Bad weather hindered our progress." },
+            { word: "Illuminate", meaning: "ส่องสว่าง, ทำให้ชัดเจน", example: "The presentation illuminated the main issues." },
+            { word: "Jargon", meaning: "ศัพท์เฉพาะวงการ", example: "The document is full of legal jargon." }
+        ];
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function getRandomVocab() {
+            const shuffled = shuffleArray(vocabPool);
+            return shuffled.slice(0, Math.min(VOCAB_PER_SESSION, shuffled.length));
+        }
+
+        // --- Calendar Logic ---
+        
+        function getFormatDateString(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function getDisplayDateString(year, month, day) {
+            return `${day} ${MONTH_NAMES[month]} ${year}`;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('month-year-display').innerText = `${MONTH_NAMES[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[1.5rem] bg-slate-50/50 border border-dashed border-slate-200 opacity-40"></div>`;
+            }
+
+            let completedThisMonth = 0;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = getFormatDateString(year, month, day);
+                const isCompleted = appState.completedDates.includes(dateString);
+                const isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                
+                if (isCompleted) completedThisMonth++;
+
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-5 rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px]";
+                
+                let stateClasses = "";
+                let indicatorHTML = "";
+
+                if (isCompleted) {
+                    stateClasses = "bg-emerald-50 border-emerald-200 text-emerald-800 shadow-sm";
+                    indicatorHTML = `
+                        <div class="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full shadow border border-emerald-100 flex items-center justify-center text-sm z-10 animate-bounce" style="animation-duration: 2s;">⭐</div>
+                        <i class="ph-fill ph-check-circle text-emerald-400 text-2xl md:text-3xl mt-1 opacity-60"></i>
+                    `;
+                } else if (isToday) {
+                    stateClasses = "bg-gradient-to-b from-indigo-500 to-violet-600 border-transparent text-white shadow-lg shadow-indigo-500/40 today-pulse";
+                    indicatorHTML = `
+                        <span class="text-[10px] md:text-xs font-bold bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm">วันนี้</span>
+                    `;
+                } else {
+                    stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-indigo-300";
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-2xl md:text-3xl mt-1 group-hover:text-indigo-400 transition-colors"></i>`;
+                }
+
+                // Check for Sunday/Saturday colors
+                const dayOfWeek = new Date(year, month, day).getDay();
+                let textStyle = "font-extrabold text-xl md:text-2xl font-english";
+                if (!isToday && !isCompleted) {
+                    if (dayOfWeek === 0) textStyle += " text-rose-500";
+                    else if (dayOfWeek === 6) textStyle += " text-blue-500";
+                }
+
+                const cardHTML = `
+                    <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
+                        <span class="${textStyle}">${day}</span>
+                        ${indicatorHTML}
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            }
+
+            // Animate number change
+            const completedEl = document.getElementById('summary-completed');
+            completedEl.innerText = completedThisMonth;
+            completedEl.classList.add('scale-150', 'text-yellow-200');
+            setTimeout(() => completedEl.classList.remove('scale-150', 'text-yellow-200'), 300);
+            
+            document.getElementById('summary-total').innerText = daysInMonth;
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // --- Dialog & Interaction ---
+        
+        function openDayDialog(year, month, day) {
+            selectedDateString = getFormatDateString(year, month, day);
+            const displayDate = getDisplayDateString(year, month, day);
+            const isCompleted = appState.completedDates.includes(selectedDateString);
+
+            const dialog = document.getElementById('vocab-dialog');
+            const title = document.getElementById('dialog-title');
+            const content = document.getElementById('dialog-content');
+            const btnComplete = document.getElementById('btn-complete-day');
+
+            title.innerText = `วันที่ ${displayDate}`;
+
+            const vocabList = getRandomVocab();
+            content.innerHTML = '';
+            
+            vocabList.forEach((v, index) => {
+                const itemHTML = `
+                    <div class="vocab-card p-5 bg-white border-2 border-slate-100 rounded-[2rem] hover:border-orange-300 hover:shadow-xl hover:shadow-orange-100/50 transition-all flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                        
+                        <!-- Cute background blob -->
+                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-orange-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        <div class="blob-bg text-indigo-700 w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm relative z-10 font-english">
+                            ${index + 1}
+                        </div>
+                        
+                        <div class="flex-1 relative z-10 w-full">
+                            <div class="flex justify-between items-start w-full">
+                                <h4 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-1 flex items-center gap-3 font-english tracking-wide">
+                                    ${v.word}
+                                    <button onclick="speakWord('${v.word}')" class="bg-indigo-50 text-indigo-500 hover:bg-indigo-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียง">
+                                        <i class="ph-fill ph-speaker-high text-lg"></i>
+                                    </button>
+                                </h4>
+                            </div>
+                            <p class="text-indigo-600 font-bold mb-3 bg-indigo-50 inline-block px-3 py-1 rounded-lg text-sm">${v.meaning}</p>
+                            
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative mt-2">
+                                <i class="ph-fill ph-quotes text-slate-200 text-4xl absolute -top-2 -left-1"></i>
+                                <p class="text-sm md:text-base text-slate-600 relative z-10 font-english pl-4">
+                                    ${v.example}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                content.innerHTML += itemHTML;
+            });
+
+            if (isCompleted) {
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-yellow-300 text-xl"></i> ทบทวนเสร็จแล้ว (เยี่ยมมาก!)`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold hover:from-emerald-600 hover:to-teal-600 rounded-2xl shadow-lg shadow-emerald-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = closeDialog; 
+            } else {
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold hover:from-indigo-600 hover:to-violet-600 rounded-2xl shadow-lg shadow-indigo-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = markDayAsComplete; 
+            }
+
+            dialog.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('dialog-content').scrollTop = 0;
+        }
+
+        function closeDialog() {
+            const dialog = document.getElementById('vocab-dialog');
+            dialog.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            selectedDateString = null;
+        }
+
+        function markDayAsComplete() {
+            if (selectedDateString && !appState.completedDates.includes(selectedDateString)) {
+                appState.completedDates.push(selectedDateString);
+                saveState();
+                
+                // Show cute alert
+                const alert = document.createElement('div');
+                alert.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-green-400";
+                alert.innerHTML = `<span class="text-2xl">🎉</span> เก่งมาก! สะสมดาวได้อีก 1 ดวง`;
+                document.body.appendChild(alert);
+                setTimeout(() => alert.remove(), 3000);
+
+                renderCalendar(); 
+            }
+            closeDialog();
+        }
+
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9; // พูดช้าลงนิดหน่อยให้ฟังชัดขึ้น
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        window.onload = () => {
+            loadState();
+            renderCalendar();
+        };
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape" && !document.getElementById('vocab-dialog').classList.contains('hidden')) {
+                closeDialog();
+            }
+        });
+    </script>
+</body>
+</html>

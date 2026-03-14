@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ท่องอังกฤษ UK — Calendar Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- เพิ่มฟอนต์ Mali สำหรับหัวข้อให้ดูน่ารัก และ Sarabun สำหรับเนื้อหา -->
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            /* เปลี่ยนพื้นหลังเป็นกราเดียนต์สีพาสเทลดูสบายตา */
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 50%, #fdf4ff 100%);
+            background-attachment: fixed;
+        }
+        h1, h2, h3, h4, .font-mali {
+            font-family: 'Mali', cursive;
+        }
+        
+        /* Custom scrollbar แบบน่ารักๆ */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.5); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a5b4fc; border: 2px solid transparent; background-clip: padding-box; }
+        
+        /* Animations */
+        .calendar-day { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .calendar-day:hover { transform: translateY(-4px) scale(1.02); }
+        
+        .vocab-card { transition: all 0.3s ease; }
+        .vocab-card:hover { transform: translateX(4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+
+        /* Wiggle animation for cute effect */
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        .wiggle-on-hover:hover { animation: wiggle 0.5s ease-in-out infinite; }
+    </style>
+</head>
+<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <div class="w-full max-w-4xl space-y-6">
+        
+        <!-- Header & Summary Section -->
+        <div class="bg-white/80 backdrop-blur-md rounded-[2rem] p-6 md:p-8 shadow-xl shadow-indigo-100/50 border border-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div class="flex items-start gap-4">
+                    <div class="text-5xl wiggle-on-hover cursor-pointer pt-1">💂‍♂️</div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-indigo-900 mb-2 flex items-center gap-2">
+                            Daily UK English 🇬🇧
+                        </h1>
+                        <p class="text-indigo-600/80 font-medium">ท่องศัพท์บริติชวันละ 20 คำ สะสมความรู้สไตล์ผู้ดีอังกฤษ ☕</p>
+                    </div>
+                </div>
+
+                <!-- Monthly Summary Card -->
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 p-4 rounded-3xl w-full md:w-auto flex items-center gap-4 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-20">🌟</div>
+                    <div class="bg-gradient-to-br from-amber-400 to-orange-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-orange-200 rotate-3">
+                        <i class="ph-bold ph-star"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="text-sm font-bold text-amber-800 uppercase tracking-wide font-mali">ความสำเร็จเดือนนี้</p>
+                        <p class="text-3xl font-bold text-slate-800 leading-none mt-1">
+                            <span id="summary-completed">0</span>
+                            <span class="text-lg text-amber-600/70 font-normal">/ <span id="summary-total">30</span> วัน</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="bg-white/80 backdrop-blur-md rounded-[2rem] p-6 md:p-8 shadow-xl shadow-indigo-100/50 border border-white">
+            
+            <!-- Calendar Header -->
+            <div class="flex justify-between items-center mb-8">
+                <h2 id="month-year-display" class="text-3xl font-bold text-indigo-900 flex items-center gap-3">
+                    <span class="text-4xl">🗓️</span> Month Year
+                </h2>
+                <div class="flex gap-2 bg-indigo-50 p-1.5 rounded-2xl border border-indigo-100">
+                    <button onclick="changeMonth(-1)" class="p-3 rounded-xl bg-white text-indigo-600 hover:bg-indigo-100 hover:text-indigo-800 transition-colors shadow-sm">
+                        <i class="ph-bold ph-caret-left text-lg"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold hover:from-indigo-600 hover:to-purple-600 transition-colors shadow-md shadow-indigo-200">
+                        วันนี้ 📍
+                    </button>
+                    <button onclick="changeMonth(1)" class="p-3 rounded-xl bg-white text-indigo-600 hover:bg-indigo-100 hover:text-indigo-800 transition-colors shadow-sm">
+                        <i class="ph-bold ph-caret-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Days of Week -->
+            <div class="grid grid-cols-7 gap-2 mb-3 text-center font-bold text-indigo-400 text-sm uppercase tracking-wider font-mali">
+                <div class="text-rose-400">Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div class="text-indigo-500">Sat</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2 md:gap-3">
+                <!-- Days will be generated by JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Dialog / Modal for Vocabulary -->
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-indigo-900/30 backdrop-blur-md transition-opacity" onclick="closeDialog()"></div>
+        
+        <!-- Modal Content -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-2xl bg-white rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-4 border-white">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-5 bg-gradient-to-r from-indigo-50 to-purple-50 flex justify-between items-center relative z-10 border-b border-indigo-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow-sm border border-indigo-100">
+                        📖
+                    </div>
+                    <div>
+                        <h3 id="dialog-title" class="text-2xl font-bold text-indigo-900 font-mali">วันที่ --/--/----</h3>
+                        <p class="text-sm text-indigo-600/80 font-medium mt-0.5">คลังศัพท์ UK 20 คำประจำวัน 🎉</p>
+                    </div>
+                </div>
+                <button onclick="closeDialog()" class="text-indigo-300 hover:text-rose-500 bg-white hover:bg-rose-50 w-10 h-10 flex items-center justify-center rounded-full transition-colors shadow-sm border border-indigo-50">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable Vocab List) -->
+            <div id="dialog-content" class="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-4 bg-slate-50/50">
+                <!-- Vocab list will be injected here -->
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="px-6 py-5 bg-white flex justify-end gap-3 border-t border-slate-100">
+                <button onclick="closeDialog()" class="px-6 py-3 text-slate-500 font-bold font-mali hover:bg-slate-100 rounded-2xl transition-colors">
+                    พักก่อน 😴
+                </button>
+                <button id="btn-complete-day" class="px-8 py-3 bg-gradient-to-r from-emerald-400 to-teal-500 text-white font-bold font-mali hover:from-emerald-500 hover:to-teal-600 rounded-2xl shadow-lg shadow-teal-500/30 transition-all active:scale-95 flex items-center gap-2">
+                    <i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants & Variables ---
+        const VOCAB_PER_SESSION = 20;
+        const MONTH_NAMES = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        
+        // Cartoon Emojis for Vocab Cards
+        const CARTOON_EMOJIS = ['🐶', '🐱', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐙', '🦖', '🦄', '🐝', '🦋', '🦉', '🐧', '🐥', '🐢'];
+        // Cute Border Colors
+        const CARD_COLORS = ['border-pink-200 bg-pink-50/30', 'border-blue-200 bg-blue-50/30', 'border-amber-200 bg-amber-50/30', 'border-emerald-200 bg-emerald-50/30', 'border-purple-200 bg-purple-50/30'];
+
+        let currentDate = new Date();
+        let today = new Date();
+        let selectedDateString = null;
+        
+        // --- State Management ---
+        let appState = {
+            completedDates: [] 
+        };
+
+        function loadState() {
+            const saved = localStorage.getItem('english_uk_calendar_v1');
+            if (saved) {
+                appState = JSON.parse(saved);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('english_uk_calendar_v1', JSON.stringify(appState));
+        }
+
+        // --- Vocabulary Pool (UK English) ---
+        const vocabPool = [
+            { word: "Biscuit", meaning: "คุกกี้, บิสกิต", example: "Would you like a biscuit with your tea?" },
+            { word: "Chips", meaning: "มันฝรั่งทอด (เฟรนช์ฟรายส์)", example: "I ordered fish and chips for dinner." },
+            { word: "Crisps", meaning: "มันฝรั่งแผ่นทอดกรอบ", example: "He bought a packet of cheese and onion crisps." },
+            { word: "Flat", meaning: "ห้องชุด, อพาร์ตเมนต์", example: "She lives in a small flat in London." },
+            { word: "Lift", meaning: "ลิฟต์", example: "The lift is broken, we have to use the stairs." },
+            { word: "Lorry", meaning: "รถบรรทุก", example: "A large lorry blocked the narrow road." },
+            { word: "Pavement", meaning: "ทางเท้า, ฟุตบาท", example: "Please walk on the pavement, not the road." },
+            { word: "Petrol", meaning: "น้ำมันรถ", example: "We need to stop at a petrol station." },
+            { word: "Queue", meaning: "เข้าคิว, แถว", example: "There was a long queue outside the cinema." },
+            { word: "Rubbish", meaning: "ขยะ, เรื่องไร้สาระ", example: "Throw that empty bottle in the rubbish bin." },
+            { word: "Trousers", meaning: "กางเกงขายาว", example: "I need to buy a new pair of trousers." },
+            { word: "Wardrobe", meaning: "ตู้เสื้อผ้า", example: "Hang your coat in the wardrobe." },
+            { word: "Chemist", meaning: "ร้านขายยา", example: "I got some medicine from the chemist." },
+            { word: "Holiday", meaning: "วันหยุดยาว", example: "Where are you going for your summer holiday?" },
+            { word: "Jumper", meaning: "เสื้อกันหนาวแบบสวมหัว", example: "It's cold, you should wear a jumper." },
+            { word: "Trainers", meaning: "รองเท้าผ้าใบ", example: "He was wearing white trainers and jeans." },
+            { word: "Postcode", meaning: "รหัสไปรษณีย์", example: "What is your address and postcode?" },
+            { word: "Boot", meaning: "กระโปรงหลังรถ", example: "Put the suitcases in the boot of the car." },
+            { word: "Bonnet", meaning: "ฝากระโปรงรถ", example: "Smoke was coming from under the bonnet." },
+            { word: "Windscreen", meaning: "กระจกหน้ารถ", example: "A stone cracked the windscreen." },
+            { word: "Indicator", meaning: "ไฟเลี้ยวรถ", example: "You forgot to use your indicator." },
+            { word: "Motorway", meaning: "ทางด่วน", example: "The speed limit on the motorway is 70 mph." },
+            { word: "Underground / Tube", meaning: "รถไฟใต้ดิน (ในลอนดอน)", example: "Let's take the Tube to Piccadilly Circus." },
+            { word: "Railway", meaning: "ทางรถไฟ", example: "We live near the railway station." },
+            { word: "Timetable", meaning: "ตารางเวลา", example: "Check the train timetable before you leave." },
+            { word: "Fortnight", meaning: "ระยะเวลา 2 สัปดาห์", example: "We are going to Spain for a fortnight." },
+            { word: "Autumn", meaning: "ฤดูใบไม้ร่วง", example: "The leaves turn brown in autumn." },
+            { word: "Tap", meaning: "ก๊อกน้ำ", example: "Turn off the tap while brushing your teeth." },
+            { word: "Plaster", meaning: "พลาสเตอร์ปิดแผล", example: "I cut my finger, do you have a plaster?" },
+            { word: "Dummy", meaning: "จุกนมปลอม (สำหรับเด็ก)", example: "The baby stopped crying when she got her dummy." },
+            { word: "Nappy", meaning: "ผ้าอ้อมเด็ก", example: "It's time to change the baby's nappy." },
+            { word: "Pram", meaning: "รถเข็นเด็ก (แบบนอน)", example: "She pushed the pram through the park." },
+            { word: "Torch", meaning: "ไฟฉาย", example: "It's dark outside, bring a torch." },
+            { word: "Maths", meaning: "วิชาคณิตศาสตร์", example: "I have a maths exam tomorrow." },
+            { word: "CV", meaning: "เรซูเม่, ประวัติการทำงาน", example: "Send your CV to the manager." },
+            { word: "Colour", meaning: "สี (Spelling)", example: "What is your favourite colour?" },
+            { word: "Flavour", meaning: "รสชาติ (Spelling)", example: "This ice cream has a strange flavour." },
+            { word: "Centre", meaning: "ศูนย์กลาง (Spelling)", example: "The shopping centre is very crowded." },
+            { word: "Apologise", meaning: "ขอโทษ (Spelling)", example: "I must apologise for my mistake." },
+            { word: "Organise", meaning: "จัดการ, จัดระเบียบ (Spelling)", example: "She helped to organise the party." }
+        ];
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function getRandomVocab() {
+            const shuffled = shuffleArray(vocabPool);
+            return shuffled.slice(0, Math.min(VOCAB_PER_SESSION, shuffled.length));
+        }
+
+        // --- Calendar Logic ---
+        
+        function getFormatDateString(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function getDisplayDateString(year, month, day) {
+            return `${day} ${MONTH_NAMES[month]} ${year}`;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('month-year-display').innerHTML = `<span class="text-4xl">🗓️</span> ${MONTH_NAMES[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            // Empty slots
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="p-2 md:p-4 rounded-3xl bg-white/40 border border-white/50 backdrop-blur-sm"></div>`;
+            }
+
+            let completedThisMonth = 0;
+
+            // Days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = getFormatDateString(year, month, day);
+                const isCompleted = appState.completedDates.includes(dateString);
+                const isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                
+                if (isCompleted) completedThisMonth++;
+
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-4 rounded-3xl border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px] bg-white";
+                let stateClasses = "";
+                let contentHTML = `<span class="text-xl md:text-3xl font-bold font-mali mt-1 text-slate-700">${day}</span>`;
+
+                if (isCompleted) {
+                    stateClasses = "border-emerald-200 bg-emerald-50/80 shadow-sm shadow-emerald-100";
+                    contentHTML += `<div class="mt-1 text-2xl md:text-3xl filter drop-shadow-sm wiggle-on-hover">⭐</div>`;
+                } else if (isToday) {
+                    stateClasses = "border-purple-400 bg-gradient-to-b from-purple-50 to-indigo-100 shadow-md shadow-purple-200";
+                    contentHTML = `
+                        <span class="absolute top-2 left-2 flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
+                        </span>
+                        <span class="text-xl md:text-3xl font-bold font-mali mt-1 text-indigo-900">${day}</span>
+                        <div class="mt-1 text-xs md:text-sm font-bold bg-white text-purple-600 px-2.5 py-1 rounded-full shadow-sm font-mali">วันนี้</div>
+                    `;
+                } else {
+                    stateClasses = "border-white shadow-sm hover:border-indigo-300 hover:bg-indigo-50/50";
+                    contentHTML += `<i class="ph-duotone ph-book-open text-indigo-200 text-2xl md:text-3xl mt-1 group-hover:text-indigo-400 transition-colors"></i>`;
+                }
+
+                grid.innerHTML += `
+                    <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
+                        ${contentHTML}
+                    </div>
+                `;
+            }
+
+            document.getElementById('summary-completed').innerText = completedThisMonth;
+            document.getElementById('summary-total').innerText = daysInMonth;
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // --- Dialog & Interaction ---
+        
+        function openDayDialog(year, month, day) {
+            selectedDateString = getFormatDateString(year, month, day);
+            const displayDate = getDisplayDateString(year, month, day);
+            const isCompleted = appState.completedDates.includes(selectedDateString);
+
+            const dialog = document.getElementById('vocab-dialog');
+            document.getElementById('dialog-title').innerText = `วันที่ ${displayDate}`;
+            const content = document.getElementById('dialog-content');
+            const btnComplete = document.getElementById('btn-complete-day');
+
+            // Get Vocab & Render Cards
+            const vocabList = getRandomVocab();
+            content.innerHTML = '';
+            
+            vocabList.forEach((v, index) => {
+                const randomEmoji = CARTOON_EMOJIS[Math.floor(Math.random() * CARTOON_EMOJIS.length)];
+                const randomColorClass = CARD_COLORS[index % CARD_COLORS.length]; // สลับสีขอบ
+
+                content.innerHTML += `
+                    <div class="vocab-card p-5 bg-white border-2 ${randomColorClass} rounded-3xl shadow-sm relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 text-6xl opacity-10 blur-[2px]">${randomEmoji}</div>
+                        <div class="flex items-start gap-4 relative z-10">
+                            <div class="bg-white text-slate-700 w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shrink-0 border-2 border-slate-100 shadow-sm font-mali">
+                                ${index + 1}
+                            </div>
+                            <div class="flex-1 pt-1">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="text-2xl font-bold text-slate-800 mb-1 flex items-center gap-2 font-mali">
+                                        ${v.word}
+                                        <button onclick="speakWord('${v.word}')" class="text-indigo-400 hover:text-indigo-600 bg-white rounded-full p-1.5 shadow-sm border border-indigo-50 transition-transform active:scale-90" title="ฟังเสียงสำเนียง UK">
+                                            <i class="ph-fill ph-speaker-high"></i>
+                                        </button>
+                                    </h4>
+                                    <span class="text-3xl wiggle-on-hover cursor-default">${randomEmoji}</span>
+                                </div>
+                                <p class="text-rose-500 font-bold mb-3 font-mali text-lg tracking-wide">${v.meaning}</p>
+                                <div class="bg-white/80 p-3.5 rounded-2xl border border-white shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] relative">
+                                    <p class="text-[15px] text-slate-600 font-serif italic pr-4 font-medium leading-relaxed">"${v.example}"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (isCompleted) {
+                btnComplete.innerHTML = `<i class="ph-bold ph-check text-xl"></i> ทบทวนเสร็จแล้ว`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-slate-400 to-slate-500 text-white font-bold font-mali hover:from-slate-500 hover:to-slate-600 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-2";
+                btnComplete.onclick = closeDialog;
+            } else {
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-xl"></i> ท่องเสร็จแล้ว!`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold font-mali hover:from-amber-500 hover:to-orange-600 rounded-2xl shadow-lg shadow-orange-500/30 transition-all active:scale-95 flex items-center gap-2";
+                btnComplete.onclick = markDayAsComplete;
+            }
+
+            dialog.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('dialog-content').scrollTop = 0;
+        }
+
+        function closeDialog() {
+            document.getElementById('vocab-dialog').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            selectedDateString = null;
+        }
+
+        function markDayAsComplete() {
+            if (selectedDateString && !appState.completedDates.includes(selectedDateString)) {
+                appState.completedDates.push(selectedDateString);
+                saveState();
+                renderCalendar();
+            }
+            closeDialog();
+        }
+
+        // --- TTS (UK English) ---
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(word);
+                // เปลี่ยนเป็นเสียงสำเนียงบริติช (UK)
+                utterance.lang = 'en-GB'; 
+                // ปรับความเร็วเสียงให้อ่านชัดเจนขึ้นเล็กน้อย
+                utterance.rate = 0.9; 
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // --- Init ---
+        window.onload = () => {
+            loadState();
+            renderCalendar();
+        };
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape" && !document.getElementById('vocab-dialog').classList.contains('hidden')) {
+                closeDialog();
+            }
+        });
+    </script>
+</body>
+</html>

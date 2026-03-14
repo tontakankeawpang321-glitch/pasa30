@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ท่องจีน — Calendar Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for UI -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            /* พื้นหลังโทนสีพีช/แดงอ่อนๆ สไตล์จีน สบายตา */
+            background: linear-gradient(135deg, #fff1f2 0%, #fff7ed 100%);
+            background-color: #fff1f2;
+            background-image: radial-gradient(#fecdd3 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        h1, h2, h3, .font-english {
+            font-family: 'Fredoka', 'Sarabun', sans-serif;
+        }
+        .font-chinese {
+            font-family: 'Noto Sans SC', 'Sarabun', sans-serif; /* ฟอนต์รองรับภาษาจีน */
+        }
+        
+        /* Custom scrollbar for dialog */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #fff1f2; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fda4af; border-radius: 10px; border: 2px solid #fff1f2; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #fb7185; }
+        
+        /* Playful animations */
+        .calendar-day { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .calendar-day:hover { transform: translateY(-4px) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.1), 0 4px 6px -2px rgba(225, 29, 72, 0.05); }
+        .calendar-day:active { transform: translateY(0) scale(0.95); }
+        
+        .vocab-card { transition: all 0.2s ease-in-out; }
+        .vocab-card:hover { transform: translateY(-3px) scale(1.01); }
+
+        /* Blob รูปทรงน่ารักสีชมพูอ่อน */
+        .blob-bg {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23FFE4E6' d='M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.4,-46.3C91,-33.5,97.2,-18.1,97.1,-3.1C97,12,90.6,26.7,81.3,39.4C72,52.2,59.8,63.1,45.8,71.3C31.8,79.5,15.9,85.1,0.2,84.7C-15.5,84.4,-31,78.2,-45.1,69.9C-59.2,61.6,-71.9,51.2,-81.1,38.2C-90.3,25.2,-96,9.6,-95.2,-5.7C-94.4,-21.1,-87.1,-36,-76.3,-47.9C-65.5,-59.8,-51.2,-68.6,-36.8,-75.4C-22.4,-82.2,-7.9,-87,3.9,-93.8C15.7,-100.6,30.6,-83.6,44.7,-76.4Z' transform='translate(100 100)' /%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Pulse animation for 'Today' (โทนสีแดง/ส้ม) */
+        @keyframes softPulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+        .today-pulse { animation: softPulse 2s infinite; }
+    </style>
+</head>
+<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <div class="w-full max-w-4xl space-y-6">
+        
+        <!-- Header & Summary Section -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-[2rem] p-6 md:p-8 shadow-xl shadow-rose-100/50 border border-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Title & Mascot -->
+                <div class="flex items-center gap-4">
+                    <div class="text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🐼</div>
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400 mb-1">
+                            Daily Chinese Vocab
+                        </h1>
+                        <p class="text-slate-500 font-medium text-sm md:text-base flex items-center gap-1">
+                            ท่องศัพท์วันละ 20 คำ กับน้องแพนด้า! 🎋
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Monthly Summary Card -->
+                <div class="bg-gradient-to-tr from-amber-400 to-red-400 p-5 rounded-3xl w-full md:w-auto flex items-center gap-5 shadow-lg shadow-red-200 text-white transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30">
+                        🏆
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-red-50 mb-1">สรุปการเรียนเดือนนี้</p>
+                        <p class="text-3xl font-extrabold leading-none">
+                            <span id="summary-completed">0</span>
+                            <span class="text-xl font-medium text-red-100">/ <span id="summary-total">30</span> วัน</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="bg-white/90 backdrop-blur-lg rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-rose-100/40 border border-white">
+            
+            <!-- Calendar Header (Month Navigation) -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">🗓️</div>
+                    <h2 id="month-year-display" class="text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
+                </div>
+                
+                <div class="flex gap-2 bg-slate-100 p-1.5 rounded-2xl">
+                    <button onclick="changeMonth(-1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-left text-lg"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-5 py-2 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-700 font-bold transition-all active:scale-95 text-sm">
+                        กลับมาวันนี้
+                    </button>
+                    <button onclick="changeMonth(1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Days of Week -->
+            <div class="grid grid-cols-7 gap-2 md:gap-3 mb-3 text-center font-bold text-slate-400 text-xs md:text-sm uppercase tracking-wider">
+                <div class="text-red-400">Sun</div>
+                <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
+                <div class="text-blue-400">Sat</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2 md:gap-3">
+                <!-- Days will be generated by JS -->
+            </div>
+        </div>
+        
+        <!-- Footer info -->
+        <div class="text-center text-slate-400 text-sm font-medium">
+            <p>💡 Tip: กดที่วันที่เพื่อเริ่มท่องศัพท์ได้เลย!</p>
+        </div>
+
+    </div>
+
+    <!-- Dialog / Modal for Vocabulary -->
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-red-900/30 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
+        
+        <!-- Modal Content -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-3xl bg-[#fffafb] rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-4 border-white">
+            
+            <!-- Modal Header -->
+            <div class="px-8 py-6 border-b border-rose-100 bg-white flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl">🏮</div>
+                    <div>
+                        <h3 id="dialog-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-orange-400">วันที่ --/--/----</h3>
+                        <p class="text-sm text-slate-500 mt-1 font-medium">มาเก็บศัพท์เข้าสมองกันเถอะ! (20 คำ)</p>
+                    </div>
+                </div>
+                <button onclick="closeDialog()" class="text-slate-400 hover:text-rose-500 bg-slate-100 hover:bg-rose-50 p-3 rounded-full transition-all active:scale-90">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable Vocab List) -->
+            <div id="dialog-content" class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+                <!-- Vocab list will be injected here -->
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="px-8 py-5 border-t border-rose-100 bg-white flex justify-between items-center gap-3">
+                <div class="text-3xl hidden md:block">🎉</div>
+                <div class="flex gap-3 w-full md:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-2xl transition-colors">
+                        ปิดไว้ก่อน
+                    </button>
+                    <button id="btn-complete-day" class="px-8 py-3 bg-gradient-to-r from-rose-500 to-orange-400 text-white font-bold hover:from-rose-600 hover:to-orange-500 rounded-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg">
+                        <i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants & Variables ---
+        const VOCAB_PER_SESSION = 20;
+        const MONTH_NAMES = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        
+        let currentDate = new Date(); 
+        let today = new Date(); 
+        let selectedDateString = null; 
+        
+        // --- State Management (Local Storage) ---
+        let appState = {
+            completedDates: [] 
+        };
+
+        function loadState() {
+            // เปลี่ยน key เป็นสำหรับภาษาจีนเพื่อไม่ให้ทับข้อมูลเก่า
+            const saved = localStorage.getItem('chinese_calendar_v1');
+            if (saved) {
+                appState = JSON.parse(saved);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('chinese_calendar_v1', JSON.stringify(appState));
+        }
+
+        // --- Vocabulary Pool (ภาษาจีน) ---
+        const vocabPool = [
+            { word: "你好 (Nǐ hǎo - หนีห่าว)", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "你好，最近好吗？ (สวัสดี ช่วงนี้สบายดีไหม?)" },
+            { word: "谢谢 (Xièxiè - เซี่ยเซี่ย)", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "非常谢谢你 (ขอบคุณคุณมากๆ)" },
+            { word: "对不起 (Duìbùqǐ - ตุ้ยปู้ฉี่)", meaning: "ขอโทษ", english: "Sorry", icon: "🥺", example: "对不起，我迟到了 (ขอโทษ ฉันมาสาย)" },
+            { word: "再见 (Zàijiàn - จ้ายเจี้ยน)", meaning: "ลาก่อน", english: "Goodbye", icon: "👋", example: "明天见，再见 (เจอกันพรุ่งนี้ ลาก่อน)" },
+            { word: "是 (Shì - ซื่อ)", meaning: "ใช่ / เป็น / คือ", english: "Yes / Is", icon: "👍", example: "是的，我是泰国人 (ใช่ครับ/ค่ะ ฉันเป็นคนไทย)" },
+            { word: "不是 (Bù shì - ปู๋ซื่อ)", meaning: "ไม่ใช่", english: "No", icon: "👎", example: "这不是我的 (นี่ไม่ใช่ของฉัน)" },
+            { word: "请 (Qǐng - ฉิ่ง)", meaning: "กรุณา / เชิญ", english: "Please", icon: "🤲", example: "请进，请坐 (เชิญเข้ามา เชิญนั่ง)" },
+            { word: "多少钱 (Duōshǎo qián - ตัวเส่าเฉียน)", meaning: "เท่าไหร่?", english: "How much?", icon: "💰", example: "这个多少钱？ (อันนี้ราคาเท่าไหร่?)" },
+            { word: "叫什么名字 (Jiào shénme míngzì - เจี้ยวเสินเมอะหมิงจื้อ)", meaning: "ชื่ออะไร?", english: "What is your name?", icon: "📛", example: "你叫什么名字？ (คุณชื่ออะไร?)" },
+            { word: "吃饭了吗 (Chīfànle ma - ชือฟ่านเลอมะ)", meaning: "กินข้าวหรือยัง?", english: "Have you eaten?", icon: "🍚", example: "你吃饭了吗？ (คุณกินข้าวหรือยัง?)" },
+            { word: "我不懂 (Wǒ bù dǒng - หว่อปู้ต่ง)", meaning: "ฉันไม่เข้าใจ", english: "I don't understand", icon: "🤷", example: "对不起，我不懂 (ขอโทษค่ะ ฉันไม่เข้าใจ)" },
+            { word: "去哪里 (Qù nǎlǐ - ชวี่หนาลี่)", meaning: "ไปที่ไหน?", english: "Where are you going?", icon: "🚶", example: "你要去哪里？ (คุณจะไปไหน?)" },
+            { word: "漂亮 (Piàoliang - เพี่ยวเลี่ยง)", meaning: "สวย", english: "Beautiful", icon: "✨", example: "这件衣服很漂亮 (เสื้อตัวนี้สวยมาก)" },
+            { word: "很好 (Hěn hǎo - เหิ่นห่าว)", meaning: "ดีมาก", english: "Very good", icon: "🌟", example: "你的中文很好 (ภาษาจีนของคุณดีมาก)" },
+            { word: "我爱你 (Wǒ ài nǐ - หว่ออ้ายหนี่)", meaning: "ฉันรักคุณ", english: "I love you", icon: "❤️", example: "我爱你，你知道吗？ (ฉันรักคุณ คุณรู้ไหม?)" },
+            { word: "饿 (È - เอ้อ)", meaning: "หิว", english: "Hungry", icon: "🤤", example: "我肚子很饿 (ฉันหิวท้องร้องแล้ว)" },
+            { word: "渴 (Kě - เข่อ)", meaning: "หิวน้ำ", english: "Thirsty", icon: "💧", example: "我有点渴，想喝水 (ฉันหิวน้ำนิดหน่อย อยากดื่มน้ำ)" },
+            { word: "热 (Rè - เร่อ)", meaning: "ร้อน", english: "Hot", icon: "🥵", example: "今天天气很热 (วันนี้อากาศร้อนมาก)" },
+            { word: "冷 (Lěng - เหลิ่ง)", meaning: "หนาว / เย็น", english: "Cold", icon: "🥶", example: "外面很冷 (ข้างนอกหนาวมาก)" },
+            { word: "开心 (Kāixīn - ไคซิน)", meaning: "มีความสุข", english: "Happy", icon: "😄", example: "今天我很高兴/开心 (วันนี้ฉันมีความสุขมาก)" },
+            { word: "伤心 (Shāngxīn - ซางซิน)", meaning: "เสียใจ", english: "Sad", icon: "😢", example: "别伤心了 (อย่าเสียใจไปเลย)" },
+            { word: "累 (Lèi - เล่ย)", meaning: "เหนื่อย", english: "Tired", icon: "😩", example: "工作了一天，我很累 (ทำงานมาทั้งวัน ฉันเหนื่อยมาก)" },
+            { word: "等一下 (Děng yīxià - เติ่งอี๋เซี่ย)", meaning: "รอสักครู่", english: "Wait a moment", icon: "⏱️", example: "请等一下 (กรุณารอสักครู่)" },
+            { word: "救命 (Jiùmìng - จิ้วมิ่ง)", meaning: "ช่วยด้วย", english: "Help!", icon: "🆘", example: "救命啊！ (ช่วยด้วย!)" },
+            { word: "在哪里 (Zài nǎlǐ - จ้ายหนาลี่)", meaning: "อยู่ที่ไหน?", english: "Where is it?", icon: "📍", example: "洗手间在哪里？ (ห้องน้ำอยู่ที่ไหน?)" },
+            { word: "什么时候 (Shénme shíhòu - เสินเมอะสือโฮ่ว)", meaning: "เมื่อไหร่?", english: "When?", icon: "📅", example: "你什么时候来？ (คุณจะมาเมื่อไหร่?)" },
+            { word: "什么 (Shénme - เสินเมอะ)", meaning: "อะไร?", english: "What?", icon: "❓", example: "这是什么？ (นี่คืออะไร?)" },
+            { word: "谁 (Shéi - เสย)", meaning: "ใคร?", english: "Who?", icon: "👤", example: "那个人是谁？ (คนนั้นคือใคร?)" },
+            { word: "为什么 (Wèishénme - เว่ยเสินเมอะ)", meaning: "ทำไม?", english: "Why?", icon: "🤔", example: "你为什么不开心？ (ทำไมคุณถึงไม่มีความสุข?)" },
+            { word: "洗手间 (Xǐshǒujiān - สีโส่วเจียน)", meaning: "ห้องน้ำ", english: "Toilet/Washroom", icon: "🚽", example: "我想去洗手间 (ฉันอยากไปห้องน้ำ)" },
+            { word: "市场 (Shìchǎng - ซื่อฉ่าง)", meaning: "ตลาด", english: "Market", icon: "🛒", example: "我们去市场买水果吧 (พวกเราไปซื้อผลไม้ที่ตลาดกันเถอะ)" },
+            { word: "医院 (Yīyuàn - อีเยี่ยน)", meaning: "โรงพยาบาล", english: "Hospital", icon: "🏥", example: "怎么去医院？ (ไปโรงพยาบาลยังไง?)" },
+            { word: "机场 (Jīchǎng - จีฉ่าง)", meaning: "สนามบิน", english: "Airport", icon: "✈️", example: "我要去机场 (ฉันต้องการไปสนามบิน)" },
+            { word: "酒店 (Jiǔdiàn - จิ่วเตี้ยน)", meaning: "โรงแรม", english: "Hotel", icon: "🏨", example: "你住在哪家酒店？ (คุณพักอยู่ที่โรงแรมไหน?)" },
+            { word: "餐厅 (Cāntīng - ชานทิง)", meaning: "ร้านอาหาร", english: "Restaurant", icon: "🍽️", example: "这家餐厅的菜很好吃 (อาหารของร้านนี้อร่อยมาก)" },
+            { word: "水 (Shuǐ - สุ่ย)", meaning: "น้ำ", english: "Water", icon: "🚰", example: "请给我一杯水 (ขอน้ำให้ฉันหนึ่งแก้วค่ะ/ครับ)" },
+            { word: "米饭 (Mǐfàn - หมี่ฟ่าน)", meaning: "ข้าว", english: "Rice", icon: "🍛", example: "我要一碗米饭 (ฉันขอข้าวสวยหนึ่งถ้วย)" },
+            { word: "鸡肉 (Jīròu - จีโร่ว)", meaning: "เนื้อไก่", english: "Chicken", icon: "🍗", example: "我不吃鸡肉 (ฉันไม่กินเนื้อไก่)" },
+            { word: "猪肉 (Zhūròu - จูโร่ว)", meaning: "เนื้อหมู", english: "Pork", icon: "🥓", example: "我想吃烤猪肉 (ฉันอยากกินหมูย่าง)" },
+            { word: "鱼 (Yú - อวี๋)", meaning: "ปลา", english: "Fish", icon: "🐟", example: "这条鱼很新鲜 (ปลาตัวนี้สดมาก)" },
+            { word: "好吃 (Hǎochī - ห่าวชือ)", meaning: "อร่อย", english: "Delicious", icon: "😋", example: "泰国菜很好吃 (อาหารไทยอร่อยมาก)" },
+            { word: "贵 (Guì - กุ้ย)", meaning: "แพง", english: "Expensive", icon: "💸", example: "太贵了 (แพงเกินไปแล้ว)" },
+            { word: "便宜 (Piányí - เผียนอี๋)", meaning: "ถูก (ราคา)", english: "Cheap", icon: "🏷️", example: "能便宜一点吗？ (ลดราคาให้หน่อยได้ไหม?)" },
+            { word: "打折 (Dǎzhé - ต่าเจ๋อ)", meaning: "ลดราคา", english: "Discount", icon: "📉", example: "现在打折吗？ (ตอนนี้มีลดราคาไหม?)" },
+            { word: "买单 (Mǎidān - หม่ายตาน)", meaning: "เช็คบิล / เก็บเงิน", english: "Check/Bill", icon: "🧾", example: "服务员，买单 (พนักงานคะ เก็บเงินด้วยค่ะ)" },
+            { word: "需要帮忙吗 (Xūyào bāngmáng ma - ซูเย่าปางหมางมะ)", meaning: "ต้องการความช่วยเหลือไหม?", english: "Need help?", icon: "🤝", example: "你需要帮忙吗？ (คุณต้องการให้ช่วยอะไรไหม?)" },
+            { word: "没关系 (Méiguānxi - เหมยกวนสิ)", meaning: "ไม่เป็นไร", english: "It's okay / Never mind", icon: "👌", example: "没关系，我不介意 (ไม่เป็นไร ฉันไม่ถือสา)" },
+            { word: "慢点说 (Màn diǎn shuō - ม่านเตี่ยนซัว)", meaning: "พูดช้าๆ หน่อย", english: "Speak slowly", icon: "🐢", example: "请慢点说，我听不懂 (กรุณาพูดช้าหน่อย ฉันฟังไม่รู้เรื่อง)" },
+            { word: "再说一遍 (Zài shuō yībiàn - จ้ายซัวอี๋เปี้ยน)", meaning: "พูดอีกครั้ง", english: "Say it again", icon: "🔁", example: "请再说一遍好吗？ (กรุณาพูดอีกรอบได้ไหม?)" },
+            { word: "朋友 (Péngyǒu - เผิงโหย่ว)", meaning: "เพื่อน", english: "Friend", icon: "🧑‍🤝‍🧑", example: "他是我的好朋友 (เขาเป็นเพื่อนสนิทของฉัน)" }
+        ];
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function getRandomVocab() {
+            const shuffled = shuffleArray(vocabPool);
+            return shuffled.slice(0, Math.min(VOCAB_PER_SESSION, shuffled.length));
+        }
+
+        // --- Calendar Logic ---
+        
+        function getFormatDateString(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function getDisplayDateString(year, month, day) {
+            return `${day} ${MONTH_NAMES[month]} ${year}`;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('month-year-display').innerText = `${MONTH_NAMES[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[1.5rem] bg-rose-50/50 border border-dashed border-rose-200 opacity-40"></div>`;
+            }
+
+            let completedThisMonth = 0;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = getFormatDateString(year, month, day);
+                const isCompleted = appState.completedDates.includes(dateString);
+                const isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                
+                if (isCompleted) completedThisMonth++;
+
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-5 rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px]";
+                
+                let stateClasses = "";
+                let indicatorHTML = "";
+
+                if (isCompleted) {
+                    stateClasses = "bg-amber-50 border-amber-200 text-amber-800 shadow-sm";
+                    indicatorHTML = `
+                        <div class="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-sm z-10 animate-bounce" style="animation-duration: 2s;">🌟</div>
+                        <i class="ph-fill ph-check-circle text-amber-400 text-2xl md:text-3xl mt-1 opacity-60"></i>
+                    `;
+                } else if (isToday) {
+                    stateClasses = "bg-gradient-to-b from-rose-400 to-orange-400 border-transparent text-white shadow-lg shadow-rose-400/40 today-pulse";
+                    indicatorHTML = `
+                        <span class="text-[10px] md:text-xs font-bold bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm">วันนี้</span>
+                    `;
+                } else {
+                    stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-rose-300";
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-2xl md:text-3xl mt-1 group-hover:text-rose-400 transition-colors"></i>`;
+                }
+
+                // Check for Sunday/Saturday colors
+                const dayOfWeek = new Date(year, month, day).getDay();
+                let textStyle = "font-extrabold text-xl md:text-2xl font-english";
+                if (!isToday && !isCompleted) {
+                    if (dayOfWeek === 0) textStyle += " text-red-500";
+                    else if (dayOfWeek === 6) textStyle += " text-blue-500";
+                }
+
+                const cardHTML = `
+                    <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
+                        <span class="${textStyle}">${day}</span>
+                        ${indicatorHTML}
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            }
+
+            // Animate number change
+            const completedEl = document.getElementById('summary-completed');
+            completedEl.innerText = completedThisMonth;
+            completedEl.classList.add('scale-150', 'text-yellow-200');
+            setTimeout(() => completedEl.classList.remove('scale-150', 'text-yellow-200'), 300);
+            
+            document.getElementById('summary-total').innerText = daysInMonth;
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // --- Dialog & Interaction ---
+        
+        function openDayDialog(year, month, day) {
+            selectedDateString = getFormatDateString(year, month, day);
+            const displayDate = getDisplayDateString(year, month, day);
+            const isCompleted = appState.completedDates.includes(selectedDateString);
+
+            const dialog = document.getElementById('vocab-dialog');
+            const title = document.getElementById('dialog-title');
+            const content = document.getElementById('dialog-content');
+            const btnComplete = document.getElementById('btn-complete-day');
+
+            title.innerText = `วันที่ ${displayDate}`;
+
+            const vocabList = getRandomVocab();
+            content.innerHTML = '';
+            
+            vocabList.forEach((v, index) => {
+                // ดึงเฉพาะตัวอักษรจีนหน้าวงเล็บมาใช้ให้ระบบอ่าน
+                const chineseWordOnly = v.word.split(' (')[0];
+
+                const itemHTML = `
+                    <div class="vocab-card p-5 bg-white border-2 border-slate-100 rounded-[2rem] hover:border-rose-300 hover:shadow-xl hover:shadow-rose-100/50 transition-all flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                        
+                        <!-- Cute background blob -->
+                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-rose-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        <div class="blob-bg text-rose-600 w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm relative z-10 font-english">
+                            ${index + 1}
+                        </div>
+                        
+                        <div class="flex-1 relative z-10 w-full">
+                            <div class="flex justify-between items-start w-full">
+                                <h4 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-2 flex flex-wrap items-center gap-2 font-chinese tracking-wide w-full pr-12">
+                                    <span class="text-2xl md:text-3xl drop-shadow-sm mr-1">${v.icon}</span> 
+                                    <span>${v.word}</span>
+                                </h4>
+                                <button onclick="speakWord('${chineseWordOnly}')" class="absolute top-0 right-0 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียงจีน (Google TTS)">
+                                    <i class="ph-fill ph-speaker-high text-lg"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2 mb-3 mt-1">
+                                <span class="text-rose-700 font-bold bg-rose-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 border border-rose-100">
+                                    🇹🇭 ${v.meaning}
+                                </span>
+                                <span class="text-amber-700 font-bold bg-amber-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 font-english border border-amber-100">
+                                    🇬🇧 ${v.english}
+                                </span>
+                            </div>
+                            
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative mt-3">
+                                <i class="ph-fill ph-quotes text-slate-200 text-4xl absolute -top-2 -left-1"></i>
+                                <p class="text-sm md:text-base text-slate-600 relative z-10 font-chinese pl-4">
+                                    ${v.example}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                content.innerHTML += itemHTML;
+            });
+
+            if (isCompleted) {
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-xl"></i> ทบทวนเสร็จแล้ว (เยี่ยมมาก!)`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-600 hover:to-orange-600 rounded-2xl shadow-lg shadow-amber-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = closeDialog; 
+            } else {
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold hover:from-rose-600 hover:to-orange-600 rounded-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = markDayAsComplete; 
+            }
+
+            dialog.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('dialog-content').scrollTop = 0;
+        }
+
+        function closeDialog() {
+            const dialog = document.getElementById('vocab-dialog');
+            dialog.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            selectedDateString = null;
+        }
+
+        function markDayAsComplete() {
+            if (selectedDateString && !appState.completedDates.includes(selectedDateString)) {
+                appState.completedDates.push(selectedDateString);
+                saveState();
+                
+                // Show cute alert
+                const alert = document.createElement('div');
+                alert.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-green-400";
+                alert.innerHTML = `<span class="text-2xl">🎉</span> เก่งมาก! สะสมดาวได้อีก 1 ดวง`;
+                document.body.appendChild(alert);
+                setTimeout(() => alert.remove(), 3000);
+
+                renderCalendar(); 
+            }
+            closeDialog();
+        }
+
+        function speakWord(word) {
+            // ใช้ Google Translate TTS API เสียงภาษาจีน (zh-CN)
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=zh-CN&client=tw-ob`;
+            const audio = new Audio(url);
+            
+            audio.play().catch(error => {
+                console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
+                // ระบบสำรอง: ใช้เสียงของเบราว์เซอร์หาก API มีปัญหา
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = 'zh-CN'; 
+                    utterance.rate = 0.8; 
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
+
+        window.onload = () => {
+            loadState();
+            renderCalendar();
+        };
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape" && !document.getElementById('vocab-dialog').classList.contains('hidden')) {
+                closeDialog();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ท่องญี่ปุ่น — Calendar Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for UI -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            /* พื้นหลังสีพาสเทลซากุระอ่อนๆ */
+            background: linear-gradient(135deg, #fffafa 0%, #fff0f3 100%);
+            background-image: radial-gradient(#ffe4e6 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        h1, h2, h3, .font-english {
+            font-family: 'Fredoka', 'Sarabun', sans-serif;
+        }
+        .font-japanese {
+            font-family: 'Noto Sans JP', 'Sarabun', sans-serif;
+        }
+        
+        /* Custom scrollbar for dialog */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f8fafc; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fda4af; border-radius: 10px; border: 2px solid #f8fafc; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #fb7185; }
+        
+        /* Playful animations */
+        .calendar-day { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .calendar-day:hover { transform: translateY(-4px) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.1), 0 4px 6px -2px rgba(225, 29, 72, 0.05); }
+        .calendar-day:active { transform: translateY(0) scale(0.95); }
+        
+        .vocab-card { transition: all 0.2s ease-in-out; }
+        .vocab-card:hover { transform: translateY(-3px) scale(1.01); }
+
+        .blob-bg {
+            /* เปลี่ยนสี Blob เป็นโทนชมพูอ่อน (rose-100) */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23FFE4E6' d='M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.4,-46.3C91,-33.5,97.2,-18.1,97.1,-3.1C97,12,90.6,26.7,81.3,39.4C72,52.2,59.8,63.1,45.8,71.3C31.8,79.5,15.9,85.1,0.2,84.7C-15.5,84.4,-31,78.2,-45.1,69.9C-59.2,61.6,-71.9,51.2,-81.1,38.2C-90.3,25.2,-96,9.6,-95.2,-5.7C-94.4,-21.1,-87.1,-36,-76.3,-47.9C-65.5,-59.8,-51.2,-68.6,-36.8,-75.4C-22.4,-82.2,-7.9,-87,3.9,-93.8C15.7,-100.6,30.6,-83.6,44.7,-76.4Z' transform='translate(100 100)' /%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Pulse animation for 'Today' */
+        @keyframes softPulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); } /* rose-500 */
+            70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+        .today-pulse { animation: softPulse 2s infinite; }
+    </style>
+</head>
+<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <div class="w-full max-w-4xl space-y-6">
+        
+        <!-- Header & Summary Section -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-[2rem] p-6 md:p-8 shadow-xl shadow-rose-100/50 border border-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Title & Mascot -->
+                <div class="flex items-center gap-4">
+                    <div class="text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🗻</div>
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-500 mb-1">
+                            Daily Japanese Vocab
+                        </h1>
+                        <p class="text-slate-500 font-medium text-sm md:text-base flex items-center gap-1">
+                            ท่องศัพท์วันละ 20 คำ สไตล์ญี่ปุ่น! 🌟 
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Monthly Summary Card -->
+                <div class="bg-gradient-to-tr from-rose-400 to-red-400 p-5 rounded-3xl w-full md:w-auto flex items-center gap-5 shadow-lg shadow-rose-200 text-white transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30">
+                        🌸
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-rose-50 mb-1">สรุปการเรียนเดือนนี้</p>
+                        <p class="text-3xl font-extrabold leading-none">
+                            <span id="summary-completed">0</span>
+                            <span class="text-xl font-medium text-rose-100">/ <span id="summary-total">30</span> วัน</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="bg-white/90 backdrop-blur-lg rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-rose-100/40 border border-white">
+            
+            <!-- Calendar Header (Month Navigation) -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">🗓️</div>
+                    <h2 id="month-year-display" class="text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
+                </div>
+                
+                <div class="flex gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                    <button onclick="changeMonth(-1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-left text-lg"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-5 py-2 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-700 font-bold transition-all active:scale-95 text-sm">
+                        กลับมาวันนี้
+                    </button>
+                    <button onclick="changeMonth(1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-50 hover:text-rose-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Days of Week -->
+            <div class="grid grid-cols-7 gap-2 md:gap-3 mb-3 text-center font-bold text-slate-400 text-xs md:text-sm uppercase tracking-wider">
+                <div class="text-red-400">Sun</div>
+                <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
+                <div class="text-sky-400">Sat</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2 md:gap-3">
+                <!-- Days will be generated by JS -->
+            </div>
+        </div>
+        
+        <!-- Footer info -->
+        <div class="text-center text-slate-400 text-sm font-medium">
+            <p>💡 Tip: กดที่วันที่เพื่อเริ่มท่องศัพท์ได้เลย!</p>
+        </div>
+
+    </div>
+
+    <!-- Dialog / Modal for Vocabulary -->
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
+        
+        <!-- Modal Content -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-3xl bg-[#f8fafc] rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-4 border-white">
+            
+            <!-- Modal Header -->
+            <div class="px-8 py-6 border-b border-slate-200/60 bg-white flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl">⛩️</div>
+                    <div>
+                        <h3 id="dialog-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-500">วันที่ --/--/----</h3>
+                        <p class="text-sm text-slate-500 mt-1 font-medium">มาเก็บศัพท์เข้าสมองกันเถอะ! (20 คำ)</p>
+                    </div>
+                </div>
+                <button onclick="closeDialog()" class="text-slate-400 hover:text-red-500 bg-slate-100 hover:bg-red-50 p-3 rounded-full transition-all active:scale-90">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable Vocab List) -->
+            <div id="dialog-content" class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+                <!-- Vocab list will be injected here -->
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="px-8 py-5 border-t border-slate-200/60 bg-white flex justify-between items-center gap-3">
+                <div class="text-3xl hidden md:block">🎌</div>
+                <div class="flex gap-3 w-full md:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-6 py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-2xl transition-colors">
+                        ปิดไว้ก่อน
+                    </button>
+                    <button id="btn-complete-day" class="px-8 py-3 bg-gradient-to-r from-rose-500 to-red-500 text-white font-bold hover:from-rose-600 hover:to-red-600 rounded-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg">
+                        <i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants & Variables ---
+        const VOCAB_PER_SESSION = 20;
+        const MONTH_NAMES = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        
+        let currentDate = new Date(); 
+        let today = new Date(); 
+        let selectedDateString = null; 
+        
+        // --- State Management (Local Storage) ---
+        let appState = {
+            completedDates: [] 
+        };
+
+        function loadState() {
+            // เปลี่ยน key เป็นของญี่ปุ่นเพื่อไม่ให้ซ้ำกับของเดิม
+            const saved = localStorage.getItem('japanese_calendar_v1');
+            if (saved) {
+                appState = JSON.parse(saved);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('japanese_calendar_v1', JSON.stringify(appState));
+        }
+
+        // --- Vocabulary Pool (ภาษาญี่ปุ่น) ---
+        const vocabPool = [
+            { word: "こんにちは (คอนนิจิวะ)", meaning: "สวัสดี (ตอนกลางวัน)", english: "Hello", icon: "👋", example: "こんにちは、元気ですか？ (สวัสดี สบายดีไหม?)" },
+            { word: "ありがとうございます (อาริกาโตะ โกไซมัส)", meaning: "ขอบคุณมาก", english: "Thank you", icon: "🙏", example: "いつもありがとうございます (ขอบคุณเสมอมานะ)" },
+            { word: "はい (ไฮ่)", meaning: "ใช่ / ครับ,ค่ะ", english: "Yes", icon: "👍", example: "はい、分かりました (ครับ/ค่ะ เข้าใจแล้ว)" },
+            { word: "いいえ (อีเอะ)", meaning: "ไม่ใช่ / ไม่เป็นไร", english: "No", icon: "👎", example: "いいえ、大丈夫です (ไม่เป็นไรครับ/ค่ะ)" },
+            { word: "すみません (ซูมิมาเซ็น)", meaning: "ขอโทษ / ขออนุญาต", english: "Excuse me / Sorry", icon: "🥺", example: "すみません、駅はどこですか？ (ขอโทษครับ สถานีรถไฟอยู่ไหน?)" },
+            { word: "いくらですか (อิคุระ เดสึ กะ)", meaning: "เท่าไหร่?", english: "How much?", icon: "💰", example: "これはいくらですか？ (อันนี้ราคาเท่าไหร่?)" },
+            { word: "お名前は何ですか (โอนามาเอะ วะ นัน เดสึ กะ)", meaning: "คุณชื่ออะไร?", english: "What is your name?", icon: "📛", example: "お名前は何ですか？ (ขอทราบชื่อหน่อยครับ/ค่ะ?)" },
+            { word: "元気ですか (เก็งคิ เดสึ กะ)", meaning: "สบายดีไหม?", english: "How are you?", icon: "😊", example: "お元気ですか？ (คุณสบายดีไหม?)" },
+            { word: "いただきます (อิตาดาคิมัส)", meaning: "จะทานแล้วนะครับ/คะ", english: "Let's eat (Thanks for the food)", icon: "🍚", example: "それでは、いただきます (ถ้างั้น จะทานแล้วนะครับ/คะ)" },
+            { word: "わかりません (วาคาริมาเซ็น)", meaning: "ไม่เข้าใจ", english: "I don't understand", icon: "🤷", example: "日本語がわかりません (ไม่เข้าใจภาษาญี่ปุ่น)" },
+            { word: "行きます (อิคิมัส)", meaning: "จะไป", english: "Go", icon: "🚶", example: "明日、東京へ行きます (พรุ่งนี้จะไปโตเกียว)" },
+            { word: "来てください (คิเตะ คุดาไซ)", meaning: "กรุณามา / มาเถอะ", english: "Please come", icon: "🤝", example: "こちらへ来てください (เชิญทางนี้ครับ/ค่ะ)" },
+            { word: "きれいです (คิเร เดสึ)", meaning: "สวย / สะอาด", english: "Beautiful / Clean", icon: "✨", example: "桜がきれいです (ซากุระสวยจัง)" },
+            { word: "いいです (อี เดสึ)", meaning: "ดี", english: "Good", icon: "🌟", example: "天気がいいですね (อากาศดีจังเลยนะ)" },
+            { word: "好きです (ซุคิ เดสึ)", meaning: "ชอบ", english: "Like / Love", icon: "❤️", example: "私は日本が好きです (ฉันชอบประเทศญี่ปุ่น)" },
+            { word: "お腹が空きました (โอนากะ งะ สุคิมาชิตะ)", meaning: "หิว", english: "Hungry", icon: "🤤", example: "とてもお腹が空きました (หิวมากๆ เลย)" },
+            { word: "喉が渇きました (โนโดะ งะ คาวาคิมาชิตะ)", meaning: "หิวน้ำ", english: "Thirsty", icon: "💧", example: "喉が渇きました、水をお願いします (หิวน้ำครับ ขอน้ำหน่อย)" },
+            { word: "暑いです (อะซึ่ย เดสึ)", meaning: "ร้อน", english: "Hot", icon: "🥵", example: "今日は暑いですね (วันนี้ร้อนจังเลยนะ)" },
+            { word: "寒いです (ซามุย เดสึ)", meaning: "หนาว", english: "Cold", icon: "🥶", example: "冬は寒いです (ฤดูหนาวอากาศหนาว)" },
+            { word: "楽しいです (ทาโนชี่ เดสึ)", meaning: "สนุก", english: "Fun", icon: "😄", example: "旅行は楽しいです (การท่องเที่ยวสนุกดีนะ)" },
+            { word: "悲しいです (คานาชี่ เดสึ)", meaning: "เศร้า / เสียใจ", english: "Sad", icon: "😢", example: "悲しい映画を見ました (ดูหนังที่เศร้ามา)" },
+            { word: "疲れました (ทสึคาเรมาชิตะ)", meaning: "เหนื่อยแล้ว", english: "Tired", icon: "😩", example: "仕事で疲れました (เหนื่อยจากงาน)" },
+            { word: "ちょっと待って (จ๊ตโตะ มัตเตะ)", meaning: "รอแป๊บหนึ่ง", english: "Wait a moment", icon: "⏱️", example: "ちょっと待ってください (กรุณารอสักครู่)" },
+            { word: "助けて (ทาสุเคเตะ)", meaning: "ช่วยด้วย", english: "Help", icon: "🆘", example: "助けてください！ (กรุณาช่วยด้วย!)" },
+            { word: "どこですか (โดโกะ เดสึ กะ)", meaning: "อยู่ที่ไหน?", english: "Where is it?", icon: "📍", example: "トイレはどこですか？ (ห้องน้ำอยู่ที่ไหน?)" },
+            { word: "いつですか (อิทสึ เดสึ กะ)", meaning: "เมื่อไหร่?", english: "When?", icon: "📅", example: "誕生日はいつですか？ (วันเกิดเมื่อไหร่?)" },
+            { word: "何ですか (นัน เดสึ กะ)", meaning: "อะไร?", english: "What?", icon: "❓", example: "これは何ですか？ (นี่คืออะไร?)" },
+            { word: "誰ですか (ดาเระ เดสึ กะ)", meaning: "ใคร?", english: "Who?", icon: "👤", example: "あの人は誰ですか？ (คนนั้นคือใคร?)" },
+            { word: "なぜですか (นาเซะ เดสึ กะ)", meaning: "ทำไม?", english: "Why?", icon: "🤔", example: "なぜ来なかったのですか？ (ทำไมถึงไม่มา?)" },
+            { word: "トイレ (โทอิเระ)", meaning: "ห้องน้ำ", english: "Toilet", icon: "🚽", example: "トイレを貸してください (ขอเข้าห้องน้ำหน่อยครับ/ค่ะ)" },
+            { word: "コンビニ (คอนบินิ)", meaning: "ร้านสะดวกซื้อ", english: "Convenience Store", icon: "🏪", example: "コンビニに行きます (จะไปร้านสะดวกซื้อ)" },
+            { word: "病院 (เบียวอิน)", meaning: "โรงพยาบาล", english: "Hospital", icon: "🏥", example: "病院はどこですか (โรงพยาบาลอยู่ไหน?)" },
+            { word: "空港 (คูโค)", meaning: "สนามบิน", english: "Airport", icon: "✈️", example: "空港までお願いします (ไปสนามบินครับ/ค่ะ)" },
+            { word: "ホテル (โฮเตะรุ)", meaning: "โรงแรม", english: "Hotel", icon: "🏨", example: "ホテルを予約しました (จองโรงแรมไว้แล้ว)" },
+            { word: "レストラン (เรสึโตะรัน)", meaning: "ร้านอาหาร", english: "Restaurant", icon: "🍽️", example: "おいしいレストランを探しています (กำลังหาร้านอาหารอร่อยๆ)" },
+            { word: "水 (มิซึ)", meaning: "น้ำ", english: "Water", icon: "🚰", example: "お水をください (ขอน้ำเปล่าหน่อยครับ/ค่ะ)" },
+            { word: "ご飯 (โกฮัง)", meaning: "ข้าว / อาหาร", english: "Rice / Meal", icon: "🍛", example: "朝ご飯を食べました (กินข้าวเช้าแล้ว)" },
+            { word: "肉 (นิคุ)", meaning: "เนื้อสัตว์", english: "Meat", icon: "🍖", example: "豚肉が好きです (ชอบเนื้อหมู)" },
+            { word: "魚 (ซาคานะ)", meaning: "ปลา", english: "Fish", icon: "🐟", example: "魚はおいしいです (ปลาอร่อย)" },
+            { word: "美味しいです (โออิชี่ เดสึ)", meaning: "อร่อย", english: "Delicious", icon: "😋", example: "このラーメンはとても美味しいです (ราเมนชามนี้อร่อยมาก)" },
+            { word: "高いです (ทาไค เดสึ)", meaning: "แพง / สูง", english: "Expensive / High", icon: "💸", example: "それは高すぎます (นั่นแพงเกินไป)" },
+            { word: "安いです (ยาสุ่ย เดสึ)", meaning: "ถูก (ราคา)", english: "Cheap", icon: "🏷️", example: "安いですね (ราคาถูกจังเลย)" },
+            { word: "安くしてください (ยาสุคุ ชิเตะ คุดาไซ)", meaning: "ลดราคาหน่อยได้ไหม", english: "Discount please", icon: "📉", example: "もう少し安くしてください (ช่วยลดราคาให้อีกหน่อยได้ไหม)" },
+            { word: "お会計をお願いします (โอไคเค โอะ โอเนไงชิมัส)", meaning: "เก็บเงินด้วย (เช็คบิล)", english: "Check/Bill please", icon: "🧾", example: "すみません、お会計をお願いします (ขอโทษครับ/ค่ะ คิดเงินด้วย)" },
+            { word: "大丈夫ですか (ไดโจบุ เดสึ กะ)", meaning: "ไม่เป็นไรใช่ไหม? / โอเคไหม?", english: "Are you okay?", icon: "👌", example: "本当に大丈夫ですか？ (ไม่เป็นไรจริงๆ ใช่ไหม?)" },
+            { word: "大丈夫です (ไดโจบุ เดสึ)", meaning: "ไม่เป็นไร / โอเค", english: "It's okay / Fine", icon: "🙆", example: "はい、大丈夫です (ครับ ไม่เป็นไรครับ)" },
+            { word: "ゆっくり話してください (ยุคคุริ ฮานาชิเตะ คุดาไซ)", meaning: "พูดช้าๆ หน่อย", english: "Speak slowly", icon: "🐢", example: "もう少しゆっくり話してください (ช่วยพูดช้าลงอีกนิดได้ไหม)" },
+            { word: "もう一度お願いします (โม อิจิโดะ โอเนไงชิมัส)", meaning: "พูดอีกครั้งได้ไหม", english: "Say it again", icon: "🔁", example: "すみません、もう一度お願いします (ขอโทษนะครับ ขออีกครั้งได้ไหม)" },
+            { word: "さようなら (ซาโยนาระ)", meaning: "ลาก่อน", english: "Goodbye", icon: "👋", example: "先生、さようなら (คุณครู ลาก่อนครับ/ค่ะ)" },
+            { word: "またね (มาตะเนะ)", meaning: "เจอกันใหม่นะ / บ๊ายบาย", english: "See you later", icon: "👋", example: "じゃあ、またね！ (งั้น ไว้เจอกันนะ!)" }
+        ];
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function getRandomVocab() {
+            const shuffled = shuffleArray(vocabPool);
+            return shuffled.slice(0, Math.min(VOCAB_PER_SESSION, shuffled.length));
+        }
+
+        // --- Calendar Logic ---
+        
+        function getFormatDateString(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function getDisplayDateString(year, month, day) {
+            return `${day} ${MONTH_NAMES[month]} ${year}`;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('month-year-display').innerText = `${MONTH_NAMES[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[1.5rem] bg-slate-50/50 border border-dashed border-slate-200 opacity-40"></div>`;
+            }
+
+            let completedThisMonth = 0;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = getFormatDateString(year, month, day);
+                const isCompleted = appState.completedDates.includes(dateString);
+                const isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                
+                if (isCompleted) completedThisMonth++;
+
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-5 rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px]";
+                
+                let stateClasses = "";
+                let indicatorHTML = "";
+
+                if (isCompleted) {
+                    stateClasses = "bg-teal-50 border-teal-200 text-teal-800 shadow-sm";
+                    indicatorHTML = `
+                        <div class="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full shadow border border-teal-100 flex items-center justify-center text-sm z-10 animate-bounce" style="animation-duration: 2s;">⭐</div>
+                        <i class="ph-fill ph-check-circle text-teal-400 text-2xl md:text-3xl mt-1 opacity-60"></i>
+                    `;
+                } else if (isToday) {
+                    stateClasses = "bg-gradient-to-b from-rose-400 to-red-500 border-transparent text-white shadow-lg shadow-rose-500/40 today-pulse";
+                    indicatorHTML = `
+                        <span class="text-[10px] md:text-xs font-bold bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm">วันนี้</span>
+                    `;
+                } else {
+                    stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-rose-300";
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-2xl md:text-3xl mt-1 group-hover:text-rose-400 transition-colors"></i>`;
+                }
+
+                // Check for Sunday/Saturday colors
+                const dayOfWeek = new Date(year, month, day).getDay();
+                let textStyle = "font-extrabold text-xl md:text-2xl font-english";
+                if (!isToday && !isCompleted) {
+                    if (dayOfWeek === 0) textStyle += " text-red-500";
+                    else if (dayOfWeek === 6) textStyle += " text-sky-500";
+                }
+
+                const cardHTML = `
+                    <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
+                        <span class="${textStyle}">${day}</span>
+                        ${indicatorHTML}
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            }
+
+            // Animate number change
+            const completedEl = document.getElementById('summary-completed');
+            completedEl.innerText = completedThisMonth;
+            completedEl.classList.add('scale-150', 'text-yellow-200');
+            setTimeout(() => completedEl.classList.remove('scale-150', 'text-yellow-200'), 300);
+            
+            document.getElementById('summary-total').innerText = daysInMonth;
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // --- Dialog & Interaction ---
+        
+        function openDayDialog(year, month, day) {
+            selectedDateString = getFormatDateString(year, month, day);
+            const displayDate = getDisplayDateString(year, month, day);
+            const isCompleted = appState.completedDates.includes(selectedDateString);
+
+            const dialog = document.getElementById('vocab-dialog');
+            const title = document.getElementById('dialog-title');
+            const content = document.getElementById('dialog-content');
+            const btnComplete = document.getElementById('btn-complete-day');
+
+            title.innerText = `วันที่ ${displayDate}`;
+
+            const vocabList = getRandomVocab();
+            content.innerHTML = '';
+            
+            vocabList.forEach((v, index) => {
+                // ดึงเฉพาะตัวหนังสือญี่ปุ่นมาใช้เป็นเสียงอ่าน (ตัดส่วนภาษาไทยในวงเล็บออก)
+                const japaneseWordOnly = v.word.split(' (')[0];
+
+                const itemHTML = `
+                    <div class="vocab-card p-5 bg-white border-2 border-slate-100 rounded-[2rem] hover:border-rose-300 hover:shadow-xl hover:shadow-rose-100/50 transition-all flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                        
+                        <!-- Cute background blob -->
+                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-rose-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        <div class="blob-bg text-rose-700 w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm relative z-10 font-english">
+                            ${index + 1}
+                        </div>
+                        
+                        <div class="flex-1 relative z-10 w-full">
+                            <div class="flex justify-between items-start w-full">
+                                <h4 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-2 flex flex-wrap items-center gap-2 font-japanese tracking-wide w-full pr-12">
+                                    <span class="text-2xl md:text-3xl drop-shadow-sm mr-1">${v.icon}</span> 
+                                    <span>${v.word}</span>
+                                </h4>
+                                <button onclick="speakWord('${japaneseWordOnly}')" class="absolute top-0 right-0 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียงญี่ปุ่น (Google TTS)">
+                                    <i class="ph-fill ph-speaker-high text-lg"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2 mb-3 mt-1">
+                                <span class="text-rose-600 font-bold bg-rose-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 border border-rose-100">
+                                    🇹🇭 ${v.meaning}
+                                </span>
+                                <span class="text-slate-600 font-bold bg-slate-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 font-english border border-slate-200">
+                                    🇬🇧 ${v.english}
+                                </span>
+                            </div>
+                            
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 relative mt-3">
+                                <i class="ph-fill ph-quotes text-slate-200 text-4xl absolute -top-2 -left-1"></i>
+                                <p class="text-sm md:text-base text-slate-600 relative z-10 font-japanese pl-4">
+                                    ${v.example}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                content.innerHTML += itemHTML;
+            });
+
+            if (isCompleted) {
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-yellow-300 text-xl"></i> ทบทวนเสร็จแล้ว (เยี่ยมมาก!)`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold hover:from-teal-600 hover:to-emerald-600 rounded-2xl shadow-lg shadow-teal-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = closeDialog; 
+            } else {
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-rose-500 to-red-500 text-white font-bold hover:from-rose-600 hover:to-red-600 rounded-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = markDayAsComplete; 
+            }
+
+            dialog.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('dialog-content').scrollTop = 0;
+        }
+
+        function closeDialog() {
+            const dialog = document.getElementById('vocab-dialog');
+            dialog.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            selectedDateString = null;
+        }
+
+        function markDayAsComplete() {
+            if (selectedDateString && !appState.completedDates.includes(selectedDateString)) {
+                appState.completedDates.push(selectedDateString);
+                saveState();
+                
+                // Show cute alert
+                const alert = document.createElement('div');
+                alert.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-red-400";
+                alert.innerHTML = `<span class="text-2xl">🎌</span> เก่งมาก! สะสมดาวได้อีก 1 ดวง`;
+                document.body.appendChild(alert);
+                setTimeout(() => alert.remove(), 3000);
+
+                renderCalendar(); 
+            }
+            closeDialog();
+        }
+
+        function speakWord(word) {
+            // ใช้ Google Translate TTS API เสียงญี่ปุ่น (tl=ja)
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=ja&client=tw-ob`;
+            const audio = new Audio(url);
+            
+            audio.play().catch(error => {
+                console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
+                // ระบบสำรอง: ใช้เสียงของเบราว์เซอร์หาก API มีปัญหา
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = 'ja-JP';  // เสียงภาษาญี่ปุ่น
+                    utterance.rate = 0.9; // ปรับความเร็วเสียงให้อ่านง่ายขึ้น
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
+
+        window.onload = () => {
+            loadState();
+            renderCalendar();
+        };
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape" && !document.getElementById('vocab-dialog').classList.contains('hidden')) {
+                closeDialog();
+            }
+        });
+    </script>
+</body>
+</html>
