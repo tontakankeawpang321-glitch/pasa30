@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ท่องดัตช์ — Calendar Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for UI -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            /* พื้นหลังสีส้มพาสเทล-ฟ้าอ่อน สไตล์เนเธอร์แลนด์ */
+            background: linear-gradient(135deg, #fff7ed 0%, #f0f9ff 100%);
+            background-color: #fff7ed;
+            background-image: radial-gradient(#fdba74 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        h1, h2, h3, .font-english {
+            font-family: 'Fredoka', 'Sarabun', sans-serif; 
+        }
+        .font-target {
+            font-family: 'Nunito', 'Sarabun', sans-serif; /* ฟอนต์รองรับภาษาดัตช์/อังกฤษ สวยๆ โค้งมน */
+            word-break: keep-all;
+        }
+        
+        /* Custom scrollbar for dialog - โทนส้ม */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #fff7ed; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fb923c; border-radius: 10px; border: 2px solid #fff7ed; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #f97316; }
+        
+        /* Playful animations */
+        .calendar-day { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .calendar-day:hover { transform: translateY(-4px) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.15), 0 4px 6px -2px rgba(249, 115, 22, 0.1); }
+        .calendar-day:active { transform: translateY(0) scale(0.95); }
+        
+        .vocab-card { transition: all 0.2s ease-in-out; }
+        .vocab-card:hover { transform: translateY(-3px) scale(1.01); }
+
+        /* เปลี่ยนสี Blob ให้เป็นสีส้มพาสเทล (Orange-100) */
+        .blob-bg {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23ffedd5' d='M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.4,-46.3C91,-33.5,97.2,-18.1,97.1,-3.1C97,12,90.6,26.7,81.3,39.4C72,52.2,59.8,63.1,45.8,71.3C31.8,79.5,15.9,85.1,0.2,84.7C-15.5,84.4,-31,78.2,-45.1,69.9C-59.2,61.6,-71.9,51.2,-81.1,38.2C-90.3,25.2,-96,9.6,-95.2,-5.7C-94.4,-21.1,-87.1,-36,-76.3,-47.9C-65.5,-59.8,-51.2,-68.6,-36.8,-75.4C-22.4,-82.2,-7.9,-87,3.9,-93.8C15.7,-100.6,30.6,-83.6,44.7,-76.4Z' transform='translate(100 100)' /%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Pulse animation for 'Today' - สีส้ม */
+        @keyframes softPulse {
+            0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+        }
+        .today-pulse { animation: softPulse 2s infinite; }
+    </style>
+</head>
+<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <div class="w-full max-w-4xl space-y-6">
+        
+        <!-- Header & Summary Section -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-[2rem] p-6 md:p-8 shadow-xl shadow-orange-100/50 border border-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Title & Mascot -->
+                <div class="flex items-center gap-4">
+                    <div class="text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🌷</div>
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500 mb-1">
+                            Daily Dutch Vocab
+                        </h1>
+                        <p class="text-slate-500 font-medium text-sm md:text-base flex items-center gap-1">
+                            ท่องศัพท์วันละ 20 คำ ไปแดนกังหันลม! 🇳🇱 
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Monthly Summary Card -->
+                <div class="bg-gradient-to-tr from-blue-600 to-cyan-500 p-5 rounded-3xl w-full md:w-auto flex items-center gap-5 shadow-lg shadow-blue-200 text-white transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30">
+                        🧀
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-blue-50 mb-1">สรุปการเรียนเดือนนี้</p>
+                        <p class="text-3xl font-extrabold leading-none">
+                            <span id="summary-completed">0</span>
+                            <span class="text-xl font-medium text-blue-100">/ <span id="summary-total">30</span> วัน</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="bg-white/90 backdrop-blur-lg rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-orange-100/40 border border-white">
+            
+            <!-- Calendar Header (Month Navigation) -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">📅</div>
+                    <h2 id="month-year-display" class="text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
+                </div>
+                
+                <div class="flex gap-2 bg-orange-50 p-1.5 rounded-2xl">
+                    <button onclick="changeMonth(-1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-orange-100 hover:text-orange-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-left text-lg"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-5 py-2 rounded-xl bg-white shadow-sm hover:shadow hover:bg-orange-100 hover:text-orange-600 text-slate-700 font-bold transition-all active:scale-95 text-sm">
+                        กลับมาวันนี้
+                    </button>
+                    <button onclick="changeMonth(1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-orange-100 hover:text-orange-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Days of Week -->
+            <div class="grid grid-cols-7 gap-2 md:gap-3 mb-3 text-center font-bold text-slate-400 text-xs md:text-sm uppercase tracking-wider">
+                <div class="text-red-500">Sun</div>
+                <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
+                <div class="text-blue-500">Sat</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2 md:gap-3">
+                <!-- Days will be generated by JS -->
+            </div>
+        </div>
+        
+        <!-- Footer info -->
+        <div class="text-center text-slate-500 text-sm font-medium">
+            <p>💡 Tip: กดที่วันที่เพื่อเริ่มท่องศัพท์ภาษาดัตช์ได้เลย! (ลองกดฟังเสียงดูนะ)</p>
+        </div>
+
+    </div>
+
+    <!-- Dialog / Modal for Vocabulary -->
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-blue-900/30 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
+        
+        <!-- Modal Content -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-3xl bg-[#fdfbf7] rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-4 border-white">
+            
+            <!-- Modal Header -->
+            <div class="px-8 py-6 border-b border-orange-100 bg-white flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl">🌷</div>
+                    <div>
+                        <h3 id="dialog-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-500">วันที่ --/--/----</h3>
+                        <p class="text-sm text-slate-500 mt-1 font-medium">มาเก็บศัพท์ดัตช์เข้าสมองกันเถอะ! (20 คำ)</p>
+                    </div>
+                </div>
+                <button onclick="closeDialog()" class="text-slate-400 hover:text-orange-500 bg-slate-100 hover:bg-orange-50 p-3 rounded-full transition-all active:scale-90">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable Vocab List) -->
+            <div id="dialog-content" class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+                <!-- Vocab list will be injected here -->
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="px-8 py-5 border-t border-orange-100 bg-white flex justify-between items-center gap-3">
+                <div class="text-3xl hidden md:block">🚲</div>
+                <div class="flex gap-3 w-full md:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-6 py-3 text-slate-600 font-bold hover:bg-orange-50 hover:text-orange-700 rounded-2xl transition-colors">
+                        ปิดไว้ก่อน
+                    </button>
+                    <button id="btn-complete-day" class="px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold hover:from-orange-600 hover:to-red-600 rounded-2xl shadow-lg shadow-orange-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg">
+                        <i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants & Variables ---
+        const VOCAB_PER_SESSION = 20;
+        const MONTH_NAMES = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        
+        let currentDate = new Date(); 
+        let today = new Date(); 
+        let selectedDateString = null; 
+        
+        // --- State Management (Local Storage) ---
+        let appState = {
+            completedDates: [] 
+        };
+
+        function loadState() {
+            // เปลี่ยน Key สำหรับภาษาดัตช์
+            const saved = localStorage.getItem('dutch_calendar_v1');
+            if (saved) {
+                appState = JSON.parse(saved);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('dutch_calendar_v1', JSON.stringify(appState));
+        }
+
+        // --- Vocabulary Pool (ภาษาดัตช์) ---
+        const vocabPool = [
+            { word: "Hallo (ฮัลโล)", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Hallo, hoe gaat het? (สวัสดี สบายดีไหม?)" },
+            { word: "Dank je wel (ดัง เยอ เวล)", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Dank je wel voor je hulp. (ขอบคุณสำหรับความช่วยเหลือ)" },
+            { word: "Alstublieft (อัลสตูบลีฟต์)", meaning: "ได้โปรด / เชิญครับ,ค่ะ", english: "Please / Here you go", icon: "✨", example: "Een koffie, alstublieft. (ขอกาแฟหนึ่งแก้วครับ/ค่ะ)" },
+            { word: "Ja (ยา)", meaning: "ใช่", english: "Yes", icon: "👍", example: "Ja, dat klopt. (ใช่ ถูกต้องแล้ว)" },
+            { word: "Nee (เน)", meaning: "ไม่", english: "No", icon: "👎", example: "Nee, bedankt. (ไม่ครับ/ค่ะ ขอบคุณ)" },
+            { word: "Tot ziens (ต๊ด ซีนส์)", meaning: "ลาก่อน", english: "Goodbye", icon: "👋", example: "Tot ziens en een fijne dag! (ลาก่อนและขอให้มีวันที่ดี!)" },
+            { word: "Hoe gaat het? (ฮู คาต เฮต?)", meaning: "สบายดีไหม?", english: "How are you?", icon: "😊", example: "Hallo, hoe gaat het met jou? (สวัสดี คุณสบายดีไหม?)" },
+            { word: "Goed (คูต)", meaning: "ดี / สบายดี", english: "Good / Fine", icon: "👍", example: "Het gaat goed met mij. (ฉันสบายดี)" },
+            { word: "Sorry (ซอรี่)", meaning: "ขอโทษ", english: "Sorry", icon: "🥺", example: "Sorry, ik ben laat. (ขอโทษที่ฉันมาสาย)" },
+            { word: "Wat is dat? (วัด อิส ดัต?)", meaning: "นั่นคืออะไร?", english: "What is that?", icon: "❓", example: "Wat is dat voor een ding? (ของสิ่งนั้นคืออะไร?)" },
+            { word: "Ik (อิค)", meaning: "ฉัน", english: "I", icon: "👤", example: "Ik kom uit Thailand. (ฉันมาจากประเทศไทย)" },
+            { word: "Jij (ไย)", meaning: "คุณ", english: "You", icon: "👉", example: "Waar woon jij? (คุณอาศัยอยู่ที่ไหน?)" },
+            { word: "Water (วาเตอร์)", meaning: "น้ำ", english: "Water", icon: "💧", example: "Mag ik een glas water? (ขอฉันดื่มน้ำสักแก้วได้ไหม?)" },
+            { word: "Koffie (คอฟฟี่)", meaning: "กาแฟ", english: "Coffee", icon: "☕", example: "Ik drink graag koffie. (ฉันชอบดื่มกาแฟ)" },
+            { word: "Melk (เมลค์)", meaning: "นม", english: "Milk", icon: "🥛", example: "Wil je melk in je koffie? (คุณเอานมในกาแฟไหม?)" },
+            { word: "Eten (เอเติน)", meaning: "กิน / อาหาร", english: "Eat / Food", icon: "🍽️", example: "Wij gaan vanavond uit eten. (คืนนี้พวกเราจะไปกินข้าวนอกบ้าน)" },
+            { word: "Drinken (ดริงเคิน)", meaning: "ดื่ม", english: "Drink", icon: "🥤", example: "Wat wil je drinken? (คุณอยากดื่มอะไร?)" },
+            { word: "Brood (โบรต)", meaning: "ขนมปัง", english: "Bread", icon: "🍞", example: "Ik eet brood met kaas. (ฉันกินขนมปังกับชีส)" },
+            { word: "Kaas (คาส)", meaning: "ชีส", english: "Cheese", icon: "🧀", example: "Nederland staat bekend om kaas. (เนเธอร์แลนด์มีชื่อเสียงเรื่องชีส)" },
+            { word: "Fiets (ฟีตส์)", meaning: "จักรยาน", english: "Bicycle", icon: "🚲", example: "Ik ga met de fiets naar werk. (ฉันขี่จักรยานไปทำงาน)" },
+            { word: "Mooi (มอย)", meaning: "สวย", english: "Beautiful", icon: "✨", example: "Dat is een mooie bloem. (นั่นคือดอกไม้ที่สวยงาม)" },
+            { word: "Groot (โครต)", meaning: "ใหญ่", english: "Big", icon: "🐘", example: "Mijn huis is heel groot. (บ้านของฉันใหญ่มาก)" },
+            { word: "Klein (ไคลน์)", meaning: "เล็ก", english: "Small", icon: "🐁", example: "Dat is een kleine hond. (นั่นคือหมาตัวเล็ก)" },
+            { word: "Huis (เฮาส์)", meaning: "บ้าน", english: "House", icon: "🏠", example: "Dit is mijn huis. (นี่คือบ้านของฉัน)" },
+            { word: "Werk (แวร์ก)", meaning: "งาน / ทำงาน", english: "Work", icon: "💼", example: "Ik ben aan het werk. (ฉันกำลังทำงานอยู่)" },
+            { word: "Geld (เคลต์)", meaning: "เงิน", english: "Money", icon: "💶", example: "Ik heb geen geld. (ฉันไม่มีเงิน)" },
+            { word: "Duur (ดูร์)", meaning: "แพง", english: "Expensive", icon: "💸", example: "Deze auto is erg duur. (รถคันนี้แพงมาก)" },
+            { word: "Goedkoop (คูตโคป)", meaning: "ถูก (ราคา)", english: "Cheap", icon: "🏷️", example: "Die trui is heel goedkoop. (เสื้อกันหนาวตัวนั้นราคาถูกมาก)" },
+            { word: "Vandaag (ฟันดาก)", meaning: "วันนี้", english: "Today", icon: "📅", example: "Vandaag is het warm. (วันนี้อากาศร้อน)" },
+            { word: "Morgen (มอร์เคน)", meaning: "พรุ่งนี้", english: "Tomorrow", icon: "🌅", example: "Tot morgen! (แล้วพบกันพรุ่งนี้!)" },
+            { word: "Gisteren (คิสเตอเริน)", meaning: "เมื่อวาน", english: "Yesterday", icon: "⏪", example: "Ik was gisteren ziek. (เมื่อวานฉันป่วย)" },
+            { word: "Leuk (เลิก)", meaning: "สนุก / น่ารัก / ดี", english: "Nice / Fun", icon: "😄", example: "Dat is een leuk idee! (นั่นเป็นไอเดียที่ดี/น่าสนุกนะ!)" },
+            { word: "Lekker (เลกเคอร์)", meaning: "อร่อย / ดี(ความรู้สึก)", english: "Tasty / Nice", icon: "😋", example: "Deze soep is erg lekker. (ซุปนี้อร่อยมาก)" },
+            { word: "Hond (ฮอนต์)", meaning: "หมา", english: "Dog", icon: "🐕", example: "De hond blaft. (หมากำลังเห่า)" },
+            { word: "Kat (คัต)", meaning: "แมว", english: "Cat", icon: "🐈", example: "De kat slaapt. (แมวกำลังนอนหลับ)" },
+            { word: "Boek (บุค)", meaning: "หนังสือ", english: "Book", icon: "📚", example: "Ik lees een spannend boek. (ฉันกำลังอ่านหนังสือที่น่าตื่นเต้น)" },
+            { word: "School (สโคล)", meaning: "โรงเรียน", english: "School", icon: "🏫", example: "De kinderen gaan naar school. (เด็กๆ กำลังไปโรงเรียน)" },
+            { word: "Trein (ไทรน์)", meaning: "รถไฟ", english: "Train", icon: "🚆", example: "Ik reis met de trein. (ฉันเดินทางด้วยรถไฟ)" },
+            { word: "Station (สตาชอน)", meaning: "สถานี", english: "Station", icon: "🚉", example: "Waar is het station? (สถานีอยู่ตรงไหน?)" },
+            { word: "Rechts (เรคตส์)", meaning: "ขวา", english: "Right", icon: "➡️", example: "Ga hier naar rechts. (เลี้ยวขวาตรงนี้)" },
+            { word: "Links (ลิงก์ส)", meaning: "ซ้าย", english: "Left", icon: "⬅️", example: "Ga bij de kruising naar links. (เลี้ยวซ้ายที่ทางแยก)" },
+            { word: "Bellen (เบลเลิน)", meaning: "โทรศัพท์ / กดกริ่ง", english: "Call / Ring", icon: "📞", example: "Ik zal je straks bellen. (เดี๋ยวฉันจะโทรหาคุณ)" },
+            { word: "Vriend (ฟรีนต์)", meaning: "เพื่อน(ผู้ชาย)", english: "Friend (Male)", icon: "🧑", example: "Hij is een goede vriend. (เขาเป็นเพื่อนที่ดี)" },
+            { word: "Vriendin (ฟรีนดิน)", meaning: "เพื่อน(ผู้หญิง) / แฟนสาว", english: "Girlfriend / Friend", icon: "👩", example: "Zij is mijn vriendin. (เธอคือแฟน/เพื่อน ของฉัน)" },
+            { word: "Liefde (ลีฟเดอ)", meaning: "ความรัก", english: "Love", icon: "❤️", example: "Liefde is belangrijk. (ความรักเป็นสิ่งสำคัญ)" },
+            { word: "Koud (เคาต์)", meaning: "หนาว / เย็น", english: "Cold", icon: "🥶", example: "Het is erg koud in de winter. (มันหนาวมากในฤดูหนาว)" },
+            { word: "Warm (วาร์ม)", meaning: "ร้อน / อุ่น", english: "Warm / Hot", icon: "🥵", example: "Het water is te warm. (น้ำร้อนเกินไป)" },
+            { word: "Slaap lekker (สลาป เลกเคอร์)", meaning: "ฝันดี / นอนหลับให้สบาย", english: "Sleep well", icon: "🌙", example: "Slaap lekker en tot morgen. (ฝันดีและเจอกันพรุ่งนี้)" },
+            { word: "Gezellig (เคอเซลลิก)", meaning: "บรรยากาศดี / อบอุ่น / สนุกสนาน", english: "Cozy / Pleasant", icon: "☕", example: "Het was een gezellige avond. (มันเป็นค่ำคืนที่บรรยากาศดีมาก)" },
+            { word: "Succes (ซุกเซส)", meaning: "โชคดี / ขอให้สำเร็จ", english: "Good luck", icon: "🍀", example: "Succes met je examen! (ขอให้โชคดีกับการสอบ!)" }
+        ];
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function getRandomVocab() {
+            const shuffled = shuffleArray(vocabPool);
+            return shuffled.slice(0, Math.min(VOCAB_PER_SESSION, shuffled.length));
+        }
+
+        // --- Calendar Logic ---
+        
+        function getFormatDateString(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function getDisplayDateString(year, month, day) {
+            return `${day} ${MONTH_NAMES[month]} ${year}`;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('month-year-display').innerText = `${MONTH_NAMES[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[1.5rem] bg-orange-50/30 border border-dashed border-orange-200 opacity-40"></div>`;
+            }
+
+            let completedThisMonth = 0;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = getFormatDateString(year, month, day);
+                const isCompleted = appState.completedDates.includes(dateString);
+                const isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                
+                if (isCompleted) completedThisMonth++;
+
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-5 rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px]";
+                
+                let stateClasses = "";
+                let indicatorHTML = "";
+
+                if (isCompleted) {
+                    stateClasses = "bg-blue-50 border-blue-200 text-blue-800 shadow-sm";
+                    indicatorHTML = `
+                        <div class="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full shadow border border-blue-200 flex items-center justify-center text-sm z-10 animate-bounce" style="animation-duration: 2s;">🌟</div>
+                        <i class="ph-fill ph-check-circle text-blue-400 text-2xl md:text-3xl mt-1 opacity-60"></i>
+                    `;
+                } else if (isToday) {
+                    stateClasses = "bg-gradient-to-b from-orange-400 to-orange-500 border-transparent text-white shadow-lg shadow-orange-500/40 today-pulse";
+                    indicatorHTML = `
+                        <span class="text-[10px] md:text-xs font-bold bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm text-white">วันนี้</span>
+                    `;
+                } else {
+                    stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-orange-300";
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-2xl md:text-3xl mt-1 group-hover:text-orange-400 transition-colors"></i>`;
+                }
+
+                // Check for Sunday/Saturday colors
+                const dayOfWeek = new Date(year, month, day).getDay();
+                let textStyle = "font-extrabold text-xl md:text-2xl font-english";
+                if (!isToday && !isCompleted) {
+                    if (dayOfWeek === 0) textStyle += " text-red-500";
+                    else if (dayOfWeek === 6) textStyle += " text-blue-500";
+                }
+
+                const cardHTML = `
+                    <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
+                        <span class="${textStyle}">${day}</span>
+                        ${indicatorHTML}
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            }
+
+            // Animate number change
+            const completedEl = document.getElementById('summary-completed');
+            completedEl.innerText = completedThisMonth;
+            completedEl.classList.add('scale-150', 'text-yellow-200');
+            setTimeout(() => completedEl.classList.remove('scale-150', 'text-yellow-200'), 300);
+            
+            document.getElementById('summary-total').innerText = daysInMonth;
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // --- Dialog & Interaction ---
+        
+        function openDayDialog(year, month, day) {
+            selectedDateString = getFormatDateString(year, month, day);
+            const displayDate = getDisplayDateString(year, month, day);
+            const isCompleted = appState.completedDates.includes(selectedDateString);
+
+            const dialog = document.getElementById('vocab-dialog');
+            const title = document.getElementById('dialog-title');
+            const content = document.getElementById('dialog-content');
+            const btnComplete = document.getElementById('btn-complete-day');
+
+            title.innerText = `วันที่ ${displayDate}`;
+
+            const vocabList = getRandomVocab();
+            content.innerHTML = '';
+            
+            vocabList.forEach((v, index) => {
+                // ดึงเฉพาะตัวหนังสือดัตช์มาใช้เป็นเสียงอ่าน (ตัดส่วนวงเล็บคำอ่านภาษาไทยออก)
+                const targetWordOnly = v.word.split(' (')[0];
+
+                const itemHTML = `
+                    <div class="vocab-card p-5 bg-white border-2 border-orange-50 rounded-[2rem] hover:border-orange-300 hover:shadow-xl hover:shadow-orange-100/50 transition-all flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                        
+                        <!-- Cute background blob -->
+                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-orange-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        <div class="blob-bg text-orange-700 w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm relative z-10 font-english">
+                            ${index + 1}
+                        </div>
+                        
+                        <div class="flex-1 relative z-10 w-full">
+                            <div class="flex justify-between items-start w-full">
+                                <h4 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-2 flex flex-wrap items-center gap-2 font-target tracking-wide w-full pr-12">
+                                    <span class="text-2xl md:text-3xl drop-shadow-sm mr-1">${v.icon}</span> 
+                                    <span>${v.word}</span>
+                                </h4>
+                                <button onclick="speakWord('${targetWordOnly}')" class="absolute top-0 right-0 bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียงภาษาดัตช์">
+                                    <i class="ph-fill ph-speaker-high text-lg"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2 mb-3 mt-1">
+                                <span class="text-orange-700 font-bold bg-orange-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 border border-orange-100">
+                                    🇹🇭 ${v.meaning}
+                                </span>
+                                <span class="text-blue-600 font-bold bg-blue-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 font-english border border-blue-100">
+                                    🇬🇧 ${v.english}
+                                </span>
+                            </div>
+                            
+                            <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 relative mt-3">
+                                <i class="ph-fill ph-quotes text-orange-200/50 text-4xl absolute -top-2 -left-1"></i>
+                                <p class="text-sm md:text-base text-slate-600 relative z-10 font-target pl-4 leading-relaxed">
+                                    ${v.example}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                content.innerHTML += itemHTML;
+            });
+
+            if (isCompleted) {
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-xl"></i> ทบทวนเสร็จแล้ว (เยี่ยมมาก!)`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold hover:from-blue-600 hover:to-cyan-600 rounded-2xl shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = closeDialog; 
+            } else {
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold hover:from-orange-600 hover:to-red-600 rounded-2xl shadow-lg shadow-orange-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = markDayAsComplete; 
+            }
+
+            dialog.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('dialog-content').scrollTop = 0;
+        }
+
+        function closeDialog() {
+            const dialog = document.getElementById('vocab-dialog');
+            dialog.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            selectedDateString = null;
+        }
+
+        function markDayAsComplete() {
+            if (selectedDateString && !appState.completedDates.includes(selectedDateString)) {
+                appState.completedDates.push(selectedDateString);
+                saveState();
+                
+                // Show cute alert (เปลี่ยนเป็นภาษาดัตช์)
+                const alert = document.createElement('div');
+                alert.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-orange-400";
+                alert.innerHTML = `<span class="text-2xl">🎉</span> Geweldig! สะสมดาวได้อีก 1 ดวง`;
+                document.body.appendChild(alert);
+                setTimeout(() => alert.remove(), 3000);
+
+                renderCalendar(); 
+            }
+            closeDialog();
+        }
+
+        function speakWord(word) {
+            // ใช้ Google Translate TTS API สำหรับภาษาดัตช์ (tl=nl)
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=nl&client=tw-ob`;
+            const audio = new Audio(url);
+            
+            audio.play().catch(error => {
+                console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
+                // ระบบสำรอง: ใช้เสียงของเบราว์เซอร์
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = 'nl-NL'; // สำเนียงดัตช์
+                    utterance.rate = 0.8; 
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
+
+        window.onload = () => {
+            loadState();
+            renderCalendar();
+        };
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape" && !document.getElementById('vocab-dialog').classList.contains('hidden')) {
+                closeDialog();
+            }
+        });
+    </script>
+</body>
+</html>

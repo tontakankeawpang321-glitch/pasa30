@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ท่องสวีเดน — Calendar Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for UI -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            /* พื้นหลังสีฟ้าน้ำแข็ง-ขาว สไตล์ Nordic/Swedish */
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            background-image: radial-gradient(#bae6fd 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        h1, h2, h3, .font-english {
+            font-family: 'Fredoka', 'Sarabun', sans-serif; 
+        }
+        .font-target {
+            font-family: 'Outfit', 'Sarabun', sans-serif; /* ฟอนต์สไตล์ยุโรปสมัยใหม่ */
+            word-break: keep-all;
+        }
+        
+        /* Custom scrollbar for dialog - โทนฟ้า */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f0f9ff; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #7dd3fc; border-radius: 10px; border: 2px solid #f0f9ff; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+        
+        /* Playful animations */
+        .calendar-day { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .calendar-day:hover { transform: translateY(-4px) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(56, 189, 248, 0.15), 0 4px 6px -2px rgba(56, 189, 248, 0.1); }
+        .calendar-day:active { transform: translateY(0) scale(0.95); }
+        
+        .vocab-card { transition: all 0.2s ease-in-out; }
+        .vocab-card:hover { transform: translateY(-3px) scale(1.01); }
+
+        /* เปลี่ยนสี Blob ให้เป็นสีฟ้า Pastel */
+        .blob-bg {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23BAE6FD' d='M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.4,-46.3C91,-33.5,97.2,-18.1,97.1,-3.1C97,12,90.6,26.7,81.3,39.4C72,52.2,59.8,63.1,45.8,71.3C31.8,79.5,15.9,85.1,0.2,84.7C-15.5,84.4,-31,78.2,-45.1,69.9C-59.2,61.6,-71.9,51.2,-81.1,38.2C-90.3,25.2,-96,9.6,-95.2,-5.7C-94.4,-21.1,-87.1,-36,-76.3,-47.9C-65.5,-59.8,-51.2,-68.6,-36.8,-75.4C-22.4,-82.2,-7.9,-87,3.9,-93.8C15.7,-100.6,30.6,-83.6,44.7,-76.4Z' transform='translate(100 100)' /%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Pulse animation for 'Today' - สีฟ้า/น้ำเงิน */
+        @keyframes softPulse {
+            0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+        }
+        .today-pulse { animation: softPulse 2s infinite; }
+    </style>
+</head>
+<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+
+    <div class="w-full max-w-4xl space-y-6">
+        
+        <!-- Header & Summary Section -->
+        <div class="bg-white/80 backdrop-blur-lg rounded-[2rem] p-6 md:p-8 shadow-xl shadow-sky-100/50 border border-white">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <!-- Title & Mascot -->
+                <div class="flex items-center gap-4">
+                    <div class="text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🦊</div>
+                    <div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-400 mb-1">
+                            Svenska Vocab
+                        </h1>
+                        <p class="text-slate-500 font-medium text-sm md:text-base flex items-center gap-1">
+                            ท่องศัพท์สวีเดนวันละ 20 คำ สไตล์นอร์ดิก! 🇸🇪
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Monthly Summary Card -->
+                <div class="bg-gradient-to-tr from-yellow-400 to-amber-500 p-5 rounded-3xl w-full md:w-auto flex items-center gap-5 shadow-lg shadow-amber-200 text-white transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30">
+                        👑
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-amber-50 mb-1">สรุปการเรียนเดือนนี้</p>
+                        <p class="text-3xl font-extrabold leading-none">
+                            <span id="summary-completed">0</span>
+                            <span class="text-xl font-medium text-amber-100">/ <span id="summary-total">30</span> วัน</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Section -->
+        <div class="bg-white/90 backdrop-blur-lg rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-sky-100/40 border border-white">
+            
+            <!-- Calendar Header (Month Navigation) -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">📅</div>
+                    <h2 id="month-year-display" class="text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
+                </div>
+                
+                <div class="flex gap-2 bg-sky-50 p-1.5 rounded-2xl">
+                    <button onclick="changeMonth(-1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-sky-100 hover:text-sky-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-left text-lg"></i>
+                    </button>
+                    <button onclick="goToToday()" class="px-5 py-2 rounded-xl bg-white shadow-sm hover:shadow hover:bg-sky-100 hover:text-sky-600 text-slate-700 font-bold transition-all active:scale-95 text-sm">
+                        กลับมาวันนี้
+                    </button>
+                    <button onclick="changeMonth(1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-sky-100 hover:text-sky-600 text-slate-500 transition-all active:scale-95">
+                        <i class="ph-bold ph-caret-right text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Days of Week -->
+            <div class="grid grid-cols-7 gap-2 md:gap-3 mb-3 text-center font-bold text-slate-400 text-xs md:text-sm uppercase tracking-wider">
+                <div class="text-rose-500">Sun</div>
+                <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
+                <div class="text-blue-500">Sat</div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-2 md:gap-3">
+                <!-- Days will be generated by JS -->
+            </div>
+        </div>
+        
+        <!-- Footer info -->
+        <div class="text-center text-slate-500 text-sm font-medium">
+            <p>💡 Tip: กดที่วันที่เพื่อเริ่มท่องศัพท์สวีเดนได้เลย! (อย่าลืมเปิดเสียงเพื่อฟังสำเนียงนะ)</p>
+        </div>
+
+    </div>
+
+    <!-- Dialog / Modal for Vocabulary -->
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-blue-900/30 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
+        
+        <!-- Modal Content -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-3xl bg-[#f8fafc] rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-4 border-white">
+            
+            <!-- Modal Header -->
+            <div class="px-8 py-6 border-b border-sky-100 bg-white flex justify-between items-center relative z-10">
+                <div class="flex items-center gap-4">
+                    <div class="text-4xl">🦊</div>
+                    <div>
+                        <h3 id="dialog-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-500">วันที่ --/--/----</h3>
+                        <p class="text-sm text-slate-500 mt-1 font-medium">ได้เวลา Fika และท่องศัพท์แล้ว! (20 คำ)</p>
+                    </div>
+                </div>
+                <button onclick="closeDialog()" class="text-slate-400 hover:text-blue-500 bg-slate-100 hover:bg-sky-50 p-3 rounded-full transition-all active:scale-90">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable Vocab List) -->
+            <div id="dialog-content" class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+                <!-- Vocab list will be injected here -->
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="px-8 py-5 border-t border-sky-100 bg-white flex justify-between items-center gap-3">
+                <div class="text-3xl hidden md:block">🇸🇪</div>
+                <div class="flex gap-3 w-full md:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-6 py-3 text-slate-600 font-bold hover:bg-sky-50 hover:text-blue-700 rounded-2xl transition-colors">
+                        ปิดไว้ก่อน
+                    </button>
+                    <button id="btn-complete-day" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-sky-500 text-white font-bold hover:from-blue-600 hover:to-sky-600 rounded-2xl shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg">
+                        <i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Constants & Variables ---
+        const VOCAB_PER_SESSION = 20;
+        const MONTH_NAMES = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        
+        let currentDate = new Date(); 
+        let today = new Date(); 
+        let selectedDateString = null; 
+        
+        // --- State Management (Local Storage) ---
+        let appState = {
+            completedDates: [] 
+        };
+
+        function loadState() {
+            // เปลี่ยน Key สำหรับภาษาสวีเดน ป้องกันการทับซ้อนกับแอปอื่น
+            const saved = localStorage.getItem('swedish_calendar_v1');
+            if (saved) {
+                appState = JSON.parse(saved);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('swedish_calendar_v1', JSON.stringify(appState));
+        }
+
+        // --- Vocabulary Pool (ภาษาสวีเดน) ---
+        const vocabPool = [
+            { word: "Hej (เฮย)", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Hej! Hur mår du? (สวัสดี! คุณสบายดีไหม?)" },
+            { word: "Tack (ทัก)", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Tack så mycket! (ขอบคุณมากๆ!)" },
+            { word: "Ja (ยา)", meaning: "ใช่ / ครับ,ค่ะ", english: "Yes", icon: "👍", example: "Ja, det stämmer. (ใช่ ถูกต้องเลย)" },
+            { word: "Nej (เนย)", meaning: "ไม่", english: "No", icon: "👎", example: "Nej tack. (ไม่ล่ะ ขอบคุณ)" },
+            { word: "Hejdå (เฮย-ดัว)", meaning: "ลาก่อน", english: "Goodbye", icon: "👋", example: "Hejdå, vi ses! (ลาก่อน ไว้เจอกันนะ!)" },
+            { word: "Förlåt (เฟอร์-ล้อต)", meaning: "ขอโทษ (เมื่อทำผิด)", english: "Sorry", icon: "🥺", example: "Förlåt att jag är sen. (ขอโทษที่ฉันมาสาย)" },
+            { word: "Ursäkta (อูร์-เช็ก-ต้า)", meaning: "ขอโทษ (รบกวนหน่อย)", english: "Excuse me", icon: "🙋", example: "Ursäkta, var är toaletten? (ขอโทษนะคะ ห้องน้ำอยู่ไหน?)" },
+            { word: "God morgon (กูด มอร์-กอน)", meaning: "อรุณสวัสดิ์", english: "Good morning", icon: "🌅", example: "God morgon! Har du sovit gott? (อรุณสวัสดิ์! หลับสบายไหม?)" },
+            { word: "God natt (กูด นัท)", meaning: "ราตรีสวัสดิ์", english: "Good night", icon: "🌙", example: "God natt och sov gott. (ราตรีสวัสดิ์และฝันดีนะ)" },
+            { word: "Hur mår du? (ฮูร์ มอร์ ดือ?)", meaning: "คุณสบายดีไหม?", english: "How are you?", icon: "😊", example: "Hej, hur mår du idag? (สวัสดี วันนี้คุณสบายดีไหม?)" },
+            { word: "Bra (บรา)", meaning: "ดี / สบายดี", english: "Good / Fine", icon: "✨", example: "Jag mår bra, tack. (ฉันสบายดี ขอบคุณ)" },
+            { word: "Vad heter du? (หวอด เฮีย-เตอร์ ดือ?)", meaning: "คุณชื่ออะไร?", english: "What's your name?", icon: "📛", example: "Hej, vad heter du? (สวัสดี คุณชื่ออะไร?)" },
+            { word: "Jag heter... (ยอก เฮีย-เตอร์...)", meaning: "ฉันชื่อ...", english: "My name is...", icon: "👤", example: "Jag heter Anna. (ฉันชื่ออันนา)" },
+            { word: "Vatten (วัต-เต็น)", meaning: "น้ำ", english: "Water", icon: "💧", example: "Kan jag få lite vatten? (ฉันขอน้ำหน่อยได้ไหม?)" },
+            { word: "Kaffe (คัฟ-เฟอะ)", meaning: "กาแฟ", english: "Coffee", icon: "☕", example: "Jag dricker kaffe varje morgon. (ฉันดื่มกาแฟทุกเช้า)" },
+            { word: "Fika (ฟี-ก้า)", meaning: "พักดื่มกาแฟกับขนม (วัฒนธรรมสวีเดน)", english: "Coffee break", icon: "🥐", example: "Ska vi ta en fika? (ไปพักกินกาแฟขนมกันไหม?)" },
+            { word: "Köttbullar (ช็อต-บุล-ลาร์)", meaning: "มีทบอล (ลูกชิ้นสวีเดน)", english: "Meatballs", icon: "🧆", example: "Svenska köttbullar är jättegoda! (มีทบอลสวีเดนอร่อยมาก!)" },
+            { word: "Gott (ก๊อต)", meaning: "อร่อย", english: "Delicious", icon: "😋", example: "Det här var mycket gott. (อันนี้อร่อยมากๆ)" },
+            { word: "Mycket (มึค-เค็ต)", meaning: "มาก", english: "Much / Very", icon: "📈", example: "Jag gillar det mycket. (ฉันชอบมันมาก)" },
+            { word: "Lite (ลี-เตอะ)", meaning: "นิดหน่อย", english: "A little", icon: "🤏", example: "Jag pratar lite svenska. (ฉันพูดสวีเดนได้นิดหน่อย)" },
+            { word: "Jag älskar dig (ยอก เอล-สการ์ เดญ)", meaning: "ฉันรักคุณ", english: "I love you", icon: "❤️", example: "Jag älskar dig mer än allt. (ฉันรักคุณมากกว่าสิ่งใด)" },
+            { word: "Snälla (สเนล-ล่า)", meaning: "ได้โปรด / กรุณา", english: "Please", icon: "🙏", example: "Kan du hjälpa mig, snälla? (คุณช่วยฉันหน่อยได้โปรด?)" },
+            { word: "Vad kostar det? (หวอด คอส-ต้าร์ เดท?)", meaning: "ราคาเท่าไหร่?", english: "How much is it?", icon: "💰", example: "Ursäkta, vad kostar det här? (ขอโทษนะคะ อันนี้ราคาเท่าไหร่?)" },
+            { word: "Dyr (ดียร์)", meaning: "แพง", english: "Expensive", icon: "💸", example: "Den är för dyr för mig. (มันแพงเกินไปสำหรับฉัน)" },
+            { word: "Billig (บิล-ลิก)", meaning: "ถูก (ราคา)", english: "Cheap", icon: "🏷️", example: "Det var väldigt billigt! (มันราคาถูกมาก!)" },
+            { word: "Hjälp (เยล์ป)", meaning: "ช่วยด้วย", english: "Help", icon: "🆘", example: "Hjälp mig! (ช่วยฉันด้วย!)" },
+            { word: "Var är...? (วาร์ แอร์...?)", meaning: "อยู่ที่ไหน?", english: "Where is...?", icon: "📍", example: "Var är tågstationen? (สถานีรถไฟอยู่ไหน?)" },
+            { word: "När? (แนร์?)", meaning: "เมื่อไหร่?", english: "When?", icon: "📅", example: "När går bussen? (รถบัสออกเมื่อไหร่?)" },
+            { word: "Varför? (วาร์-เฟอร์?)", meaning: "ทำไม?", english: "Why?", icon: "🤔", example: "Varför säger du så? (ทำไมคุณพูดแบบนั้น?)" },
+            { word: "Vem? (เว็ม?)", meaning: "ใคร?", english: "Who?", icon: "👤", example: "Vem är det? (นั่นใครน่ะ?)" },
+            { word: "Vad? (หวอด?)", meaning: "อะไร?", english: "What?", icon: "❓", example: "Vad gör du? (คุณกำลังทำอะไร?)" },
+            { word: "Toalett (ทัว-เล็ต)", meaning: "ห้องน้ำ", english: "Toilet", icon: "🚽", example: "Var ligger toaletten? (ห้องน้ำตั้งอยู่ตรงไหน?)" },
+            { tr: true, word: "Sjukhus (ชุก-ฮูส)", meaning: "โรงพยาบาล", english: "Hospital", icon: "🏥", example: "Jag måste åka till sjukhuset. (ฉันต้องไปโรงพยาบาล)" },
+            { word: "Apotek (อา-โป-เทก)", meaning: "ร้านขายยา", english: "Pharmacy", icon: "💊", example: "Finns det ett apotek i närheten? (มีร้านขายยาแถวนี้ไหม?)" },
+            { word: "Vacker (วัก-เคอร์)", meaning: "สวยงาม", english: "Beautiful", icon: "✨", example: "Sverige är ett vackert land. (สวีเดนเป็นประเทศที่สวยงาม)" },
+            { word: "Kall (คัล)", meaning: "หนาว / เย็น", english: "Cold", icon: "🥶", example: "Det är väldigt kallt ute idag. (วันนี้ข้างนอกหนาวมาก)" },
+            { word: "Varm (วาร์ม)", meaning: "ร้อน / อบอุ่น", english: "Hot / Warm", icon: "🥵", example: "Det är varmt idag. (วันนี้อากาศร้อน/อุ่น)" },
+            { word: "Trött (เทริต)", meaning: "เหนื่อย", english: "Tired", icon: "🥱", example: "Jag är mycket trött. (ฉันเหนื่อยมาก)" },
+            { word: "Hungrig (ฮุง-ริก)", meaning: "หิว", english: "Hungry", icon: "🤤", example: "Är du hungrig? (คุณหิวไหม?)" },
+            { word: "Glad (กล๊าด)", meaning: "ดีใจ / มีความสุข", english: "Happy", icon: "😄", example: "Jag är så glad att se dig! (ฉันดีใจมากที่ได้เจอคุณ!)" },
+            { word: "Ledsen (เลส-เซ่น)", meaning: "เศร้า / เสียใจ", english: "Sad", icon: "😢", example: "Varför är du ledsen? (ทำไมคุณถึงเศร้า?)" },
+            { word: "Jag förstår inte (ยอก เฟอร์-สตอร์ อิน-เตอะ)", meaning: "ฉันไม่เข้าใจ", english: "I don't understand", icon: "🤷", example: "Förlåt, jag förstår inte. (ขอโทษนะ ฉันไม่เข้าใจ)" },
+            { word: "Prata långsammare (พรา-ต้า ลอง-ซัม-มา-เระ)", meaning: "พูดช้าลงหน่อย", english: "Speak slower", icon: "🐢", example: "Kan du prata långsammare, snälla? (คุณช่วยพูดช้าลงหน่อยได้โปรด?)" },
+            { word: "Ingen fara (อิง-เง่น ฟา-ร่า)", meaning: "ไม่เป็นไร (No worries)", english: "No problem", icon: "👌", example: "Det är okej, ingen fara. (มันโอเค ไม่เป็นไรหรอก)" },
+            { word: "Lycka till (ลึค-ก้า ทิล)", meaning: "โชคดีนะ", english: "Good luck", icon: "🍀", example: "Lycka till med provet! (โชคดีกับการสอบนะ!)" },
+            { word: "Tåg (ท็อก)", meaning: "รถไฟ", english: "Train", icon: "🚆", example: "Jag tar tåget till Stockholm. (ฉันนั่งรถไฟไปสตอกโฮล์ม)" },
+            { word: "Skola (สกู-ล่า)", meaning: "โรงเรียน", english: "School", icon: "🏫", example: "Barnen är i skolan. (เด็กๆ อยู่ที่โรงเรียน)" },
+            { word: "Vän (เวน)", meaning: "เพื่อน", english: "Friend", icon: "🤝", example: "Han är min bästa vän. (เขาคือเพื่อนสนิทของฉัน)" },
+            { word: "Roligt (รู-ลิกต์)", meaning: "สนุก", english: "Fun", icon: "🎉", example: "Det var väldigt roligt! (มันสนุกมากๆ เลย!)" },
+            { word: "Katt (คัต)", meaning: "แมว", english: "Cat", icon: "🐈", example: "Jag har en söt katt. (ฉันมีแมวน่ารักหนึ่งตัว)" }
+        ];
+
+        function shuffleArray(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function getRandomVocab() {
+            const shuffled = shuffleArray(vocabPool);
+            return shuffled.slice(0, Math.min(VOCAB_PER_SESSION, shuffled.length));
+        }
+
+        // --- Calendar Logic ---
+        
+        function getFormatDateString(year, month, day) {
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function getDisplayDateString(year, month, day) {
+            return `${day} ${MONTH_NAMES[month]} ${year}`;
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('month-year-display').innerText = `${MONTH_NAMES[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+            
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[1.5rem] bg-sky-50/30 border border-dashed border-sky-200 opacity-40"></div>`;
+            }
+
+            let completedThisMonth = 0;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = getFormatDateString(year, month, day);
+                const isCompleted = appState.completedDates.includes(dateString);
+                const isToday = (day === today.getDate() && month === today.getMonth() && year === today.getFullYear());
+                
+                if (isCompleted) completedThisMonth++;
+
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-5 rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px]";
+                
+                let stateClasses = "";
+                let indicatorHTML = "";
+
+                if (isCompleted) {
+                    stateClasses = "bg-amber-50 border-amber-200 text-amber-800 shadow-sm";
+                    indicatorHTML = `
+                        <div class="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-sm z-10 animate-bounce" style="animation-duration: 2s;">👑</div>
+                        <i class="ph-fill ph-check-circle text-amber-400 text-2xl md:text-3xl mt-1 opacity-60"></i>
+                    `;
+                } else if (isToday) {
+                    stateClasses = "bg-gradient-to-b from-blue-400 to-sky-500 border-transparent text-white shadow-lg shadow-blue-500/40 today-pulse";
+                    indicatorHTML = `
+                        <span class="text-[10px] md:text-xs font-bold bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm text-white">วันนี้</span>
+                    `;
+                } else {
+                    stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-sky-300";
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-2xl md:text-3xl mt-1 group-hover:text-blue-400 transition-colors"></i>`;
+                }
+
+                // Check for Sunday/Saturday colors
+                const dayOfWeek = new Date(year, month, day).getDay();
+                let textStyle = "font-extrabold text-xl md:text-2xl font-english";
+                if (!isToday && !isCompleted) {
+                    if (dayOfWeek === 0) textStyle += " text-rose-500";
+                    else if (dayOfWeek === 6) textStyle += " text-blue-500";
+                }
+
+                const cardHTML = `
+                    <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
+                        <span class="${textStyle}">${day}</span>
+                        ${indicatorHTML}
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            }
+
+            // Animate number change
+            const completedEl = document.getElementById('summary-completed');
+            completedEl.innerText = completedThisMonth;
+            completedEl.classList.add('scale-150', 'text-amber-200');
+            setTimeout(() => completedEl.classList.remove('scale-150', 'text-amber-200'), 300);
+            
+            document.getElementById('summary-total').innerText = daysInMonth;
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function goToToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+
+        // --- Dialog & Interaction ---
+        
+        function openDayDialog(year, month, day) {
+            selectedDateString = getFormatDateString(year, month, day);
+            const displayDate = getDisplayDateString(year, month, day);
+            const isCompleted = appState.completedDates.includes(selectedDateString);
+
+            const dialog = document.getElementById('vocab-dialog');
+            const title = document.getElementById('dialog-title');
+            const content = document.getElementById('dialog-content');
+            const btnComplete = document.getElementById('btn-complete-day');
+
+            title.innerText = `วันที่ ${displayDate}`;
+
+            const vocabList = getRandomVocab();
+            content.innerHTML = '';
+            
+            vocabList.forEach((v, index) => {
+                // ดึงเฉพาะตัวหนังสือสวีเดนมาใช้เป็นเสียงอ่าน (ตัดส่วนวงเล็บคำอ่านภาษาไทยออก)
+                const targetWordOnly = v.word.split(' (')[0];
+
+                const itemHTML = `
+                    <div class="vocab-card p-5 bg-white border-2 border-sky-50 rounded-[2rem] hover:border-sky-300 hover:shadow-xl hover:shadow-sky-100/50 transition-all flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                        
+                        <!-- Cute background blob -->
+                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-sky-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        <div class="blob-bg text-blue-700 w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm relative z-10 font-english">
+                            ${index + 1}
+                        </div>
+                        
+                        <div class="flex-1 relative z-10 w-full">
+                            <div class="flex justify-between items-start w-full">
+                                <h4 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-2 flex flex-wrap items-center gap-2 font-target tracking-wide w-full pr-12">
+                                    <span class="text-2xl md:text-3xl drop-shadow-sm mr-1">${v.icon}</span> 
+                                    <span>${v.word}</span>
+                                </h4>
+                                <button onclick="speakWord('${targetWordOnly}')" class="absolute top-0 right-0 bg-sky-50 text-blue-600 hover:bg-blue-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียงสวีเดน">
+                                    <i class="ph-fill ph-speaker-high text-lg"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2 mb-3 mt-1">
+                                <span class="text-blue-700 font-bold bg-blue-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 border border-blue-100">
+                                    🇹🇭 ${v.meaning}
+                                </span>
+                                <span class="text-sky-600 font-bold bg-sky-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 font-english border border-sky-100">
+                                    🇬🇧 ${v.english}
+                                </span>
+                            </div>
+                            
+                            <div class="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 relative mt-3">
+                                <i class="ph-fill ph-quotes text-amber-200/50 text-4xl absolute -top-2 -left-1"></i>
+                                <p class="text-sm md:text-base text-slate-600 relative z-10 font-target pl-4 leading-relaxed">
+                                    ${v.example}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                content.innerHTML += itemHTML;
+            });
+
+            if (isCompleted) {
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-xl"></i> ทบทวนเสร็จแล้ว (Bra jobbat!)`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-600 hover:to-orange-600 rounded-2xl shadow-lg shadow-amber-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = closeDialog; 
+            } else {
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!`;
+                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-blue-500 to-sky-500 text-white font-bold hover:from-blue-600 hover:to-sky-600 rounded-2xl shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.onclick = markDayAsComplete; 
+            }
+
+            dialog.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('dialog-content').scrollTop = 0;
+        }
+
+        function closeDialog() {
+            const dialog = document.getElementById('vocab-dialog');
+            dialog.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            selectedDateString = null;
+        }
+
+        function markDayAsComplete() {
+            if (selectedDateString && !appState.completedDates.includes(selectedDateString)) {
+                appState.completedDates.push(selectedDateString);
+                saveState();
+                
+                // Show cute alert (Swedish vibe)
+                const alert = document.createElement('div');
+                alert.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-amber-400";
+                alert.innerHTML = `<span class="text-2xl">🎉</span> Bra jobbat! สะสมมงกุฎได้อีก 1 อัน`;
+                document.body.appendChild(alert);
+                setTimeout(() => alert.remove(), 3000);
+
+                renderCalendar(); 
+            }
+            closeDialog();
+        }
+
+        function speakWord(word) {
+            // ใช้ Google Translate TTS API สำหรับภาษาสวีเดน (tl=sv)
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=sv&client=tw-ob`;
+            const audio = new Audio(url);
+            
+            audio.play().catch(error => {
+                console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
+                // ระบบสำรอง: ใช้เสียงของเบราว์เซอร์
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = 'sv-SE'; // สำเนียงสวีเดน
+                    utterance.rate = 0.8; 
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
+
+        window.onload = () => {
+            loadState();
+            renderCalendar();
+        };
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape" && !document.getElementById('vocab-dialog').classList.contains('hidden')) {
+                closeDialog();
+            }
+        });
+    </script>
+</body>
+</html>
