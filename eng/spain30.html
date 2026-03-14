@@ -47,9 +47,12 @@
             background-size: cover;
             background-position: center;
         }
+
+        /* รองรับขอบจอด้านล่างของ iPhone (Safe Area) */
+        .pb-safe { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col items-center p-3 md:p-8">
+<body class="text-slate-800 min-h-screen flex flex-col items-center p-3 md:p-8 pb-28 md:pb-28">
 
     <div class="w-full max-w-2xl space-y-4">
         
@@ -106,6 +109,27 @@
             <p>💡 กดที่วันที่เพื่อเริ่มเรียนรู้คำศัพท์ใหม่!</p>
         </div>
 
+    </div>
+
+    <!-- Bottom Navigation แบบแอปมือถือ -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-100 z-40 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.03)]">
+        <div class="flex justify-around items-center max-w-2xl mx-auto px-4 py-2">
+            <!-- ปุ่ม ปฏิทิน (หน้าปัจจุบัน - สถานะ Active) -->
+            <a href="#" class="flex flex-col items-center gap-1 text-orange-600 transition-all active:scale-95">
+                <div class="w-16 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                    <i class="ph-fill ph-calendar-blank text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold">ปฏิทิน</span>
+            </a>
+            
+            <!-- ปุ่ม คุยสนทนา (เปิดลิงก์หน้าย่อยแบบ _blank) -->
+            <a href="human/usahuman.html" target="_blank" class="flex flex-col items-center gap-1 text-slate-400 hover:text-orange-500 transition-all active:scale-95">
+                <div class="w-16 h-8 rounded-full flex items-center justify-center hover:bg-orange-50">
+                    <i class="ph-bold ph-chats-circle text-xl"></i>
+                </div>
+                <span class="text-[10px] font-bold">คุยสนทนา</span>
+            </a>
+        </div>
     </div>
 
     <!-- Vocab Dialog -->
