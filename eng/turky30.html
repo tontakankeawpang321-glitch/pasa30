@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ท่องศัพท์ตุรกี — Calendar Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,6 +16,8 @@
             background-color: #fff1f2;
             background-image: radial-gradient(#fecdd3 1px, transparent 1px);
             background-size: 20px 20px;
+            /* ป้องกันการเด้งเวลาเลื่อนในมือถือ */
+            overscroll-behavior-y: none; 
         }
         h1, h2, h3, .font-english, .font-target {
             font-family: 'Outfit', 'Sarabun', sans-serif; 
@@ -25,18 +27,23 @@
         }
         
         /* Custom scrollbar for dialog - โทนแดง Rose */
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #fff1f2; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fb7185; border-radius: 10px; border: 2px solid #fff1f2; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #fb7185; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #e11d48; }
         
-        /* Playful animations */
-        .calendar-day { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .calendar-day:hover { transform: translateY(-4px) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.15), 0 4px 6px -2px rgba(225, 29, 72, 0.1); }
+        /* Playful animations - ใช้ transform เพื่อให้การ์ดจอลื่นขึ้น (Hardware Acceleration) */
+        .calendar-day { 
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease; 
+            will-change: transform;
+        }
+        @media (hover: hover) {
+            .calendar-day:hover { transform: translateY(-2px) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.15), 0 4px 6px -2px rgba(225, 29, 72, 0.1); }
+            .vocab-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(254, 205, 211, 0.5); }
+        }
         .calendar-day:active { transform: translateY(0) scale(0.95); }
         
-        .vocab-card { transition: all 0.2s ease-in-out; }
-        .vocab-card:hover { transform: translateY(-3px) scale(1.01); }
+        .vocab-card { transition: transform 0.2s ease, box-shadow 0.2s ease; will-change: transform; }
 
         /* เปลี่ยนสี Blob ให้เป็นสี Rose-100 */
         .blob-bg {
@@ -45,45 +52,52 @@
             background-position: center;
         }
 
-        /* Pulse animation for 'Today' - สีแดง/ส้ม */
+        /* Pulse animation for 'Today' - สีแดง/ส้ม ลดเงาลงนิดนึงให้ไม่กินสเปค */
         @keyframes softPulse {
-            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.3); }
+            70% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); }
             100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
         }
         .today-pulse { animation: softPulse 2s infinite; }
+
+        /* Modal Overlay Animation */
+        .modal-enter { animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translate(-50%, -45%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
     </style>
 </head>
-<body class="text-slate-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-screen flex flex-col items-center">
 
-    <div class="w-full max-w-4xl space-y-6">
+    <div class="w-full max-w-4xl space-y-4 sm:space-y-6">
         
         <!-- Header & Summary Section -->
-        <div class="bg-white/80 backdrop-blur-lg rounded-[2rem] p-6 md:p-8 shadow-xl shadow-rose-100/50 border border-white">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="bg-white/90 backdrop-blur-md rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-lg shadow-rose-100/50 border border-white">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6">
                 <!-- Title & Mascot -->
-                <div class="flex items-center gap-4">
-                    <div class="text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🎈</div>
+                <div class="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
+                    <div class="text-4xl sm:text-5xl md:text-6xl animate-bounce drop-shadow-md shrink-0" style="animation-duration: 3s;">🎈</div>
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-500 mb-1">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-orange-500 mb-0.5 md:mb-1 leading-tight">
                             Daily Turkish Vocab
                         </h1>
-                        <p class="text-slate-500 font-medium text-sm md:text-base flex items-center gap-1">
+                        <p class="text-slate-500 font-medium text-xs sm:text-sm md:text-base flex items-center gap-1">
                             ท่องศัพท์วันละ 20 คำ บินลัดฟ้าสู่ตุรกี! 🇹🇷 
                         </p>
                     </div>
                 </div>
 
                 <!-- Monthly Summary Card -->
-                <div class="bg-gradient-to-tr from-rose-500 to-amber-500 p-5 rounded-3xl w-full md:w-auto flex items-center gap-5 shadow-lg shadow-rose-200 text-white transform hover:scale-105 transition-transform duration-300">
-                    <div class="bg-white/20 backdrop-blur-sm w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-white/30" title="Nazar (Evil Eye)">
+                <div class="bg-gradient-to-tr from-rose-500 to-amber-500 p-3 sm:p-4 md:p-5 rounded-2xl md:rounded-3xl w-full sm:w-auto flex items-center gap-3 md:gap-5 shadow-md shadow-rose-200 text-white transform hover:scale-105 transition-transform duration-300">
+                    <div class="bg-white/20 backdrop-blur-sm w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center text-2xl md:text-3xl shadow-inner border border-white/30 shrink-0" title="Nazar (Evil Eye)">
                         🧿
                     </div>
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-wider text-rose-50 mb-1">สรุปการเรียนเดือนนี้</p>
-                        <p class="text-3xl font-extrabold leading-none">
+                        <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-rose-50 mb-0.5 md:mb-1">สรุปการเรียนเดือนนี้</p>
+                        <p class="text-2xl sm:text-3xl font-extrabold leading-none">
                             <span id="summary-completed">0</span>
-                            <span class="text-xl font-medium text-rose-100">/ <span id="summary-total">30</span> วัน</span>
+                            <span class="text-base sm:text-xl font-medium text-rose-100">/ <span id="summary-total">30</span> วัน</span>
                         </p>
                     </div>
                 </div>
@@ -91,84 +105,85 @@
         </div>
 
         <!-- Calendar Section -->
-        <div class="bg-white/90 backdrop-blur-lg rounded-[2.5rem] p-6 md:p-8 shadow-xl shadow-rose-100/40 border border-white">
+        <div class="bg-white/95 backdrop-blur-md rounded-2xl md:rounded-[2.5rem] p-4 sm:p-6 md:p-8 shadow-lg shadow-rose-100/40 border border-white">
             
             <!-- Calendar Header (Month Navigation) -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="text-3xl">📅</div>
-                    <h2 id="month-year-display" class="text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
+            <div class="flex flex-row justify-between items-center mb-4 sm:mb-6 md:mb-8 gap-2">
+                <div class="flex items-center gap-2 md:gap-3">
+                    <div class="text-2xl sm:text-3xl">📅</div>
+                    <h2 id="month-year-display" class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800 tracking-wide leading-none">Month Year</h2>
                 </div>
                 
-                <div class="flex gap-2 bg-rose-50 p-1.5 rounded-2xl">
-                    <button onclick="changeMonth(-1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-100 hover:text-rose-600 text-slate-500 transition-all active:scale-95">
-                        <i class="ph-bold ph-caret-left text-lg"></i>
+                <div class="flex gap-1 sm:gap-2 bg-rose-50 p-1 md:p-1.5 rounded-xl md:rounded-2xl shrink-0">
+                    <button onclick="changeMonth(-1)" class="p-2 md:p-3 rounded-lg md:rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-100 hover:text-rose-600 text-slate-500 transition-colors active:scale-95">
+                        <i class="ph-bold ph-caret-left text-base sm:text-lg"></i>
                     </button>
-                    <button onclick="goToToday()" class="px-5 py-2 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-100 hover:text-rose-600 text-slate-700 font-bold transition-all active:scale-95 text-sm">
-                        กลับมาวันนี้
+                    <button onclick="goToToday()" class="px-3 sm:px-4 md:px-5 py-2 rounded-lg md:rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-100 hover:text-rose-600 text-slate-700 font-bold transition-colors active:scale-95 text-xs sm:text-sm">
+                        <span class="hidden sm:inline">กลับมาวันนี้</span>
+                        <span class="sm:hidden">วันนี้</span>
                     </button>
-                    <button onclick="changeMonth(1)" class="p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-100 hover:text-rose-600 text-slate-500 transition-all active:scale-95">
-                        <i class="ph-bold ph-caret-right text-lg"></i>
+                    <button onclick="changeMonth(1)" class="p-2 md:p-3 rounded-lg md:rounded-xl bg-white shadow-sm hover:shadow hover:bg-rose-100 hover:text-rose-600 text-slate-500 transition-colors active:scale-95">
+                        <i class="ph-bold ph-caret-right text-base sm:text-lg"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Days of Week -->
-            <div class="grid grid-cols-7 gap-2 md:gap-3 mb-3 text-center font-bold text-slate-400 text-xs md:text-sm uppercase tracking-wider">
+            <div class="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 mb-2 sm:mb-3 text-center font-bold text-slate-400 text-[10px] sm:text-xs md:text-sm uppercase tracking-wider">
                 <div class="text-rose-500">Sun</div>
                 <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
                 <div class="text-sky-500">Sat</div>
             </div>
 
             <!-- Calendar Grid -->
-            <div id="calendar-grid" class="grid grid-cols-7 gap-2 md:gap-3">
+            <div id="calendar-grid" class="grid grid-cols-7 gap-1.5 sm:gap-2 md:gap-3">
                 <!-- Days will be generated by JS -->
             </div>
         </div>
         
         <!-- Footer info -->
-        <div class="text-center text-slate-500 text-sm font-medium">
+        <div class="text-center text-slate-500 text-xs sm:text-sm font-medium pb-4">
             <p>💡 Tip: กดที่วันที่เพื่อเริ่มท่องศัพท์ตุรกีได้เลย! (ลองกดฟังเสียงดูนะ)</p>
         </div>
 
     </div>
 
     <!-- Dialog / Modal for Vocabulary -->
-    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden flex items-center justify-center p-2 sm:p-4">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-rose-950/30 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
+        <div class="absolute inset-0 bg-rose-950/40 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
         
         <!-- Modal Content -->
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-3xl bg-[#f8fafc] rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-4 border-white">
+        <div id="modal-content-box" class="relative w-full max-w-3xl bg-[#f8fafc] rounded-2xl sm:rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] md:max-h-[85vh] overflow-hidden border-2 sm:border-4 border-white opacity-0">
             
             <!-- Modal Header -->
-            <div class="px-8 py-6 border-b border-rose-100 bg-white flex justify-between items-center relative z-10">
-                <div class="flex items-center gap-4">
-                    <div class="text-4xl">☕</div>
+            <div class="px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 border-b border-rose-100 bg-white flex justify-between items-center relative z-10 shrink-0">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="text-3xl sm:text-4xl">☕</div>
                     <div>
-                        <h3 id="dialog-title" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-500">วันที่ --/--/----</h3>
-                        <p class="text-sm text-slate-500 mt-1 font-medium">มาเก็บศัพท์ตุรกีเข้าสมองกันเถอะ! (20 คำ)</p>
+                        <h3 id="dialog-title" class="text-lg sm:text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-500 leading-tight">วันที่ --/--/----</h3>
+                        <p class="text-[10px] sm:text-xs md:text-sm text-slate-500 mt-0.5 sm:mt-1 font-medium">มาเก็บศัพท์ตุรกีเข้าสมองกันเถอะ! (20 คำ)</p>
                     </div>
                 </div>
-                <button onclick="closeDialog()" class="text-slate-400 hover:text-rose-500 bg-slate-100 hover:bg-rose-50 p-3 rounded-full transition-all active:scale-90">
-                    <i class="ph-bold ph-x text-xl"></i>
+                <button onclick="closeDialog()" class="text-slate-400 hover:text-rose-500 bg-slate-50 hover:bg-rose-50 p-2 sm:p-3 rounded-full transition-colors active:scale-90 shrink-0">
+                    <i class="ph-bold ph-x text-lg sm:text-xl"></i>
                 </button>
             </div>
             
             <!-- Modal Body (Scrollable Vocab List) -->
-            <div id="dialog-content" class="p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-4">
+            <div id="dialog-content" class="p-3 sm:p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-3 sm:space-y-4">
                 <!-- Vocab list will be injected here -->
             </div>
             
             <!-- Modal Footer -->
-            <div class="px-8 py-5 border-t border-rose-100 bg-white flex justify-between items-center gap-3">
-                <div class="text-3xl hidden md:block">🇹🇷</div>
-                <div class="flex gap-3 w-full md:w-auto justify-end">
-                    <button onclick="closeDialog()" class="px-6 py-3 text-slate-600 font-bold hover:bg-rose-50 hover:text-rose-700 rounded-2xl transition-colors">
+            <div class="px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 border-t border-rose-100 bg-white flex justify-between items-center gap-3 shrink-0">
+                <div class="text-2xl sm:text-3xl hidden md:block">🇹🇷</div>
+                <div class="flex gap-2 sm:gap-3 w-full md:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-4 sm:px-6 py-2 sm:py-3 text-slate-600 font-bold hover:bg-rose-50 hover:text-rose-700 rounded-xl sm:rounded-2xl transition-colors text-sm sm:text-base">
                         ปิดไว้ก่อน
                     </button>
-                    <button id="btn-complete-day" class="px-8 py-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-bold hover:from-rose-600 hover:to-amber-600 rounded-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg">
-                        <i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!
+                    <button id="btn-complete-day" class="flex-1 md:flex-none justify-center px-4 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-bold hover:from-rose-600 hover:to-amber-600 rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center gap-1 sm:gap-2 text-sm sm:text-lg">
+                        <i class="ph-bold ph-check-circle text-lg sm:text-xl"></i> <span>ท่องเสร็จแล้ว!</span>
                     </button>
                 </div>
             </div>
@@ -190,7 +205,6 @@
         };
 
         function loadState() {
-            // เปลี่ยน Key สำหรับภาษาตุรกี
             const saved = localStorage.getItem('turkish_calendar_v1');
             if (saved) {
                 appState = JSON.parse(saved);
@@ -289,10 +303,12 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate(); 
             
             const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
+            
+            // Optimization: ใช้ Array เพื่อประกอบ HTML ให้เสร็จก่อนแล้วยัดลงจอทีเดียว (ลื่นกว่า)
+            let htmlBuffer = [];
 
             for (let i = 0; i < firstDayIndex; i++) {
-                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[1.5rem] bg-rose-50/30 border border-dashed border-rose-200 opacity-40"></div>`;
+                htmlBuffer.push(`<div class="p-2 sm:p-3 md:p-4 rounded-xl sm:rounded-2xl md:rounded-[1.5rem] bg-rose-50/30 border border-dashed border-rose-200 opacity-40"></div>`);
             }
 
             let completedThisMonth = 0;
@@ -304,7 +320,7 @@
                 
                 if (isCompleted) completedThisMonth++;
 
-                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-5 rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px]";
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-2 sm:p-3 md:p-5 rounded-xl sm:rounded-2xl md:rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[60px] sm:min-h-[85px] md:min-h-[110px]";
                 
                 let stateClasses = "";
                 let indicatorHTML = "";
@@ -312,22 +328,22 @@
                 if (isCompleted) {
                     stateClasses = "bg-amber-50 border-amber-200 text-amber-800 shadow-sm";
                     indicatorHTML = `
-                        <div class="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-sm z-10 animate-bounce" style="animation-duration: 2s;">🌟</div>
-                        <i class="ph-fill ph-check-circle text-amber-500 text-2xl md:text-3xl mt-1 opacity-60"></i>
+                        <div class="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-7 sm:h-7 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-[10px] sm:text-sm z-10 animate-bounce" style="animation-duration: 2s;">🌟</div>
+                        <i class="ph-fill ph-check-circle text-amber-500 text-xl sm:text-2xl md:text-3xl mt-0.5 sm:mt-1 opacity-60"></i>
                     `;
                 } else if (isToday) {
-                    stateClasses = "bg-gradient-to-b from-rose-500 to-orange-400 border-transparent text-white shadow-lg shadow-rose-500/40 today-pulse";
+                    stateClasses = "bg-gradient-to-b from-rose-500 to-orange-400 border-transparent text-white shadow-md sm:shadow-lg shadow-rose-500/40 today-pulse";
                     indicatorHTML = `
-                        <span class="text-[10px] md:text-xs font-bold bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm text-white">วันนี้</span>
+                        <span class="text-[8px] sm:text-[10px] md:text-xs font-bold bg-white/20 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mt-1 sm:mt-2 backdrop-blur-sm text-white">วันนี้</span>
                     `;
                 } else {
                     stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-rose-300";
-                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-2xl md:text-3xl mt-1 group-hover:text-rose-400 transition-colors"></i>`;
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-lg sm:text-2xl md:text-3xl mt-0.5 sm:mt-1 group-hover:text-rose-400 transition-colors"></i>`;
                 }
 
                 // Check for Sunday/Saturday colors
                 const dayOfWeek = new Date(year, month, day).getDay();
-                let textStyle = "font-extrabold text-xl md:text-2xl font-english";
+                let textStyle = "font-extrabold text-base sm:text-xl md:text-2xl font-english leading-none";
                 if (!isToday && !isCompleted) {
                     if (dayOfWeek === 0) textStyle += " text-rose-500";
                     else if (dayOfWeek === 6) textStyle += " text-sky-500";
@@ -339,14 +355,17 @@
                         ${indicatorHTML}
                     </div>
                 `;
-                grid.innerHTML += cardHTML;
+                htmlBuffer.push(cardHTML);
             }
+
+            // นำ HTML ทั้งหมดใส่ลงใน Grid ทีเดียว
+            grid.innerHTML = htmlBuffer.join('');
 
             // Animate number change
             const completedEl = document.getElementById('summary-completed');
             completedEl.innerText = completedThisMonth;
-            completedEl.classList.add('scale-150', 'text-yellow-200');
-            setTimeout(() => completedEl.classList.remove('scale-150', 'text-yellow-200'), 300);
+            completedEl.classList.add('scale-125', 'text-yellow-200');
+            setTimeout(() => completedEl.classList.remove('scale-125', 'text-yellow-200'), 200);
             
             document.getElementById('summary-total').innerText = daysInMonth;
         }
@@ -369,6 +388,7 @@
             const isCompleted = appState.completedDates.includes(selectedDateString);
 
             const dialog = document.getElementById('vocab-dialog');
+            const modalBox = document.getElementById('modal-content-box');
             const title = document.getElementById('dialog-title');
             const content = document.getElementById('dialog-content');
             const btnComplete = document.getElementById('btn-complete-day');
@@ -376,74 +396,87 @@
             title.innerText = `วันที่ ${displayDate}`;
 
             const vocabList = getRandomVocab();
-            content.innerHTML = '';
+            
+            // Optimization: ใช้ Array ประกอบ HTML คำศัพท์ให้เสร็จก่อนยัดลงจอ
+            let vocabHtmlBuffer = [];
             
             vocabList.forEach((v, index) => {
-                // ดึงเฉพาะตัวหนังสือตุรกีมาใช้เป็นเสียงอ่าน (ตัดส่วนวงเล็บคำอ่านภาษาไทยออก)
                 const targetWordOnly = v.word.split(' (')[0];
 
                 const itemHTML = `
-                    <div class="vocab-card p-5 bg-white border-2 border-rose-50 rounded-[2rem] hover:border-rose-300 hover:shadow-xl hover:shadow-rose-100/50 transition-all flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                    <div class="vocab-card p-3 sm:p-4 md:p-5 bg-white border-2 border-rose-50 rounded-xl md:rounded-[2rem] hover:border-rose-300 transition-transform flex flex-row gap-3 md:gap-4 items-start relative overflow-hidden group">
                         
-                        <!-- Cute background blob -->
-                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-rose-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <!-- Cute background blob (ซ่อนในจอมือถือเล็กมากๆ เพื่อความลื่น) -->
+                        <div class="hidden sm:block absolute -right-10 -bottom-10 w-24 h-24 md:w-32 md:h-32 bg-rose-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-                        <div class="blob-bg text-rose-700 w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm relative z-10 font-english">
+                        <div class="blob-bg text-rose-700 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg md:rounded-2xl flex items-center justify-center font-extrabold text-lg md:text-xl shrink-0 shadow-sm relative z-10 font-english">
                             ${index + 1}
                         </div>
                         
-                        <div class="flex-1 relative z-10 w-full">
-                            <div class="flex justify-between items-start w-full">
-                                <h4 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-2 flex flex-wrap items-center gap-2 font-target tracking-wide w-full pr-12">
-                                    <span class="text-2xl md:text-3xl drop-shadow-sm mr-1">${v.icon}</span> 
-                                    <span>${v.word}</span>
+                        <div class="flex-1 relative z-10 w-full min-w-0">
+                            <div class="flex justify-between items-start w-full gap-2">
+                                <h4 class="text-base sm:text-lg md:text-2xl font-extrabold text-slate-800 mb-1 sm:mb-2 flex items-center gap-1.5 sm:gap-2 font-target tracking-wide truncate">
+                                    <span class="text-xl sm:text-2xl md:text-3xl drop-shadow-sm shrink-0">${v.icon}</span> 
+                                    <span class="truncate">${v.word}</span>
                                 </h4>
-                                <button onclick="speakWord('${targetWordOnly}')" class="absolute top-0 right-0 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียงตุรกี">
-                                    <i class="ph-fill ph-speaker-high text-lg"></i>
+                                <button onclick="speakWord('${targetWordOnly}')" class="shrink-0 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-colors shadow-sm" title="ฟังเสียงตุรกี">
+                                    <i class="ph-fill ph-speaker-high text-base sm:text-lg"></i>
                                 </button>
                             </div>
                             
-                            <div class="flex flex-wrap gap-2 mb-3 mt-1">
-                                <span class="text-rose-700 font-bold bg-rose-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 border border-rose-100">
+                            <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                                <span class="text-rose-700 font-bold bg-rose-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[11px] sm:text-sm flex items-center gap-1 border border-rose-100">
                                     🇹🇭 ${v.meaning}
                                 </span>
-                                <span class="text-sky-600 font-bold bg-sky-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 font-english border border-sky-100">
+                                <span class="text-sky-600 font-bold bg-sky-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg text-[11px] sm:text-sm flex items-center gap-1 font-english border border-sky-100">
                                     🇬🇧 ${v.english}
                                 </span>
                             </div>
                             
-                            <div class="bg-orange-50/50 p-4 rounded-2xl border border-orange-100 relative mt-3">
-                                <i class="ph-fill ph-quotes text-rose-200/50 text-4xl absolute -top-2 -left-1"></i>
-                                <p class="text-sm md:text-base text-slate-600 relative z-10 font-target pl-4 leading-relaxed">
+                            <div class="bg-orange-50/50 p-2 sm:p-3 md:p-4 rounded-lg md:rounded-2xl border border-orange-100 relative mt-1 sm:mt-2">
+                                <i class="ph-fill ph-quotes text-rose-200/50 text-2xl sm:text-4xl absolute -top-1 -left-1 sm:-top-2 sm:-left-1"></i>
+                                <p class="text-[11px] sm:text-sm md:text-base text-slate-600 relative z-10 font-target pl-3 sm:pl-4 leading-relaxed">
                                     ${v.example}
                                 </p>
                             </div>
                         </div>
                     </div>
                 `;
-                content.innerHTML += itemHTML;
+                vocabHtmlBuffer.push(itemHTML);
             });
+            content.innerHTML = vocabHtmlBuffer.join('');
 
             if (isCompleted) {
-                btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-xl"></i> ทบทวนเสร็จแล้ว (เยี่ยมมาก!)`;
-                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-600 hover:to-orange-600 rounded-2xl shadow-lg shadow-amber-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-lg sm:text-xl"></i> <span>ทบทวนเสร็จแล้ว!</span>`;
+                btnComplete.className = "flex-1 md:flex-none justify-center px-4 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-600 hover:to-orange-600 rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg shadow-amber-500/30 transition-all active:scale-95 flex items-center gap-1 sm:gap-2 text-sm sm:text-lg";
                 btnComplete.onclick = closeDialog; 
             } else {
-                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!`;
-                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-bold hover:from-rose-600 hover:to-amber-600 rounded-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-lg sm:text-xl"></i> <span>ท่องเสร็จแล้ว!</span>`;
+                btnComplete.className = "flex-1 md:flex-none justify-center px-4 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-rose-500 to-amber-500 text-white font-bold hover:from-rose-600 hover:to-amber-600 rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg shadow-rose-500/30 transition-all active:scale-95 flex items-center gap-1 sm:gap-2 text-sm sm:text-lg";
                 btnComplete.onclick = markDayAsComplete; 
             }
 
             dialog.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden'; // ป้องกันจอหลักเลื่อน
             document.getElementById('dialog-content').scrollTop = 0;
+            
+            // Trigger animation
+            modalBox.classList.remove('opacity-0');
+            modalBox.classList.add('modal-enter');
         }
 
         function closeDialog() {
             const dialog = document.getElementById('vocab-dialog');
-            dialog.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-            selectedDateString = null;
+            const modalBox = document.getElementById('modal-content-box');
+            
+            modalBox.classList.remove('modal-enter');
+            modalBox.classList.add('opacity-0');
+            
+            setTimeout(() => {
+                dialog.classList.add('hidden');
+                document.body.style.overflow = '';
+                selectedDateString = null;
+            }, 150); // รอจังหวะ animation เฟดออกนิดนึง
         }
 
         function markDayAsComplete() {
@@ -453,27 +486,34 @@
                 
                 // Show cute alert
                 const alert = document.createElement('div');
-                alert.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-rose-400";
-                alert.innerHTML = `<span class="text-2xl">🎉</span> Harika! สะสมดาวได้อีก 1 ดวง`;
+                alert.className = "fixed top-8 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 sm:px-6 sm:py-3 rounded-full shadow-lg flex items-center gap-2 z-[100] animate-bounce font-bold text-slate-800 border-2 border-rose-400 text-sm sm:text-base";
+                alert.innerHTML = `<span class="text-xl sm:text-2xl">🎉</span> Harika! สะสมดาวได้อีกดวง`;
                 document.body.appendChild(alert);
-                setTimeout(() => alert.remove(), 3000);
+                setTimeout(() => alert.remove(), 2500);
 
                 renderCalendar(); 
             }
             closeDialog();
         }
 
+        // เก็บ instance เสียงไว้ใช้ซ้ำ เพื่อไม่ให้หน่วงเวลาสร้างใหม่
+        let ttsAudio = null;
+
         function speakWord(word) {
-            // ใช้ Google Translate TTS API สำหรับภาษาตุรกี (tl=tr)
             const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=tr&client=tw-ob`;
-            const audio = new Audio(url);
             
-            audio.play().catch(error => {
-                console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
-                // ระบบสำรอง: ใช้เสียงของเบราว์เซอร์
+            if (!ttsAudio) {
+                ttsAudio = new Audio();
+            }
+            ttsAudio.src = url;
+            
+            ttsAudio.play().catch(error => {
+                console.warn("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
+                // ระบบสำรอง
                 if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); // ตัดเสียงเก่าที่ค้าง
                     const utterance = new SpeechSynthesisUtterance(word);
-                    utterance.lang = 'tr-TR'; // สำเนียงตุรกี
+                    utterance.lang = 'tr-TR'; 
                     utterance.rate = 0.8; 
                     window.speechSynthesis.speak(utterance);
                 }
