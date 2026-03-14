@@ -11,35 +11,35 @@
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
-            /* พื้นหลังสีพาสเทลน่ารักๆ แบบใหม่ สบายตา */
             background: linear-gradient(135deg, #fdfbfb 0%, #f4fdf8 100%);
             background-color: #f0fdf4;
             background-image: radial-gradient(#d1fae5 1px, transparent 1px);
             background-size: 20px 20px;
+            -webkit-tap-highlight-color: transparent; /* เอาแถบสีเทาเวลากดบนมือถือออก */
         }
         h1, h2, h3, .font-english {
-            font-family: 'Fredoka', 'Sarabun', sans-serif; /* ฟอนต์อังกฤษหัวกลมๆ น่ารัก */
+            font-family: 'Fredoka', 'Sarabun', sans-serif;
         }
         .font-myanmar {
-            font-family: 'Padauk', 'Myanmar Text', 'Sarabun', sans-serif; /* ฟอนต์รองรับภาษาพม่า */
+            font-family: 'Padauk', 'Myanmar Text', 'Sarabun', sans-serif;
         }
         
-        /* Custom scrollbar for dialog */
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid #f1f5f9; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a2b1c6; }
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        /* Playful animations */
-        .calendar-day { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease; }
-        .calendar-day:hover { transform: translateY(-4px) rotate(1deg); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .calendar-day:active { transform: translateY(0) scale(0.95); }
+        /* Optimized animations (เบาเครื่องขึ้น) */
+        .calendar-day { transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, border-color 0.15s ease-out; }
+        .calendar-day:active { transform: scale(0.95); }
         
-        .vocab-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out; }
-        .vocab-card:hover { transform: translateY(-3px) scale(1.01); }
-
-        /* Remove tap highlight on mobile for app-like feel */
-        * { -webkit-tap-highlight-color: transparent; }
+        .vocab-card { transition: transform 0.15s ease-out, box-shadow 0.15s ease-out; }
+        
+        /* ปรับให้ในมือถือไม่ต้องแสดงผล Box Shadow หรือ Hover สเปคสูง */
+        @media (min-width: 640px) {
+            .calendar-day:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+            .vocab-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(20, 184, 166, 0.1); }
+        }
 
         .blob-bg {
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23D1FAE5' d='M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.4,-46.3C91,-33.5,97.2,-18.1,97.1,-3.1C97,12,90.6,26.7,81.3,39.4C72,52.2,59.8,63.1,45.8,71.3C31.8,79.5,15.9,85.1,0.2,84.7C-15.5,84.4,-31,78.2,-45.1,69.9C-59.2,61.6,-71.9,51.2,-81.1,38.2C-90.3,25.2,-96,9.6,-95.2,-5.7C-94.4,-21.1,-87.1,-36,-76.3,-47.9C-65.5,-59.8,-51.2,-68.6,-36.8,-75.4C-22.4,-82.2,-7.9,-87,3.9,-93.8C15.7,-100.6,30.6,-83.6,44.7,-76.4Z' transform='translate(100 100)' /%3E%3C/svg%3E");
@@ -47,10 +47,9 @@
             background-position: center;
         }
 
-        /* Pulse animation for 'Today' */
         @keyframes softPulse {
-            0% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(20, 184, 166, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.3); }
+            70% { box-shadow: 0 0 0 8px rgba(20, 184, 166, 0); }
             100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0); }
         }
         .today-pulse { animation: softPulse 2s infinite; }
@@ -61,13 +60,13 @@
     <div class="w-full max-w-4xl space-y-4 sm:space-y-6">
         
         <!-- Header & Summary Section -->
-        <div class="bg-white/95 backdrop-blur-md rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl shadow-teal-100/50 border border-white">
+        <div class="bg-white/95 sm:backdrop-blur-sm rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-lg shadow-teal-100/40 border border-white">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6">
                 <!-- Title & Mascot -->
                 <div class="flex items-center gap-3 sm:gap-4">
-                    <div class="text-4xl sm:text-5xl md:text-6xl animate-bounce drop-shadow-md" style="animation-duration: 3s;">🐘</div>
+                    <div class="text-4xl sm:text-5xl md:text-6xl animate-bounce drop-shadow-sm" style="animation-duration: 3s;">🐘</div>
                     <div>
-                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-500 mb-0.5 sm:mb-1">
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-500 mb-0.5">
                             Daily Myanmar Vocab
                         </h1>
                         <p class="text-slate-500 font-medium text-xs sm:text-sm md:text-base flex items-center gap-1">
@@ -77,12 +76,12 @@
                 </div>
 
                 <!-- Monthly Summary Card -->
-                <div class="bg-gradient-to-tr from-amber-400 to-orange-400 p-4 sm:p-5 rounded-2xl sm:rounded-3xl w-full md:w-auto flex items-center gap-4 sm:gap-5 shadow-lg shadow-amber-200 text-white transform hover:scale-105 transition-transform duration-300">
-                    <div class="bg-white/20 backdrop-blur-sm w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-inner border border-white/30">
+                <div class="bg-gradient-to-tr from-amber-400 to-orange-400 p-3 sm:p-5 rounded-2xl w-full md:w-auto flex items-center gap-3 sm:gap-5 shadow-md text-white">
+                    <div class="bg-white/20 w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-2xl sm:text-3xl shadow-inner border border-white/20">
                         🏆
                     </div>
                     <div>
-                        <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-50 mb-0.5 sm:mb-1">สรุปการเรียนเดือนนี้</p>
+                        <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-50 mb-0.5">สรุปการเรียนเดือนนี้</p>
                         <p class="text-2xl sm:text-3xl font-extrabold leading-none">
                             <span id="summary-completed">0</span>
                             <span class="text-lg sm:text-xl font-medium text-amber-100">/ <span id="summary-total">30</span> วัน</span>
@@ -93,84 +92,84 @@
         </div>
 
         <!-- Calendar Section -->
-        <div class="bg-white/95 backdrop-blur-md rounded-[1.5rem] sm:rounded-[2.5rem] p-3 sm:p-6 md:p-8 shadow-xl shadow-teal-100/40 border border-white">
+        <div class="bg-white/95 sm:backdrop-blur-sm rounded-[1.5rem] sm:rounded-[2.5rem] p-3 sm:p-6 md:p-8 shadow-lg shadow-teal-100/30 border border-white">
             
-            <!-- Calendar Header (Month Navigation) -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-8 gap-3 sm:gap-4">
-                <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Calendar Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 sm:mb-8 gap-3">
+                <div class="flex items-center gap-2">
                     <div class="text-2xl sm:text-3xl">🗓️</div>
                     <h2 id="month-year-display" class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800 tracking-wide">Month Year</h2>
                 </div>
                 
-                <div class="flex gap-1.5 sm:gap-2 bg-slate-100 p-1 sm:p-1.5 rounded-[1rem] sm:rounded-2xl w-full sm:w-auto justify-center">
-                    <button onclick="changeMonth(-1)" class="p-2 sm:p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-teal-50 hover:text-teal-600 text-slate-500 transition-all active:scale-95">
+                <div class="flex gap-1.5 bg-slate-100 p-1.5 rounded-[1rem] w-full sm:w-auto justify-center">
+                    <button onclick="changeMonth(-1)" class="p-2 sm:p-3 rounded-xl bg-white shadow-sm text-slate-500 active:scale-95">
                         <i class="ph-bold ph-caret-left text-base sm:text-lg"></i>
                     </button>
-                    <button onclick="goToToday()" class="flex-1 sm:flex-none px-4 sm:px-5 py-2 rounded-xl bg-white shadow-sm hover:shadow hover:bg-teal-50 hover:text-teal-600 text-slate-700 font-bold transition-all active:scale-95 text-xs sm:text-sm">
+                    <button onclick="goToToday()" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-white shadow-sm text-slate-700 font-bold active:scale-95 text-xs sm:text-sm">
                         กลับมาวันนี้
                     </button>
-                    <button onclick="changeMonth(1)" class="p-2 sm:p-3 rounded-xl bg-white shadow-sm hover:shadow hover:bg-teal-50 hover:text-teal-600 text-slate-500 transition-all active:scale-95">
+                    <button onclick="changeMonth(1)" class="p-2 sm:p-3 rounded-xl bg-white shadow-sm text-slate-500 active:scale-95">
                         <i class="ph-bold ph-caret-right text-base sm:text-lg"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Days of Week -->
-            <div class="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3 mb-2 sm:mb-3 text-center font-bold text-slate-400 text-[10px] sm:text-xs md:text-sm uppercase tracking-wider">
+            <div class="grid grid-cols-7 gap-1 sm:gap-2 mb-2 text-center font-bold text-slate-400 text-[10px] sm:text-xs uppercase tracking-wider">
                 <div class="text-rose-400">Sun</div>
                 <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
                 <div class="text-blue-400">Sat</div>
             </div>
 
             <!-- Calendar Grid -->
-            <div id="calendar-grid" class="grid grid-cols-7 gap-1 sm:gap-2 md:gap-3">
+            <div id="calendar-grid" class="grid grid-cols-7 gap-1 sm:gap-2">
                 <!-- Days will be generated by JS -->
             </div>
         </div>
         
         <!-- Footer info -->
-        <div class="text-center text-slate-400 text-xs sm:text-sm font-medium pt-2 pb-6 sm:py-0">
+        <div class="text-center text-slate-400 text-xs sm:text-sm font-medium pt-1 pb-4">
             <p>💡 Tip: กดที่วันที่เพื่อเริ่มท่องศัพท์ได้เลย!</p>
         </div>
 
     </div>
 
     <!-- Dialog / Modal for Vocabulary -->
-    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
+    <div id="vocab-dialog" class="fixed inset-0 z-50 hidden flex items-center justify-center">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-indigo-900/30 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
+        <div class="absolute inset-0 bg-indigo-900/40 transition-opacity" onclick="closeDialog()"></div>
         
         <!-- Modal Content -->
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[98%] sm:w-[95%] max-w-3xl bg-[#f8fafc] rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[90vh] overflow-hidden border-2 sm:border-4 border-white">
+        <div class="relative w-[96%] sm:w-[90%] max-w-3xl bg-[#f8fafc] rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border-2 sm:border-4 border-white">
             
             <!-- Modal Header -->
-            <div class="px-4 sm:px-8 py-4 sm:py-6 border-b border-slate-200/60 bg-white flex justify-between items-center relative z-10 shrink-0">
+            <div class="px-4 sm:px-8 py-3 sm:py-5 border-b border-slate-200/60 bg-white flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-2 sm:gap-4">
                     <div class="text-2xl sm:text-4xl">🦚</div>
                     <div>
-                        <h3 id="dialog-title" class="text-lg sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-500">วันที่ --/--/----</h3>
-                        <p class="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1 font-medium">มาเก็บศัพท์เข้าสมองกันเถอะ! (20 คำ)</p>
+                        <h3 id="dialog-title" class="text-base sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-emerald-500">วันที่ --/--/----</h3>
+                        <p class="text-[10px] sm:text-sm text-slate-500 mt-0.5 font-medium">มาเก็บศัพท์เข้าสมองกันเถอะ! (20 คำ)</p>
                     </div>
                 </div>
-                <button onclick="closeDialog()" class="text-slate-400 hover:text-rose-500 bg-slate-100 hover:bg-rose-50 p-2 sm:p-3 rounded-full transition-colors active:scale-90 shrink-0">
+                <button onclick="closeDialog()" class="text-slate-400 hover:text-rose-500 bg-slate-100 p-2 sm:p-3 rounded-full active:scale-90 shrink-0">
                     <i class="ph-bold ph-x text-lg sm:text-xl"></i>
                 </button>
             </div>
             
             <!-- Modal Body (Scrollable Vocab List) -->
-            <div id="dialog-content" class="p-3 sm:p-4 md:p-8 overflow-y-auto custom-scrollbar flex-1 space-y-3 sm:space-y-4 pb-10">
+            <div id="dialog-content" class="p-3 sm:p-6 overflow-y-auto custom-scrollbar flex-1 space-y-3 sm:space-y-4">
                 <!-- Vocab list will be injected here -->
             </div>
             
             <!-- Modal Footer -->
             <div class="px-4 sm:px-8 py-3 sm:py-5 border-t border-slate-200/60 bg-white flex justify-between items-center gap-3 shrink-0">
-                <div class="text-3xl hidden md:block">🎉</div>
-                <div class="flex gap-2 sm:gap-3 w-full md:w-auto justify-end">
-                    <button onclick="closeDialog()" class="px-4 sm:px-6 py-2.5 sm:py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-xl sm:rounded-2xl transition-colors text-sm sm:text-base">
+                <div class="text-2xl hidden md:block">🎉</div>
+                <div class="flex gap-2 w-full md:w-auto justify-end">
+                    <button onclick="closeDialog()" class="px-3 sm:px-6 py-2.5 sm:py-3 text-slate-600 font-bold hover:bg-slate-100 rounded-xl transition-colors text-xs sm:text-base">
                         ปิดไว้ก่อน
                     </button>
-                    <button id="btn-complete-day" class="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold hover:from-teal-600 hover:to-emerald-600 rounded-xl sm:rounded-2xl shadow-lg shadow-teal-500/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-lg">
-                        <i class="ph-bold ph-check-circle text-lg sm:text-xl"></i> ท่องเสร็จแล้ว!
+                    <button id="btn-complete-day" class="flex-1 sm:flex-none px-4 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold rounded-xl shadow-md active:scale-95 flex items-center justify-center gap-1.5 text-sm sm:text-lg">
+                        <i class="ph-bold ph-check-circle text-lg"></i> ท่องเสร็จแล้ว!
                     </button>
                 </div>
             </div>
@@ -185,26 +184,27 @@
         let currentDate = new Date(); 
         let today = new Date(); 
         let selectedDateString = null; 
-        let currentAudio = null; // ตัวแปรสำหรับจัดการเสียงไม่ให้ทับกัน
         
-        // --- State Management (Local Storage) ---
+        // --- Audio Manager (Optimized for Mobile) ---
+        // ใช้ Audio ออบเจ็กต์ตัวเดียวเพื่อประหยัดหน่วยความจำ และกันเสียงทับกัน
+        const globalAudio = new Audio();
+
+        // --- State Management ---
         let appState = {
             completedDates: [] 
         };
 
         function loadState() {
             const saved = localStorage.getItem('myanmar_calendar_v1');
-            if (saved) {
-                appState = JSON.parse(saved);
-            }
+            if (saved) appState = JSON.parse(saved);
         }
 
         function saveState() {
             localStorage.setItem('myanmar_calendar_v1', JSON.stringify(appState));
         }
 
-        // --- Vocabulary Pool (ภาษาพม่า) ---
-        const vocabPool = [
+        // --- Vocabulary Pool ---
+        const rawVocabPool = [
             { word: "မင်္ဂလာပါ (มิงกะลาบา)", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "မင်္ဂလာပါခင်ဗျာ/ရှင် (สวัสดีครับ/ค่ะ)" },
             { word: "ကျေးဇူးတင်ပါတယ် (เจซูตินบาแด)", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "အများကြီးကျေးဇူးတင်ပါတယ် (ขอบคุณมากๆ)" },
             { word: "ဟုတ်ကဲ့ (โฮะแกะ)", meaning: "ใช่ / ครับ,ค่ะ", english: "Yes", icon: "👍", example: "ဟုတ်ကဲ့၊ ကျွန်တော်သိပါတယ် (ครับ ผมทราบครับ)" },
@@ -257,6 +257,16 @@
             { word: "တာ့တာ (ต๊าดตา)", meaning: "บ๊ายบาย / ลาก่อน", english: "Bye bye", icon: "👋", example: "နောက်မှတွေ့မယ်နော် တာ့တာ (ไว้เจอกันใหม่นะ บ๊ายบาย)" }
         ];
 
+        // ประมวลผลและแยกคำพม่ากับคำอ่านไทยไว้ล่วงหน้า (Optimize: ลดภาระตอนเปิดหน้าต่าง)
+        const processedVocabPool = rawVocabPool.map(v => {
+            const parts = v.word.split('(');
+            return {
+                ...v,
+                myanmarOnly: parts[0].trim(), // คำพม่าเพียวๆ (สำหรับให้ AI อ่าน)
+                thaiReading: parts[1] ? parts[1].replace(')', '').trim() : '' // คำอ่านภาษาไทย
+            };
+        });
+
         function shuffleArray(array) {
             let shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -267,8 +277,7 @@
         }
 
         function getRandomVocab() {
-            const shuffled = shuffleArray(vocabPool);
-            return shuffled.slice(0, Math.min(VOCAB_PER_SESSION, shuffled.length));
+            return shuffleArray(processedVocabPool).slice(0, Math.min(VOCAB_PER_SESSION, processedVocabPool.length));
         }
 
         // --- Calendar Logic ---
@@ -290,11 +299,10 @@
             const firstDayIndex = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate(); 
             
-            const grid = document.getElementById('calendar-grid');
-            let gridHTML = ''; // เก็บ HTML ไว้ในตัวแปรก่อนเพื่อความลื่นไหล
+            let gridHTML = ''; // เก็บ HTML รวบยอดทีเดียว ลดการกระตุก
 
             for (let i = 0; i < firstDayIndex; i++) {
-                gridHTML += `<div class="p-1 sm:p-2 md:p-4 rounded-[1rem] sm:rounded-[1.5rem] bg-slate-50/50 border border-dashed border-slate-200 opacity-40"></div>`;
+                gridHTML += `<div class="p-1 sm:p-2 rounded-[1rem] bg-slate-50/50 border border-dashed border-slate-200 opacity-40"></div>`;
             }
 
             let completedThisMonth = 0;
@@ -306,53 +314,44 @@
                 
                 if (isCompleted) completedThisMonth++;
 
-                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-1 sm:p-3 md:p-5 rounded-[1rem] sm:rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[60px] sm:min-h-[90px] md:min-h-[110px]";
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-1 sm:p-3 rounded-[1rem] sm:rounded-[1.2rem] border-2 cursor-pointer select-none min-h-[60px] sm:min-h-[85px]";
                 
                 let stateClasses = "";
                 let indicatorHTML = "";
 
                 if (isCompleted) {
-                    stateClasses = "bg-amber-50 border-amber-200 text-amber-800 shadow-sm";
+                    stateClasses = "bg-amber-50 border-amber-200 text-amber-800";
                     indicatorHTML = `
-                        <div class="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 w-5 h-5 md:w-7 md:h-7 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-[10px] md:text-sm z-10 animate-bounce" style="animation-duration: 2s;">🌟</div>
-                        <i class="ph-fill ph-check-circle text-amber-400 text-lg sm:text-2xl md:text-3xl mt-0.5 md:mt-1 opacity-60"></i>
+                        <div class="absolute -top-1.5 -right-1.5 w-4 h-4 sm:w-6 sm:h-6 bg-white rounded-full shadow border border-amber-200 flex items-center justify-center text-[8px] sm:text-[10px] z-10">🌟</div>
+                        <i class="ph-fill ph-check-circle text-amber-400 text-lg sm:text-2xl mt-0.5 opacity-80"></i>
                     `;
                 } else if (isToday) {
-                    stateClasses = "bg-gradient-to-b from-teal-500 to-emerald-500 border-transparent text-white shadow-lg shadow-teal-500/40 today-pulse";
+                    stateClasses = "bg-gradient-to-b from-teal-500 to-emerald-500 border-transparent text-white shadow-md today-pulse";
                     indicatorHTML = `
-                        <span class="text-[8px] sm:text-[10px] md:text-xs font-bold bg-white/20 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full mt-1 md:mt-2 backdrop-blur-sm">วันนี้</span>
+                        <span class="text-[8px] sm:text-[10px] font-bold bg-white/20 px-1.5 py-0.5 rounded-full mt-1">วันนี้</span>
                     `;
                 } else {
-                    stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-teal-300";
-                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-lg sm:text-2xl md:text-3xl mt-0.5 md:mt-1 group-hover:text-teal-400 transition-colors"></i>`;
+                    stateClasses = "bg-white border-slate-100 text-slate-600";
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-lg sm:text-xl mt-0.5"></i>`;
                 }
 
-                // Check for Sunday/Saturday colors
                 const dayOfWeek = new Date(year, month, day).getDay();
-                let textStyle = "font-extrabold text-sm sm:text-xl md:text-2xl font-english";
+                let textStyle = "font-extrabold text-sm sm:text-lg font-english";
                 if (!isToday && !isCompleted) {
                     if (dayOfWeek === 0) textStyle += " text-rose-500";
                     else if (dayOfWeek === 6) textStyle += " text-blue-500";
                 }
 
-                const cardHTML = `
+                gridHTML += `
                     <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
                         <span class="${textStyle}">${day}</span>
                         ${indicatorHTML}
                     </div>
                 `;
-                gridHTML += cardHTML;
             }
 
-            // แสดงผลปฏิทินทีเดียว (ช่วยลดอาการกระตุก)
-            grid.innerHTML = gridHTML;
-
-            // Animate number change
-            const completedEl = document.getElementById('summary-completed');
-            completedEl.innerText = completedThisMonth;
-            completedEl.classList.add('scale-150', 'text-yellow-200');
-            setTimeout(() => completedEl.classList.remove('scale-150', 'text-yellow-200'), 300);
-            
+            document.getElementById('calendar-grid').innerHTML = gridHTML;
+            document.getElementById('summary-completed').innerText = completedThisMonth;
             document.getElementById('summary-total').innerText = daysInMonth;
         }
 
@@ -370,95 +369,76 @@
         
         function openDayDialog(year, month, day) {
             selectedDateString = getFormatDateString(year, month, day);
-            const displayDate = getDisplayDateString(year, month, day);
             const isCompleted = appState.completedDates.includes(selectedDateString);
 
-            const dialog = document.getElementById('vocab-dialog');
-            const title = document.getElementById('dialog-title');
+            document.getElementById('dialog-title').innerText = `วันที่ ${getDisplayDateString(year, month, day)}`;
             const content = document.getElementById('dialog-content');
-            const btnComplete = document.getElementById('btn-complete-day');
-
-            title.innerText = `วันที่ ${displayDate}`;
-
-            // แสดงหน้าต่างทันทีพร้อมไอคอนโหลด เพื่อไม่ให้หน้าจอค้าง
-            content.innerHTML = '<div class="flex flex-col items-center justify-center py-16 text-teal-500"><i class="ph-bold ph-spinner animate-spin text-4xl mb-3"></i><p class="font-bold text-sm">กำลังเตรียมคำศัพท์...</p></div>';
-            dialog.classList.remove('hidden');
+            
+            // แสดงหน้าต่างทันทีด้วยแอนิเมชันลื่นๆ พร้อม Loading ป้องกันอาการกดแล้วจอค้าง
+            content.innerHTML = '<div class="flex flex-col items-center justify-center py-10 text-teal-500"><i class="ph-bold ph-spinner animate-spin text-3xl mb-2"></i><p class="font-bold text-xs">กำลังเตรียมคำศัพท์...</p></div>';
+            document.getElementById('vocab-dialog').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
 
-            // ใช้ setTimeout เพื่อให้เบราว์เซอร์จัดการเรนเดอร์ UI ให้เสร็จก่อนสร้างการ์ดคำศัพท์ 20 ใบ
-            setTimeout(() => {
-                const vocabList = getRandomVocab();
-                let contentHTML = ''; 
-                
-                vocabList.forEach((v, index) => {
-                    // ดึงเฉพาะตัวหนังสือพม่ามาใช้เป็นเสียงอ่าน และตัดช่องว่างส่วนเกินออก
-                    const myanmarWordOnly = v.word.split('(')[0].trim();
-
-                    const itemHTML = `
-                        <div class="vocab-card p-4 sm:p-5 bg-white border-2 border-slate-100 rounded-[1.5rem] sm:rounded-[2rem] hover:border-teal-300 hover:shadow-xl hover:shadow-teal-100/50 flex flex-col md:flex-row gap-3 sm:gap-4 items-start relative overflow-hidden group">
-                            
-                            <!-- Cute background blob -->
-                            <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-teal-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                            <div class="blob-bg text-teal-700 w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center font-extrabold text-lg sm:text-xl shrink-0 shadow-sm relative z-10 font-english">
-                                ${index + 1}
-                            </div>
-                            
-                            <div class="flex-1 relative z-10 w-full">
-                                <div class="flex justify-between items-start w-full">
-                                    <h4 class="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-800 mb-2 flex flex-wrap items-center gap-1.5 sm:gap-2 font-myanmar tracking-wide w-full pr-10 sm:pr-12">
-                                        <span class="text-xl sm:text-2xl md:text-3xl drop-shadow-sm mr-1">${v.icon}</span> 
-                                        <span>${v.word}</span>
-                                    </h4>
-                                    <button onclick="speakWord('${myanmarWordOnly}')" class="absolute top-0 right-0 bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white p-1.5 sm:p-2 rounded-lg sm:rounded-xl transition-colors shadow-sm" title="ฟังเสียง">
-                                        <i class="ph-fill ph-speaker-high text-base sm:text-lg"></i>
-                                    </button>
+            // ใช้ requestAnimationFrame ช่วยกระจายภาระไม่ให้ CPU หนักจนหน้าจอกระตุก
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const vocabList = getRandomVocab();
+                    let contentHTML = ''; 
+                    
+                    vocabList.forEach((v, index) => {
+                        contentHTML += `
+                            <div class="vocab-card p-4 bg-white border-2 border-slate-100 rounded-[1.2rem] flex flex-col sm:flex-row gap-3 items-start relative overflow-hidden">
+                                <div class="blob-bg text-teal-700 w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-extrabold text-base shrink-0 shadow-sm relative z-10 font-english">
+                                    ${index + 1}
                                 </div>
-                                
-                                <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3 mt-1">
-                                    <span class="text-teal-700 font-bold bg-teal-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 border border-teal-100">
-                                        🇹🇭 ${v.meaning}
-                                    </span>
-                                    <span class="text-amber-700 font-bold bg-amber-50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 font-english border border-amber-100">
-                                        🇬🇧 ${v.english}
-                                    </span>
-                                </div>
-                                
-                                <div class="bg-slate-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-100 relative mt-2 sm:mt-3">
-                                    <i class="ph-fill ph-quotes text-slate-200 text-2xl sm:text-4xl absolute -top-1 sm:-top-2 -left-1"></i>
-                                    <p class="text-xs sm:text-sm md:text-base text-slate-600 relative z-10 font-myanmar pl-3 sm:pl-4">
-                                        ${v.example}
-                                    </p>
+                                <div class="flex-1 relative z-10 w-full">
+                                    <div class="flex justify-between items-start w-full">
+                                        <h4 class="text-base sm:text-lg font-extrabold text-slate-800 mb-1 flex flex-wrap items-center gap-1.5 font-myanmar tracking-wide w-full pr-10">
+                                            <span class="text-xl drop-shadow-sm">${v.icon}</span> 
+                                            <span>${v.myanmarOnly}</span>
+                                            <span class="text-xs text-slate-400 font-normal mt-0.5">(${v.thaiReading})</span>
+                                        </h4>
+                                        <button onclick="speakWord('${v.myanmarOnly}')" class="absolute top-0 right-0 bg-teal-50 text-teal-600 p-2 rounded-lg shadow-sm active:scale-90" title="ฟังเสียง">
+                                            <i class="ph-fill ph-speaker-high text-lg"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5 mb-2 mt-1">
+                                        <span class="text-teal-700 font-bold bg-teal-50 px-2 py-1 rounded-md text-[11px] sm:text-xs border border-teal-100">
+                                            🇹🇭 ${v.meaning}
+                                        </span>
+                                        <span class="text-amber-700 font-bold bg-amber-50 px-2 py-1 rounded-md text-[11px] sm:text-xs font-english border border-amber-100">
+                                            🇬🇧 ${v.english}
+                                        </span>
+                                    </div>
+                                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 relative mt-2">
+                                        <p class="text-xs sm:text-sm text-slate-600 font-myanmar">
+                                            <i class="ph-fill ph-quotes text-slate-300 text-lg mr-1"></i>${v.example}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                    contentHTML += itemHTML;
-                });
+                        `;
+                    });
 
-                // อัปเดตข้อมูลคำศัพท์ทั้งหมดในครั้งเดียว
-                content.innerHTML = contentHTML;
-                document.getElementById('dialog-content').scrollTop = 0;
-            }, 50);
+                    content.innerHTML = contentHTML;
+                    content.scrollTop = 0;
+                }, 10);
+            });
 
+            const btnComplete = document.getElementById('btn-complete-day');
             if (isCompleted) {
-                btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-lg sm:text-xl"></i> ทบทวนเสร็จแล้ว!`;
-                btnComplete.className = "flex-1 sm:flex-none px-4 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-600 hover:to-orange-600 rounded-xl sm:rounded-2xl shadow-lg shadow-amber-500/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-lg";
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-lg"></i> ทบทวนเสร็จแล้ว!`;
+                btnComplete.className = "flex-1 sm:flex-none px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl shadow-md active:scale-95 flex items-center justify-center gap-1.5 text-sm";
                 btnComplete.onclick = closeDialog; 
             } else {
-                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-lg sm:text-xl"></i> ท่องเสร็จแล้ว!`;
-                btnComplete.className = "flex-1 sm:flex-none px-4 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold hover:from-teal-600 hover:to-emerald-600 rounded-xl sm:rounded-2xl shadow-lg shadow-teal-500/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-lg";
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-lg"></i> ท่องเสร็จแล้ว!`;
+                btnComplete.className = "flex-1 sm:flex-none px-4 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold rounded-xl shadow-md active:scale-95 flex items-center justify-center gap-1.5 text-sm";
                 btnComplete.onclick = markDayAsComplete; 
             }
-
-            dialog.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-            document.getElementById('dialog-content').scrollTop = 0;
         }
 
         function closeDialog() {
-            const dialog = document.getElementById('vocab-dialog');
-            dialog.classList.add('hidden');
+            document.getElementById('vocab-dialog').classList.add('hidden');
             document.body.style.overflow = 'auto';
             selectedDateString = null;
         }
@@ -468,12 +448,11 @@
                 appState.completedDates.push(selectedDateString);
                 saveState();
                 
-                // Show cute alert
                 const alert = document.createElement('div');
-                alert.className = "fixed top-5 sm:top-10 left-1/2 transform -translate-x-1/2 bg-white px-4 sm:px-6 py-3 sm:py-4 rounded-full shadow-2xl flex items-center gap-2 sm:gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-emerald-400 text-sm sm:text-base w-max";
-                alert.innerHTML = `<span class="text-xl sm:text-2xl">🎉</span> เก่งมาก! สะสมดาวได้อีก 1 ดวง`;
+                alert.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-white px-5 py-3 rounded-full shadow-xl flex items-center gap-2 z-[100] animate-bounce font-bold text-slate-800 border-2 border-emerald-400 text-sm w-max";
+                alert.innerHTML = `<span class="text-xl">🎉</span> เก่งมาก! สะสมดาวได้อีก 1 ดวง`;
                 document.body.appendChild(alert);
-                setTimeout(() => alert.remove(), 3000);
+                setTimeout(() => alert.remove(), 2500);
 
                 renderCalendar(); 
             }
@@ -481,33 +460,21 @@
         }
 
         function speakWord(word) {
-            // หยุดเสียงเก่าที่กำลังเล่นอยู่เพื่อไม่ให้ทับกัน
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
-            }
+            // หยุดเสียงเดิมที่กำลังเล่น
+            globalAudio.pause();
+            globalAudio.currentTime = 0;
 
-            // บังคับใช้ Google Translate TTS เสมอ เพื่อแก้ปัญหาเสียงเพี้ยน/โดนตัด บนมือถือ Android 
-            // (เพราะ Web Speech API ของมือถือมักจะไม่มีภาษาพม่า ทำให้มันพยายามอ่านด้วยเสียงไทย/อังกฤษจนเพี้ยน)
-            const url = `https://translate.googleapis.com/translate_tts?client=tw-ob&ie=UTF-8&tl=my&q=${encodeURIComponent(word)}`;
-            currentAudio = new Audio(url);
+            // บังคับใช้ API ของ Google เสมอ (ลบระบบของเครื่องทิ้งทั้งหมด เพื่อแก้ปัญหาเสียงเพี้ยน/โดนตัด)
+            // ใช้ client=gtx เป็นตัวหลัก เพราะเสถียรสุดบนอุปกรณ์พกพา
+            const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=my&q=${encodeURIComponent(word)}`;
+            globalAudio.src = url;
             
-            currentAudio.play().catch(e => {
-                console.error("Primary Google TTS error, trying fallback:", e);
-                // ระบบสำรอง หากเซิร์ฟเวอร์หลักบล็อก ให้ใช้เซิร์ฟเวอร์รองของ Google
-                const fallbackUrl = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=my&q=${encodeURIComponent(word)}`;
-                currentAudio = new Audio(fallbackUrl);
-                currentAudio.play().catch(err => {
-                    console.error("All Google TTS failed. Try native as last resort:", err);
-                    // ท้ายที่สุด ถ้าออนไลน์ไม่ได้จริงๆ ค่อยให้ระบบเครื่องพยายามอ่าน
-                    if ('speechSynthesis' in window) {
-                        window.speechSynthesis.cancel(); 
-                        const utterance = new SpeechSynthesisUtterance(word);
-                        utterance.lang = 'my-MM'; 
-                        utterance.rate = 0.8; 
-                        window.speechSynthesis.speak(utterance);
-                    }
-                });
+            globalAudio.play().catch(e => {
+                console.warn("Primary TTS failed, trying fallback...", e);
+                // ระบบสำรอง หากเซิร์ฟเวอร์หลักบล็อก 
+                const fallbackUrl = `https://translate.googleapis.com/translate_tts?client=tw-ob&ie=UTF-8&tl=my&q=${encodeURIComponent(word)}`;
+                globalAudio.src = fallbackUrl;
+                globalAudio.play().catch(err => console.error("All TTS options failed.", err));
             });
         }
 
@@ -516,8 +483,8 @@
             renderCalendar();
         };
 
-        document.addEventListener('keydown', function(event) {
-            if (event.key === "Escape" && !document.getElementById('vocab-dialog').classList.contains('hidden')) {
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape" && !document.getElementById('vocab-dialog').classList.contains('hidden')) {
                 closeDialog();
             }
         });
