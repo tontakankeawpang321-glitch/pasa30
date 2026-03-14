@@ -396,29 +396,45 @@
         }
 
         // --- TTS (UK English) ---
-        // โหลดข้อมูลเสียงล่วงหน้า (ช่วยลดปัญหาไม่มีเสียงในมือถือบางรุ่น)
+        // โหลดข้อมูลเสียงล่วงหน้า
         if ('speechSynthesis' in window) {
-            // เรียกใช้ครั้งแรกเพื่อกระตุ้นให้เบราว์เซอร์โหลดรายการเสียง
             window.speechSynthesis.getVoices();
-            // เมื่อโหลดเสร็จให้อัปเดตอีกครั้ง
             window.speechSynthesis.onvoiceschanged = () => {
                 window.speechSynthesis.getVoices();
             };
         }
 
+        // ฟังก์ชันเสียงสำรอง (Fallback) เล่นเสียงผ่าน Google Translate
+        function playFallbackAudio(word) {
+            try {
+                // ดึงไฟล์เสียง UK English จาก Google Translate API แบบตรง
+                const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=en-GB&client=tw-ob`;
+                const audio = new Audio(url);
+                audio.play().catch(e => console.warn("Fallback audio failed to play:", e));
+            } catch (err) {
+                console.error("Fallback error:", err);
+            }
+        }
+
         function speakWord(word) {
-            if ('speechSynthesis' in window) {
-                // ยกเลิกเสียงที่ค้างอยู่ คิวเก่าจะถูกล้าง ทำให้กดฟังคำใหม่ได้ลื่นไหลทันที
+            // เช็คว่ามี API speechSynthesis หรือไม่ และมี Voice Data หรือเปล่า (ไลน์/เฟสบุ๊คบางทีมี API แต่ voices เป็น 0)
+            const hasSpeechSynthesis = 'speechSynthesis' in window;
+            const voices = hasSpeechSynthesis ? window.speechSynthesis.getVoices() : [];
+
+            // ถ้าไม่มี API หรือไม่มีข้อมูลเสียงในระบบ ให้ใช้เสียงสำรองทันที
+            if (!hasSpeechSynthesis || voices.length === 0) {
+                playFallbackAudio(word);
+                return;
+            }
+
+            try {
                 window.speechSynthesis.cancel();
 
-                // แก้บั๊ก Android: หน่วงเวลาเล็กน้อยเพื่อให้คำสั่ง cancel ทำงานเสร็จก่อนสั่ง speak ใหม่
                 setTimeout(() => {
                     const utterance = new SpeechSynthesisUtterance(word);
                     utterance.lang = 'en-GB'; 
                     utterance.rate = 0.9; 
 
-                    // ค้นหาเสียง UK English ที่มีในเครื่องโดยตรง (ปรับให้รองรับตัวพิมพ์เล็ก/ใหญ่บน Android)
-                    const voices = window.speechSynthesis.getVoices();
                     const ukVoice = voices.find(voice => 
                         voice.lang.toLowerCase() === 'en-gb' || 
                         voice.lang.toLowerCase() === 'en_gb' || 
@@ -431,10 +447,18 @@
                         utterance.voice = ukVoice;
                     }
 
+                    // ดัก Error ของ TTS ปกติ ถ้าเกิดข้อผิดพลาดระหว่างรัน ให้สลับไปใช้เสียงสำรอง
+                    utterance.onerror = function(event) {
+                        console.warn("Native TTS Error, switching to fallback:", event);
+                        playFallbackAudio(word);
+                    };
+
                     window.speechSynthesis.speak(utterance);
-                }, 50); // ดีเลย์ 50 มิลลิวินาที (เร็วมากจนคนกดไม่รู้สึก แต่ช่วยแก้บั๊ก Android ได้)
-            } else {
-                alert("ขออภัย เบราว์เซอร์นี้ไม่รองรับระบบเสียงอ่านครับ");
+                }, 50); 
+            } catch (e) {
+                // ดัก Catch ข้อผิดพลาดในกรณีที่ API ทำงานผิดปกติ
+                console.error("Native TTS failed, using fallback:", e);
+                playFallbackAudio(word);
             }
         }
 
