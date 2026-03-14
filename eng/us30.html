@@ -460,13 +460,33 @@
             closeDialog();
         }
 
+        // โหลดเสียงของระบบเตรียมไว้ล่วงหน้า (แก้ปัญหา Android โหลดเครื่องมือเสียงไม่ทัน)
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+            }
+        }
+
         function speakWord(word) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // ล้างคิวเสียงเก่าที่ค้างอยู่ ทำให้กดปุ๊บเสียงออกปั๊บ
-                const utterance = new SpeechSynthesisUtterance(word);
-                utterance.lang = 'en-US';
-                utterance.rate = 0.9; // พูดช้าลงนิดหน่อยให้ฟังชัดขึ้น
-                window.speechSynthesis.speak(utterance);
+                window.speechSynthesis.cancel(); // ล้างคิวเสียงเก่าที่ค้างอยู่
+                
+                // ใช้ setTimeout แก้บั๊กบน Android Chrome ที่ cancel() แล้วไปตัดเสียงใหม่ที่กำลังจะพูด
+                setTimeout(() => {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.9; // พูดช้าลงนิดหน่อยให้ฟังชัดขึ้น
+
+                    // พยายามบังคับใช้เสียงภาษาอังกฤษ (แก้ปัญหาบางเครื่องที่พยายามใช้เสียงไทยอ่านอังกฤษแล้วเงียบ)
+                    const voices = window.speechSynthesis.getVoices();
+                    const englishVoice = voices.find(v => v.lang.startsWith('en-') || v.lang.startsWith('en_'));
+                    if (englishVoice) {
+                        utterance.voice = englishVoice;
+                    }
+
+                    window.speechSynthesis.speak(utterance);
+                }, 50);
             }
         }
 
