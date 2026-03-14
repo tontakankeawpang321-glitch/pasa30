@@ -1,1 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3D American Virtual Avatar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #111827; font-family: 'Kanit', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap');
+        
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
 
+        .chat-bubble-user {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 1rem 1rem 0 1rem;
+            align-self: flex-end;
+        }
+
+        .chat-bubble-bot {
+            background-color: #374151;
+            color: white;
+            border-radius: 1rem 1rem 1rem 0;
+            align-self: flex-start;
+        }
+
+        .pulse-animation {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        /* Custom Scrollbar for chat */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-gray-100 h-screen w-screen flex flex-col">
+
+    <!-- 3D Canvas Background -->
+    <div id="canvas-container"></div>
+
+    <!-- UI Overlay -->
+    <div id="ui-layer" class="absolute inset-0 z-10 flex flex-col pointer-events-none transition-opacity duration-500 hidden">
+        
+        <!-- Header -->
+        <div class="p-4 bg-gradient-to-b from-gray-900/80 to-transparent pt-8">
+            <h1 class="text-xl font-medium text-center text-blue-400 drop-shadow-md">Chloe 3D</h1>
+            <p class="text-xs text-center text-gray-400">Your Virtual Assistant</p>
+        </div>
+
+        <!-- Chat History -->
+        <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 pb-24 pointer-events-auto">
+            <div class="chat-bubble-bot p-3 max-w-[80%] text-sm shadow-lg">
+                Hi there! I'm Chloe. Tap the mic button and let's chat! 👋
+            </div>
+        </div>
+
+        <!-- Controls (Bottom Fixed) -->
+        <div class="absolute bottom-0 w-full p-6 flex flex-col items-center justify-end bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent pointer-events-auto">
+            <div id="status-text" class="text-xs text-blue-300 mb-4 h-4 transition-all">Ready</div>
+            <button id="mic-btn" class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-2xl shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all hover:bg-blue-500 active:scale-90 touch-manipulation">
+                🎤
+            </button>
+        </div>
+    </div>
+
+    <!-- Start Overlay (Required to initialize Audio on Web) -->
+    <div id="start-overlay" class="absolute inset-0 z-50 bg-gray-900 flex flex-col items-center justify-center p-6 text-center transition-opacity duration-500">
+        <div class="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center text-4xl mb-6 shadow-[0_0_30px_rgba(59,130,246,0.6)] animate-bounce">
+            🤖
+        </div>
+        <h2 class="text-2xl font-bold mb-2">3D Virtual Friend</h2>
+        <p class="text-gray-400 text-sm mb-8 max-w-xs">Tap the button below to enter the 3D world and start voice chatting in English.</p>
+        <button id="start-btn" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-3 px-8 rounded-full shadow-lg transition-transform active:scale-95">
+            Get Started
+        </button>
+    </div>
+
+    <script>
+        // --- 1. Three.js 3D Setup ---
+        let scene, camera, renderer, avatar, headGroup, mouth, leftEye, rightEye;
+        let isSpeaking = false;
+        let animationTime = 0;
+
+        function init3D() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x111827, 5, 20);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 1.5, 6);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimize for mobile
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0x60a5fa, 1);
+            dirLight.position.set(5, 5, 5);
+            scene.add(dirLight);
+
+            const fillLight = new THREE.DirectionalLight(0xf472b6, 0.5);
+            fillLight.position.set(-5, 3, 5);
+            scene.add(fillLight);
+
+            // Floor Grid
+            const grid = new THREE.GridHelper(20, 20, 0x374151, 0x1f2937);
+            grid.position.y = -1;
+            scene.add(grid);
+
+            // Create Avatar (Humanoid)
+            avatar = new THREE.Group();
+            avatar.position.y = -0.5;
+            
+            const skinColor = 0xffdbac; // Human skin tone
+            const skinMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.4, metalness: 0.1 });
+            const shirtMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+            const hairMat = new THREE.MeshStandardMaterial({ color: 0x2c1b18, roughness: 0.8 }); // Dark brown hair
+
+            // Torso (Shirt)
+            const torsoGeo = new THREE.CylinderGeometry(0.7, 0.6, 1.3, 32);
+            const torso = new THREE.Mesh(torsoGeo, shirtMat);
+            torso.position.y = -0.65;
+            avatar.add(torso);
+
+            // Neck
+            const neckGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.4, 32);
+            const neck = new THREE.Mesh(neckGeo, skinMat);
+            neck.position.y = 0.1;
+            avatar.add(neck);
+
+            // Head Group (for independent rotation)
+            headGroup = new THREE.Group();
+            headGroup.position.y = 0.5;
+            avatar.add(headGroup);
+
+            // Head Sphere
+            const headGeo = new THREE.SphereGeometry(0.55, 32, 32);
+            const head = new THREE.Mesh(headGeo, skinMat);
+            headGroup.add(head);
+
+            // Hair
+            const hairGeo = new THREE.SphereGeometry(0.57, 32, 32, 0, Math.PI * 2, 0, Math.PI / 1.7);
+            const hair = new THREE.Mesh(hairGeo, hairMat);
+            hair.position.y = 0.05;
+            headGroup.add(hair);
+
+            // Nose
+            const noseGeo = new THREE.ConeGeometry(0.06, 0.18, 16);
+            const nose = new THREE.Mesh(noseGeo, skinMat);
+            nose.position.set(0, -0.05, 0.53);
+            nose.rotation.x = Math.PI / 6;
+            headGroup.add(nose);
+
+            // Eyes
+            const eyeGeo = new THREE.SphereGeometry(0.07, 16, 16);
+            const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+            const pupilGeo = new THREE.SphereGeometry(0.035, 16, 16);
+            const pupilMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+
+            // Left Eye
+            leftEye = new THREE.Group();
+            const lWhite = new THREE.Mesh(eyeGeo, eyeWhiteMat);
+            const lPupil = new THREE.Mesh(pupilGeo, pupilMat);
+            lPupil.position.z = 0.06;
+            leftEye.add(lWhite, lPupil);
+            leftEye.position.set(-0.2, 0.1, 0.48);
+            headGroup.add(leftEye);
+
+            // Right Eye
+            rightEye = new THREE.Group();
+            const rWhite = new THREE.Mesh(eyeGeo, eyeWhiteMat);
+            const rPupil = new THREE.Mesh(pupilGeo, pupilMat);
+            rPupil.position.z = 0.06;
+            rightEye.add(rWhite, rPupil);
+            rightEye.position.set(0.2, 0.1, 0.48);
+            headGroup.add(rightEye);
+
+            // Mouth
+            const mouthGeo = new THREE.PlaneGeometry(0.18, 0.02);
+            const mouthMat = new THREE.MeshBasicMaterial({ color: 0x4a1515 }); // Dark red/brown
+            mouth = new THREE.Mesh(mouthGeo, mouthMat);
+            mouth.position.set(0, -0.22, 0.52);
+            headGroup.add(mouth);
+
+            // Add avatar to scene
+            scene.add(avatar);
+
+            // Handle Resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Start Animation Loop
+            animate3D();
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            
+            animationTime += 0.016; // Approx 60fps
+
+            // Idle breathing and slight body sway
+            avatar.position.y = -0.5 + Math.sin(animationTime * 1.5) * 0.02; // Breathing
+            avatar.rotation.y = Math.sin(animationTime * 0.5) * 0.05;
+
+            // Natural head movement
+            headGroup.rotation.y = Math.sin(animationTime * 0.8) * 0.1;
+            headGroup.rotation.z = Math.sin(animationTime * 1.2) * 0.02;
+            
+            // Default idle head tilt
+            let targetHeadTiltX = Math.sin(animationTime * 0.5) * 0.05;
+
+            // Blinking logic
+            if (Math.random() > 0.995) {
+                leftEye.scale.y = 0.05;
+                rightEye.scale.y = 0.05;
+                setTimeout(() => {
+                    leftEye.scale.y = 1;
+                    rightEye.scale.y = 1;
+                }, 150);
+            }
+
+            // Talking animation (Realistic Lip Sync simulation)
+            if (isSpeaking) {
+                // Head nodding while talking
+                targetHeadTiltX += Math.sin(animationTime * 8) * 0.03;
+                
+                // Simulate syllables: fast opening and closing using combined sine waves
+                const syllableSync = Math.sin(animationTime * 25) * 0.5 + Math.sin(animationTime * 15) * 0.5;
+                const talkScale = 1 + Math.max(0, syllableSync) * 6; // Scale mouth height
+                
+                // Smoothly interpolate mouth scale for realism
+                mouth.scale.y += (talkScale - mouth.scale.y) * 0.3;
+            } else {
+                // Return to closed mouth smoothly
+                mouth.scale.y += (1 - mouth.scale.y) * 0.2;
+            }
+            
+            // Apply head tilt smoothly
+            headGroup.rotation.x += (targetHeadTiltX - headGroup.rotation.x) * 0.1;
+
+            renderer.render(scene, camera);
+        }
+
+        // --- 2. Speech & AI Logic ---
+        
+        const startBtn = document.getElementById('start-btn');
+        const startOverlay = document.getElementById('start-overlay');
+        const uiLayer = document.getElementById('ui-layer');
+        const micBtn = document.getElementById('mic-btn');
+        const statusText = document.getElementById('status-text');
+        const chatHistory = document.getElementById('chat-history');
+
+        let recognition;
+        let isListening = false;
+        const apiKey = ""; // Gemini API Key is provided by environment
+
+        // Initialize Speech Recognition
+        function initSpeech() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Your browser does not support Speech Recognition. Please use Google Chrome.");
+                return;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US'; // Set to US English
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                isListening = true;
+                micBtn.classList.add('pulse-animation');
+                micBtn.classList.replace('bg-blue-600', 'bg-red-500');
+                statusText.innerText = "Listening...";
+            };
+
+            recognition.onresult = async (event) => {
+                const transcript = event.results[0][0].transcript;
+                appendMessage('user', transcript);
+                statusText.innerText = "Thinking...";
+                
+                // Stop listening UI visually
+                stopListeningUI();
+
+                // Call Gemini API
+                const botReply = await askGemini(transcript);
+                
+                appendMessage('bot', botReply);
+                statusText.innerText = "Ready";
+                
+                // Speak the reply
+                speakText(botReply);
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error", event.error);
+                statusText.innerText = "Didn't catch that. Try again.";
+                stopListeningUI();
+            };
+
+            recognition.onend = () => {
+                if(isListening) { stopListeningUI(); }
+            };
+        }
+
+        function stopListeningUI() {
+            isListening = false;
+            micBtn.classList.remove('pulse-animation');
+            micBtn.classList.replace('bg-red-500', 'bg-blue-600');
+            if(statusText.innerText === "Listening...") statusText.innerText = "Ready";
+        }
+
+        function appendMessage(sender, text) {
+            const div = document.createElement('div');
+            div.className = `p-3 max-w-[80%] text-sm shadow-lg mb-2 ${sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot'}`;
+            div.innerText = text;
+            chatHistory.appendChild(div);
+            // Scroll to bottom
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // --- 3. Gemini API Call ---
+        async function askGemini(userText) {
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: userText }] }],
+                    systemInstruction: { 
+                        parts: [{ 
+                            text: "You are a 3D virtual assistant, a human female named 'Chloe'. Answer questions using short, concise, natural, and friendly American English, as if talking to a friend. Keep it to 2-3 sentences maximum. Do not use Markdown or special characters." 
+                        }] 
+                    }
+                };
+
+                // Simple exponential backoff retry for robustness
+                let retries = 3;
+                while (retries > 0) {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        return data.candidates[0].content.parts[0].text.trim();
+                    }
+                    retries--;
+                    await new Promise(r => setTimeout(r, 1000)); // wait 1s
+                }
+                return "Sorry, my brain is a little fuzzy right now. Could you try asking again?";
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                return "Oops! I ran into a connection error. Please try again later.";
+            }
+        }
+
+        // --- 4. Text to Speech (TTS) ---
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; // American English voice
+                utterance.rate = 1.0; 
+                utterance.pitch = 1.1; 
+
+                // Attempt to find a female US English voice if available
+                const voices = window.speechSynthesis.getVoices();
+                const usFemaleVoice = voices.find(voice => voice.lang === 'en-US' && (voice.name.includes('Female') || voice.name.includes('Samantha') || voice.name.includes('Zira')));
+                if (usFemaleVoice) {
+                    utterance.voice = usFemaleVoice;
+                }
+
+                utterance.onstart = () => {
+                    isSpeaking = true;
+                };
+
+                utterance.onend = () => {
+                    isSpeaking = false;
+                };
+
+                utterance.onerror = () => {
+                    isSpeaking = false;
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.warn("Text-to-speech not supported.");
+            }
+        }
+
+        // --- 5. Event Listeners & Init ---
+        
+        // Ensure voices are loaded before setting up TTS options properly
+        if ('speechSynthesis' in window && speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => {
+                // Preload voices
+                window.speechSynthesis.getVoices();
+            };
+        }
+
+        window.onload = () => {
+            init3D();
+            initSpeech();
+        };
+
+        startBtn.addEventListener('click', () => {
+            // Required to unlock AudioContext/SpeechSynthesis on mobile browsers
+            if ('speechSynthesis' in window) {
+                const initUtterance = new SpeechSynthesisUtterance('');
+                window.speechSynthesis.speak(initUtterance);
+            }
+
+            // Hide overlay, show UI
+            startOverlay.classList.add('opacity-0');
+            setTimeout(() => {
+                startOverlay.classList.add('hidden');
+                uiLayer.classList.remove('hidden');
+                uiLayer.classList.add('opacity-100');
+            }, 500);
+        });
+
+        micBtn.addEventListener('click', () => {
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error("Recognition already started or error:", e);
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
