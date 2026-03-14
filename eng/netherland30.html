@@ -290,10 +290,10 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate(); 
             
             const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
+            let gridHTML = ''; // ใช้วิธีต่อ String แล้วยัดทีเดียว (Performance ดีกว่า)
 
             for (let i = 0; i < firstDayIndex; i++) {
-                grid.innerHTML += `<div class="p-2 md:p-4 rounded-[1.5rem] bg-orange-50/30 border border-dashed border-orange-200 opacity-40"></div>`;
+                gridHTML += `<div class="p-1 sm:p-2 md:p-4 rounded-xl md:rounded-[1.5rem] bg-orange-50/30 border border-dashed border-orange-200 opacity-40 min-h-[65px] sm:min-h-[90px] md:min-h-[110px]"></div>`;
             }
 
             let completedThisMonth = 0;
@@ -305,7 +305,7 @@
                 
                 if (isCompleted) completedThisMonth++;
 
-                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-3 md:p-5 rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[90px] md:min-h-[110px]";
+                let baseClasses = "calendar-day relative flex flex-col items-center justify-center p-1 sm:p-3 md:p-5 rounded-xl md:rounded-[1.5rem] border-2 cursor-pointer select-none min-h-[65px] sm:min-h-[90px] md:min-h-[110px]";
                 
                 let stateClasses = "";
                 let indicatorHTML = "";
@@ -313,35 +313,35 @@
                 if (isCompleted) {
                     stateClasses = "bg-blue-50 border-blue-200 text-blue-800 shadow-sm";
                     indicatorHTML = `
-                        <div class="absolute -top-2 -right-2 w-7 h-7 bg-white rounded-full shadow border border-blue-200 flex items-center justify-center text-sm z-10 animate-bounce" style="animation-duration: 2s;">🌟</div>
-                        <i class="ph-fill ph-check-circle text-blue-400 text-2xl md:text-3xl mt-1 opacity-60"></i>
+                        <div class="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-7 sm:h-7 bg-white rounded-full shadow border border-blue-200 flex items-center justify-center text-[10px] sm:text-sm z-10 animate-bounce" style="animation-duration: 2s;">🌟</div>
+                        <i class="ph-fill ph-check-circle text-blue-400 text-xl sm:text-2xl md:text-3xl mt-0.5 sm:mt-1 opacity-60"></i>
                     `;
                 } else if (isToday) {
-                    stateClasses = "bg-gradient-to-b from-orange-400 to-orange-500 border-transparent text-white shadow-lg shadow-orange-500/40 today-pulse";
+                    stateClasses = "bg-gradient-to-b from-orange-400 to-orange-500 border-transparent text-white shadow-md sm:shadow-lg shadow-orange-500/40 today-pulse";
                     indicatorHTML = `
-                        <span class="text-[10px] md:text-xs font-bold bg-white/20 px-3 py-1 rounded-full mt-2 backdrop-blur-sm text-white">วันนี้</span>
+                        <span class="text-[8px] sm:text-[10px] md:text-xs font-bold bg-white/20 px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full mt-1 sm:mt-2 backdrop-blur-sm text-white">วันนี้</span>
                     `;
                 } else {
                     stateClasses = "bg-white border-slate-100 text-slate-600 hover:border-orange-300";
-                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-2xl md:text-3xl mt-1 group-hover:text-orange-400 transition-colors"></i>`;
+                    indicatorHTML = `<i class="ph-duotone ph-book-open text-slate-200 text-xl sm:text-2xl md:text-3xl mt-0.5 sm:mt-1 group-hover:text-orange-400 transition-colors"></i>`;
                 }
 
                 // Check for Sunday/Saturday colors
                 const dayOfWeek = new Date(year, month, day).getDay();
-                let textStyle = "font-extrabold text-xl md:text-2xl font-english";
+                let textStyle = "font-extrabold text-base sm:text-xl md:text-2xl font-english";
                 if (!isToday && !isCompleted) {
                     if (dayOfWeek === 0) textStyle += " text-red-500";
                     else if (dayOfWeek === 6) textStyle += " text-blue-500";
                 }
 
-                const cardHTML = `
+                gridHTML += `
                     <div class="${baseClasses} ${stateClasses} group" onclick="openDayDialog(${year}, ${month}, ${day})">
                         <span class="${textStyle}">${day}</span>
                         ${indicatorHTML}
                     </div>
                 `;
-                grid.innerHTML += cardHTML;
             }
+            grid.innerHTML = gridHTML;
 
             // Animate number change
             const completedEl = document.getElementById('summary-completed');
@@ -377,61 +377,61 @@
             title.innerText = `วันที่ ${displayDate}`;
 
             const vocabList = getRandomVocab();
-            content.innerHTML = '';
+            let contentHTML = ''; // ใช้วิธีต่อ String แล้วยัดทีเดียว
             
             vocabList.forEach((v, index) => {
                 // ดึงเฉพาะตัวหนังสือดัตช์มาใช้เป็นเสียงอ่าน (ตัดส่วนวงเล็บคำอ่านภาษาไทยออก)
                 const targetWordOnly = v.word.split(' (')[0];
 
-                const itemHTML = `
-                    <div class="vocab-card p-5 bg-white border-2 border-orange-50 rounded-[2rem] hover:border-orange-300 hover:shadow-xl hover:shadow-orange-100/50 transition-all flex flex-col md:flex-row gap-4 items-start relative overflow-hidden group">
+                contentHTML += `
+                    <div class="vocab-card p-4 sm:p-5 bg-white border-2 border-orange-50 rounded-2xl md:rounded-[2rem] hover:border-orange-300 hover:shadow-xl hover:shadow-orange-100/50 transition-all flex flex-col md:flex-row gap-3 sm:gap-4 items-start md:items-center relative overflow-hidden group">
                         
                         <!-- Cute background blob -->
-                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-orange-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div class="absolute -right-5 -bottom-5 sm:-right-10 sm:-bottom-10 w-24 h-24 sm:w-32 sm:h-32 bg-orange-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
-                        <div class="blob-bg text-orange-700 w-14 h-14 rounded-2xl flex items-center justify-center font-extrabold text-xl shrink-0 shadow-sm relative z-10 font-english">
+                        <div class="blob-bg text-orange-700 w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center font-extrabold text-lg sm:text-xl shrink-0 shadow-sm relative z-10 font-english">
                             ${index + 1}
                         </div>
                         
                         <div class="flex-1 relative z-10 w-full">
-                            <div class="flex justify-between items-start w-full">
-                                <h4 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-2 flex flex-wrap items-center gap-2 font-target tracking-wide w-full pr-12">
-                                    <span class="text-2xl md:text-3xl drop-shadow-sm mr-1">${v.icon}</span> 
+                            <div class="flex justify-between items-start w-full gap-2">
+                                <h4 class="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-800 mb-1 sm:mb-2 flex flex-wrap items-center gap-1.5 sm:gap-2 font-target tracking-wide w-full pr-10 sm:pr-12 leading-tight">
+                                    <span class="text-xl sm:text-2xl md:text-3xl drop-shadow-sm mr-0.5 sm:mr-1">${v.icon}</span> 
                                     <span>${v.word}</span>
                                 </h4>
-                                <button onclick="speakWord('${targetWordOnly}')" class="absolute top-0 right-0 bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียงภาษาดัตช์">
-                                    <i class="ph-fill ph-speaker-high text-lg"></i>
+                                <button onclick="speakWord('${targetWordOnly}')" class="shrink-0 absolute top-0 right-0 md:relative bg-orange-50 text-orange-600 hover:bg-orange-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียงภาษาดัตช์">
+                                    <i class="ph-fill ph-speaker-high text-base sm:text-lg"></i>
                                 </button>
                             </div>
                             
-                            <div class="flex flex-wrap gap-2 mb-3 mt-1">
-                                <span class="text-orange-700 font-bold bg-orange-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 border border-orange-100">
+                            <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3 mt-1">
+                                <span class="text-orange-700 font-bold bg-orange-50 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-sm flex items-center gap-1 sm:gap-1.5 border border-orange-100">
                                     🇹🇭 ${v.meaning}
                                 </span>
-                                <span class="text-blue-600 font-bold bg-blue-50 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 font-english border border-blue-100">
+                                <span class="text-blue-600 font-bold bg-blue-50 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-sm flex items-center gap-1 sm:gap-1.5 font-english border border-blue-100">
                                     🇬🇧 ${v.english}
                                 </span>
                             </div>
                             
-                            <div class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 relative mt-3">
-                                <i class="ph-fill ph-quotes text-orange-200/50 text-4xl absolute -top-2 -left-1"></i>
-                                <p class="text-sm md:text-base text-slate-600 relative z-10 font-target pl-4 leading-relaxed">
+                            <div class="bg-blue-50/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-blue-100 relative mt-2 sm:mt-3">
+                                <i class="ph-fill ph-quotes text-orange-200/50 text-2xl sm:text-4xl absolute -top-1 -left-0 sm:-top-2 sm:-left-1 pointer-events-none"></i>
+                                <p class="text-xs sm:text-sm md:text-base text-slate-600 relative z-10 font-target pl-3 sm:pl-4 leading-relaxed">
                                     ${v.example}
                                 </p>
                             </div>
                         </div>
                     </div>
                 `;
-                content.innerHTML += itemHTML;
             });
+            content.innerHTML = contentHTML;
 
             if (isCompleted) {
-                btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-xl"></i> ทบทวนเสร็จแล้ว (เยี่ยมมาก!)`;
-                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold hover:from-blue-600 hover:to-cyan-600 rounded-2xl shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.innerHTML = `<i class="ph-bold ph-star text-amber-300 text-lg sm:text-xl"></i> <span class="whitespace-nowrap">ทบทวนเสร็จแล้ว!</span>`;
+                btnComplete.className = "flex-1 md:flex-none px-4 py-2.5 sm:px-8 sm:py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold hover:from-blue-600 hover:to-cyan-600 rounded-xl sm:rounded-2xl shadow-lg shadow-blue-500/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-lg";
                 btnComplete.onclick = closeDialog; 
             } else {
-                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-xl"></i> ท่องเสร็จแล้ว!`;
-                btnComplete.className = "px-8 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold hover:from-orange-600 hover:to-red-600 rounded-2xl shadow-lg shadow-orange-500/30 transition-all active:scale-95 flex items-center gap-2 text-lg";
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-lg sm:text-xl"></i> <span class="whitespace-nowrap">ท่องเสร็จแล้ว!</span>`;
+                btnComplete.className = "flex-1 md:flex-none px-4 py-2.5 sm:px-8 sm:py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold hover:from-orange-600 hover:to-red-600 rounded-xl sm:rounded-2xl shadow-lg shadow-orange-500/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-lg";
                 btnComplete.onclick = markDayAsComplete; 
             }
 
@@ -452,10 +452,10 @@
                 appState.completedDates.push(selectedDateString);
                 saveState();
                 
-                // Show cute alert (เปลี่ยนเป็นภาษาดัตช์)
+                // Show cute alert 
                 const alert = document.createElement('div');
-                alert.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-orange-400";
-                alert.innerHTML = `<span class="text-2xl">🎉</span> Geweldig! สะสมดาวได้อีก 1 ดวง`;
+                alert.className = "fixed top-5 sm:top-10 left-1/2 transform -translate-x-1/2 w-[90%] sm:w-auto bg-white px-4 py-3 sm:px-6 sm:py-4 rounded-2xl sm:rounded-full shadow-2xl flex items-center justify-center gap-2 sm:gap-3 z-[100] animate-bounce font-bold text-slate-800 border-2 border-orange-400 text-sm sm:text-base text-center";
+                alert.innerHTML = `<span class="text-xl sm:text-2xl">🎉</span> Geweldig! สะสมดาวได้อีก 1 ดวง`;
                 document.body.appendChild(alert);
                 setTimeout(() => alert.remove(), 3000);
 
