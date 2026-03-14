@@ -396,14 +396,41 @@
         }
 
         // --- TTS (UK English) ---
+        // โหลดข้อมูลเสียงล่วงหน้า (ช่วยลดปัญหาไม่มีเสียงในมือถือบางรุ่น)
+        if ('speechSynthesis' in window) {
+            // เรียกใช้ครั้งแรกเพื่อกระตุ้นให้เบราว์เซอร์โหลดรายการเสียง
+            window.speechSynthesis.getVoices();
+            // เมื่อโหลดเสร็จให้อัปเดตอีกครั้ง
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
+        }
+
         function speakWord(word) {
             if ('speechSynthesis' in window) {
+                // ยกเลิกเสียงที่ค้างอยู่ คิวเก่าจะถูกล้าง ทำให้กดฟังคำใหม่ได้ลื่นไหลทันที
+                window.speechSynthesis.cancel();
+
                 const utterance = new SpeechSynthesisUtterance(word);
-                // เปลี่ยนเป็นเสียงสำเนียงบริติช (UK)
                 utterance.lang = 'en-GB'; 
-                // ปรับความเร็วเสียงให้อ่านชัดเจนขึ้นเล็กน้อย
                 utterance.rate = 0.9; 
+
+                // ค้นหาเสียง UK English ที่มีในเครื่องโดยตรง (สำคัญสำหรับ Safari บน iOS/Mac)
+                const voices = window.speechSynthesis.getVoices();
+                const ukVoice = voices.find(voice => 
+                    voice.lang === 'en-GB' || 
+                    voice.lang === 'en_GB' || 
+                    voice.name.includes('UK') || 
+                    voice.name.includes('British')
+                );
+                
+                if (ukVoice) {
+                    utterance.voice = ukVoice;
+                }
+
                 window.speechSynthesis.speak(utterance);
+            } else {
+                alert("ขออภัย เบราว์เซอร์นี้ไม่รองรับระบบเสียงอ่านครับ");
             }
         }
 
