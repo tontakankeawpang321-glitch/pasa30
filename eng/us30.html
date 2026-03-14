@@ -194,46 +194,56 @@
         }
 
         const vocabPool = [
-            { word: "Absolutely", meaning: "อย่างแน่นอน, อย่างแท้จริง", example: "I absolutely agree with your point." },
-            { word: "Bizarre", meaning: "แปลกประหลาด", example: "That's a bizarre story." },
-            { word: "Crucial", meaning: "สำคัญมาก, วิกฤต", example: "Water is crucial for survival." },
-            { word: "Determine", meaning: "ตัดสินใจ, กำหนด", example: "We need to determine the cause of the problem." },
-            { word: "Emphasize", meaning: "เน้นย้ำ", example: "The teacher emphasized the importance of reading." },
-            { word: "Fascinating", meaning: "น่าหลงใหล, น่าสนใจมาก", example: "The museum had a fascinating exhibit." },
-            { word: "Genuine", meaning: "แท้จริง, จริงใจ", example: "She showed genuine interest in my project." },
-            { word: "Hesitate", meaning: "ลังเล", example: "Don't hesitate to call me if you need help." },
-            { word: "Implement", meaning: "นำไปปฏิบัติ, ทำให้มีผล", example: "We will implement the new policy next month." },
-            { word: "Justify", meaning: "แสดงให้เห็นถึงเหตุผล, พิสูจน์ว่าถูกต้อง", example: "Can you justify your decision?" },
-            { word: "Knowledgeable", meaning: "มีความรู้มาก", example: "He is very knowledgeable about history." },
-            { word: "Literally", meaning: "อย่างแท้จริง, ตามตัวอักษร", example: "I was literally starving." },
-            { word: "Maintain", meaning: "รักษาไว้, บำรุง", example: "It's important to maintain a healthy diet." },
-            { word: "Negotiate", meaning: "เจรจาต่อรอง", example: "They are trying to negotiate a peace treaty." },
-            { word: "Observe", meaning: "สังเกต", example: "Observe how the birds build their nests." },
-            { word: "Persuade", meaning: "ชักชวน, โน้มน้าว", example: "I tried to persuade him to come with us." },
-            { word: "Significant", meaning: "สำคัญ, มีความหมาย", example: "There was a significant change in the weather." },
-            { word: "Tolerate", meaning: "อดทน, ยอมรับ", example: "I will not tolerate bad behavior." },
-            { word: "Utilize", meaning: "ใช้ประโยชน์", example: "We must utilize all available resources." },
-            { word: "Vulnerable", meaning: "อ่อนแอ, เปราะบาง", example: "Elderly people are particularly vulnerable to the virus." },
-            { word: "Accommodate", meaning: "จัดให้เหมาะสม, ให้ที่พัก", example: "The hotel can accommodate up to 500 guests." },
-            { word: "Beneficial", meaning: "เป็นประโยชน์", example: "Exercise is beneficial to your health." },
-            { word: "Consequence", meaning: "ผลลัพธ์, ผลที่ตามมา", example: "He must face the consequences of his actions." },
-            { word: "Dilemma", meaning: "สภาวะกลืนไม่เข้าคายไม่ออก", example: "I'm in a dilemma about which job offer to accept." },
-            { word: "Evaluate", meaning: "ประเมินผล", example: "The teacher will evaluate your performance." },
-            { word: "Flaw", meaning: "ข้อบกพร่อง, ตำหนิ", example: "There is a minor flaw in this design." },
-            { word: "Grasp", meaning: "จับ, เข้าใจ", example: "I finally grasped the concept of the lesson." },
-            { word: "Hypothesis", meaning: "สมมติฐาน", example: "The scientists are testing a new hypothesis." },
-            { word: "Interpret", meaning: "ตีความ, แปล", example: "How do you interpret this poem?" },
-            { word: "Jeopardize", meaning: "ทำให้ตกอยู่ในอันตราย", example: "His mistake could jeopardize the entire project." },
-            { word: "Lucrative", meaning: "ได้กำไรดี", example: "She runs a very lucrative business." },
-            { word: "Mandatory", meaning: "บังคับ, จำเป็นต้องทำ", example: "Attendance at the meeting is mandatory." },
-            { word: "Notorious", meaning: "มีชื่อเสียงในทางไม่ดี", example: "The city is notorious for its traffic jams." },
-            { word: "Obsolete", meaning: "ล้าสมัย, เลิกใช้แล้ว", example: "Typewriters are now largely obsolete." },
-            { word: "Prominent", meaning: "โดดเด่น, มีชื่อเสียง", example: "He is a prominent figure in the tech industry." },
-            { word: "Retrieve", meaning: "ได้กลับคืนมา, กู้คืน", example: "I need to retrieve my data from the broken hard drive." },
-            { word: "Spontaneous", meaning: "เกิดขึ้นเอง, ไม่ได้เตรียมตัว", example: "We took a spontaneous trip to the beach." },
-            { word: "Tedious", meaning: "น่าเบื่อ, ยืดเยื้อ", example: "Data entry can be a very tedious task." },
-            { word: "Unanimous", meaning: "เป็นเอกฉันท์", example: "The committee reached a unanimous decision." },
-            { word: "Verify", meaning: "ตรวจสอบความถูกต้อง", example: "Please verify your account via email." }
+            { word: "Absolutely", pronunciation: "แอบ-โซ-ลูท-ลี", meaning: "อย่างแน่นอน, อย่างแท้จริง", example: "I absolutely agree with your point." },
+            { word: "Bizarre", pronunciation: "บิ-ซาร์", meaning: "แปลกประหลาด", example: "That's a bizarre story." },
+            { word: "Crucial", pronunciation: "ครู-เชียล", meaning: "สำคัญมาก, วิกฤต", example: "Water is crucial for survival." },
+            { word: "Determine", pronunciation: "ดิ-เทอร์-มิน", meaning: "ตัดสินใจ, กำหนด", example: "We need to determine the cause of the problem." },
+            { word: "Emphasize", pronunciation: "เอ็ม-ฟะ-ไซซ", meaning: "เน้นย้ำ", example: "The teacher emphasized the importance of reading." },
+            { word: "Fascinating", pronunciation: "แฟส-ซิ-เนท-ทิง", meaning: "น่าหลงใหล, น่าสนใจมาก", example: "The museum had a fascinating exhibit." },
+            { word: "Genuine", pronunciation: "เจน-ยุ-อิน", meaning: "แท้จริง, จริงใจ", example: "She showed genuine interest in my project." },
+            { word: "Hesitate", pronunciation: "เฮส-ซิ-เทท", meaning: "ลังเล", example: "Don't hesitate to call me if you need help." },
+            { word: "Implement", pronunciation: "อิม-พลิ-เมินท", meaning: "นำไปปฏิบัติ, ทำให้มีผล", example: "We will implement the new policy next month." },
+            { word: "Justify", pronunciation: "จัส-ติ-ไฟ", meaning: "แสดงให้เห็นถึงเหตุผล, พิสูจน์ว่าถูกต้อง", example: "Can you justify your decision?" },
+            { word: "Knowledgeable", pronunciation: "นอล-เลจ-เจอะ-เบิล", meaning: "มีความรู้มาก", example: "He is very knowledgeable about history." },
+            { word: "Literally", pronunciation: "ลิด-เทอะ-แรล-ลี", meaning: "อย่างแท้จริง, ตามตัวอักษร", example: "I was literally starving." },
+            { word: "Maintain", pronunciation: "เมน-เทน", meaning: "รักษาไว้, บำรุง", example: "It's important to maintain a healthy diet." },
+            { word: "Negotiate", pronunciation: "นิ-โก-ชี-เอท", meaning: "เจรจาต่อรอง", example: "They are trying to negotiate a peace treaty." },
+            { word: "Observe", pronunciation: "ออบ-เซิร์ฟว", meaning: "สังเกต", example: "Observe how the birds build their nests." },
+            { word: "Persuade", pronunciation: "เพอร์-สเวด", meaning: "ชักชวน, โน้มน้าว", example: "I tried to persuade him to come with us." },
+            { word: "Significant", pronunciation: "ซิก-นิฟ-ฟิ-แคนท", meaning: "สำคัญ, มีความหมาย", example: "There was a significant change in the weather." },
+            { word: "Tolerate", pronunciation: "ทอล-เลอะ-เรท", meaning: "อดทน, ยอมรับ", example: "I will not tolerate bad behavior." },
+            { word: "Utilize", pronunciation: "ยู-ทิ-ไลซ", meaning: "ใช้ประโยชน์", example: "We must utilize all available resources." },
+            { word: "Vulnerable", pronunciation: "วัล-เนอะ-ระ-เบิล", meaning: "อ่อนแอ, เปราะบาง", example: "Elderly people are particularly vulnerable to the virus." },
+            { word: "Accommodate", pronunciation: "อะ-คอม-โม-เดท", meaning: "จัดให้เหมาะสม, ให้ที่พัก", example: "The hotel can accommodate up to 500 guests." },
+            { word: "Beneficial", pronunciation: "เบน-นิ-ฟิ-เชียล", meaning: "เป็นประโยชน์", example: "Exercise is beneficial to your health." },
+            { word: "Consequence", pronunciation: "คอน-ซิ-เควนซ", meaning: "ผลลัพธ์, ผลที่ตามมา", example: "He must face the consequences of his actions." },
+            { word: "Dilemma", pronunciation: "ดิ-เลม-มา", meaning: "สภาวะกลืนไม่เข้าคายไม่ออก", example: "I'm in a dilemma about which job offer to accept." },
+            { word: "Evaluate", pronunciation: "อี-แวล-ลู-เอท", meaning: "ประเมินผล", example: "The teacher will evaluate your performance." },
+            { word: "Flaw", pronunciation: "ฟลอว์", meaning: "ข้อบกพร่อง, ตำหนิ", example: "There is a minor flaw in this design." },
+            { word: "Grasp", pronunciation: "กราสพ", meaning: "จับ, เข้าใจ", example: "I finally grasped the concept of the lesson." },
+            { word: "Hypothesis", pronunciation: "ไฮ-พอท-ทิ-ซิส", meaning: "สมมติฐาน", example: "The scientists are testing a new hypothesis." },
+            { word: "Interpret", pronunciation: "อิน-เทอร์-พริท", meaning: "ตีความ, แปล", example: "How do you interpret this poem?" },
+            { word: "Jeopardize", pronunciation: "เจป-เพอะ-ไดซ", meaning: "ทำให้ตกอยู่ในอันตราย", example: "His mistake could jeopardize the entire project." },
+            { word: "Lucrative", pronunciation: "ลู-คระ-ทิฟว", meaning: "ได้กำไรดี", example: "She runs a very lucrative business." },
+            { word: "Mandatory", pronunciation: "แมน-ดะ-ทอ-รี", meaning: "บังคับ, จำเป็นต้องทำ", example: "Attendance at the meeting is mandatory." },
+            { word: "Notorious", pronunciation: "โน-ทอ-เรียส", meaning: "มีชื่อเสียงในทางไม่ดี", example: "The city is notorious for its traffic jams." },
+            { word: "Obsolete", pronunciation: "ออบ-โซ-ลีท", meaning: "ล้าสมัย, เลิกใช้แล้ว", example: "Typewriters are now largely obsolete." },
+            { word: "Prominent", pronunciation: "พรอม-มิ-เนินท", meaning: "โดดเด่น, มีชื่อเสียง", example: "He is a prominent figure in the tech industry." },
+            { word: "Retrieve", pronunciation: "ริ-ทรีฟว", meaning: "ได้กลับคืนมา, กู้คืน", example: "I need to retrieve my data from the broken hard drive." },
+            { word: "Spontaneous", pronunciation: "สปอน-เท-เนียส", meaning: "เกิดขึ้นเอง, ไม่ได้เตรียมตัว", example: "We took a spontaneous trip to the beach." },
+            { word: "Tedious", pronunciation: "ที-เดียส", meaning: "น่าเบื่อ, ยืดเยื้อ", example: "Data entry can be a very tedious task." },
+            { word: "Unanimous", pronunciation: "ยู-แนน-นิ-มัส", meaning: "เป็นเอกฉันท์", example: "The committee reached a unanimous decision." },
+            { word: "Verify", pronunciation: "เวอ-ริ-ไฟ", meaning: "ตรวจสอบความถูกต้อง", example: "Please verify your account via email." },
+            { word: "Abundant", pronunciation: "อะ-บัน-ดันท", meaning: "มากมาย, อุดมสมบูรณ์", example: "There is an abundant supply of water." },
+            { word: "Banish", pronunciation: "แบน-นิช", meaning: "เนรเทศ, ขจัดออกไป", example: "He was banished from the country." },
+            { word: "Candid", pronunciation: "แคน-ดิด", meaning: "ตรงไปตรงมา, เปิดเผย", example: "Give me your candid opinion." },
+            { word: "Deceive", pronunciation: "ดิ-ซีฟว", meaning: "หลอกลวง", example: "He tried to deceive me into giving him money." },
+            { word: "Endure", pronunciation: "เอน-ดัวร์", meaning: "อดทน, คงอยู่", example: "She had to endure a lot of pain." },
+            { word: "Feasible", pronunciation: "ฟี-ซิ-เบิล", meaning: "เป็นไปได้, สามารถทำได้", example: "Is this plan practically feasible?" },
+            { word: "Glimpse", pronunciation: "กลิมพส์", meaning: "มองแวบเดียว, เหลือบเห็น", example: "I caught a glimpse of her in the crowd." },
+            { word: "Hinder", pronunciation: "ฮิน-เดอร์", meaning: "ขัดขวาง, เป็นอุปสรรค", example: "Bad weather hindered our progress." },
+            { word: "Illuminate", pronunciation: "อิล-ลู-มิ-เนท", meaning: "ส่องสว่าง, ทำให้ชัดเจน", example: "The presentation illuminated the main issues." },
+            { word: "Jargon", pronunciation: "จาร์-กอน", meaning: "ศัพท์เฉพาะวงการ", example: "The document is full of legal jargon." }
         ];
 
         function shuffleArray(array) {
@@ -373,16 +383,19 @@
                         
                         <div class="flex-1 relative z-10 w-full mt-1 md:mt-0">
                             <div class="flex justify-between items-start w-full">
-                                <h4 class="text-lg md:text-2xl font-extrabold text-slate-800 mb-1 flex items-center gap-3 font-english tracking-wide">
-                                    ${v.word}
-                                    <button onclick="speakWord('${v.word.replace(/'/g, "\\'")}')" class="hidden md:block bg-indigo-50 text-indigo-500 hover:bg-indigo-500 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="ฟังเสียง">
-                                        <i class="ph-fill ph-speaker-high text-lg"></i>
-                                    </button>
-                                </h4>
+                                <div class="flex flex-col mb-1 md:mb-1.5 w-full text-left">
+                                    <h4 class="text-lg md:text-2xl font-extrabold text-slate-800 flex items-center gap-3 font-english tracking-wide">
+                                        ${v.word}
+                                        <button onclick="speakWord('${v.word.replace(/'/g, "\\'")}')" class="hidden md:flex bg-indigo-50 text-indigo-500 hover:bg-indigo-500 hover:text-white p-1.5 md:p-2 rounded-xl transition-colors shadow-sm items-center justify-center" title="ฟังเสียง">
+                                            <i class="ph-fill ph-speaker-high text-base md:text-lg"></i>
+                                        </button>
+                                    </h4>
+                                    <span class="text-[11px] md:text-sm text-slate-400 font-medium mt-0.5 md:mt-1">[ ${v.pronunciation} ]</span>
+                                </div>
                             </div>
-                            <p class="text-indigo-600 font-bold mb-2 md:mb-3 bg-indigo-50 inline-block px-2.5 py-1 rounded-lg text-xs md:text-sm">${v.meaning}</p>
+                            <p class="text-indigo-600 font-bold mb-2 md:mb-3 bg-indigo-50 inline-block px-2.5 py-1 rounded-lg text-xs md:text-sm text-left">${v.meaning}</p>
                             
-                            <div class="bg-slate-50 p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-100 relative mt-1 md:mt-2">
+                            <div class="bg-slate-50 p-3 md:p-4 rounded-xl md:rounded-2xl border border-slate-100 relative mt-1 md:mt-2 text-left">
                                 <i class="ph-fill ph-quotes text-slate-200 text-2xl md:text-4xl absolute -top-1 -left-1"></i>
                                 <p class="text-xs md:text-base text-slate-600 relative z-10 font-english pl-3 md:pl-4">
                                     ${v.example}
