@@ -417,6 +417,12 @@
         }
 
         function speakWord(word) {
+            // ✅ ถ้ารันใน Android WebView ให้ใช้ Android TTS
+            if (typeof Android !== 'undefined' && Android.speak) {
+                Android.speak(word);
+                return;
+            }
+
             // เช็คว่ามี API speechSynthesis หรือไม่ และมี Voice Data หรือเปล่า (ไลน์/เฟสบุ๊คบางทีมี API แต่ voices เป็น 0)
             const hasSpeechSynthesis = 'speechSynthesis' in window;
             const voices = hasSpeechSynthesis ? window.speechSynthesis.getVoices() : [];
