@@ -28,9 +28,13 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #fff7ed; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #fbbf24; border-radius: 10px; }
         
-        .calendar-day { transition: all 0.2s ease-out; }
+        /* Hardware Acceleration & Smoother Transitions */
+        .calendar-day { transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, color 0.2s; will-change: transform; }
         .calendar-day:active { transform: scale(0.92); }
         
+        .vocab-card { transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s; will-change: transform; }
+        .vocab-card:active { transform: scale(0.96); background-color: #fff7ed; }
+
         @keyframes pulse-gold {
             0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
             70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
@@ -49,7 +53,7 @@
 
     <div class="w-full max-w-2xl space-y-4">
         
-        <!-- Header Section - ปรับขนาดให้พอดีมือถือ -->
+        <!-- Header Section -->
         <div class="bg-white/90 backdrop-blur-md rounded-[2rem] p-5 md:p-8 shadow-xl border border-white">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-4">
@@ -104,7 +108,7 @@
 
     </div>
 
-    <!-- Vocab Dialog - ปรับให้เต็มจอในมือถือ -->
+    <!-- Vocab Dialog -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center">
         <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeDialog()"></div>
         
@@ -211,10 +215,12 @@
             const firstDayIndex = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate(); 
             const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
+            
+            // ใช้ string concatenation แทนการแก้ DOM ซ้ำๆ เพื่อลด Layout Thrashing ทำให้ลื่นขึ้นมาก
+            let gridHTML = '';
 
             for (let i = 0; i < firstDayIndex; i++) {
-                grid.innerHTML += `<div class="aspect-square bg-slate-50/50 border border-slate-50 opacity-10 rounded-lg"></div>`;
+                gridHTML += `<div class="aspect-square bg-slate-50/50 border border-slate-50 opacity-10 rounded-lg"></div>`;
             }
 
             let completedThisMonth = 0;
@@ -229,13 +235,16 @@
                                    (isToday ? "bg-orange-500 text-white border-transparent today-pulse" : 
                                    "bg-white border-slate-100 text-slate-600");
                 
-                grid.innerHTML += `
+                gridHTML += `
                     <div class="calendar-day aspect-square flex flex-col items-center justify-center rounded-xl border-2 text-sm font-black ${stateClasses}" onclick="openDayDialog(${year}, ${month}, ${day})">
                         ${day}
                         ${isCompleted ? '<i class="ph-fill ph-check-circle text-[10px] mt-0.5"></i>' : ''}
                     </div>
                 `;
             }
+
+            // อัปเดต DOM แค่ครั้งเดียว
+            grid.innerHTML = gridHTML;
 
             document.getElementById('summary-completed').innerText = completedThisMonth;
             document.getElementById('summary-total').innerText = daysInMonth;
@@ -252,17 +261,20 @@
             document.getElementById('dialog-title').innerText = `${day} ${MONTH_NAMES[month]} ${year}`;
 
             const content = document.getElementById('dialog-content');
-            content.innerHTML = '';
+            let contentHTML = '';
             
             getRandomVocab().forEach((v, idx) => {
                 const cleanWord = v.word.split(' (')[0];
-                content.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl border border-orange-50 shadow-sm flex items-start gap-4 active:bg-orange-50 transition-colors" onclick="speakWord('${cleanWord}')">
+                contentHTML += `
+                    <div class="vocab-card bg-white p-4 rounded-2xl border border-orange-50 shadow-sm flex items-start gap-4 cursor-pointer" onclick="speakWord('${cleanWord}')">
                         <div class="blob-bg w-10 h-10 shrink-0 rounded-xl flex items-center justify-center text-orange-600 font-black text-sm font-english">${idx+1}</div>
-                        <div class="flex-1">
+                        <!-- ใส่ pointer-events-none เพื่อไม่ให้ลูกกวนการทัช ทำให้กดง่ายขึ้น 100% -->
+                        <div class="flex-1 pointer-events-none">
                             <div class="flex justify-between items-center mb-1">
                                 <h4 class="text-lg font-black font-target">${v.icon} ${v.word}</h4>
-                                <i class="ph-fill ph-speaker-high text-orange-400"></i>
+                                <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-500">
+                                    <i class="ph-fill ph-speaker-high"></i>
+                                </div>
                             </div>
                             <div class="flex gap-2 mb-2">
                                 <span class="px-2 py-0.5 bg-red-50 text-red-600 text-[10px] font-bold rounded-md">🇹🇭 ${v.meaning}</span>
@@ -272,6 +284,8 @@
                     </div>
                 `;
             });
+
+            content.innerHTML = contentHTML;
 
             const btn = document.getElementById('btn-complete-day');
             btn.innerHTML = isCompleted ? '<i class="ph-bold ph-star"></i> ทบทวนแล้ว' : '<i class="ph-bold ph-check-circle"></i> บันทึกว่าเรียนเสร็จแล้ว';
@@ -296,6 +310,14 @@
         }
 
         // --- ปรับปรุงระบบเสียงให้ตรงและไม่ถูกตัด ---
+        let cachedSpanishVoice = null;
+
+        function initVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            // ค้นหาเสียงภาษาสเปนมาแคชไว้ เพื่อให้กดแล้วเสียงออกทันทีไม่ต้องรอประมวลผลใหม่
+            cachedSpanishVoice = voices.find(v => v.lang.startsWith('es-ES') || v.lang.startsWith('es'));
+        }
+
         function speakWord(word) {
             // หยุดเสียงเดิมที่กำลังเล่นอยู่
             window.speechSynthesis.cancel();
@@ -303,15 +325,17 @@
             // พยายามใช้ SpeechSynthesis เป็นอันดับแรก เพราะเสถียรกว่าในเบราว์เซอร์มือถือ
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(word);
-                // ตั้งค่าเป็นสเปน (Spain หรือ Latin America)
                 utterance.lang = 'es-ES'; 
                 utterance.rate = 0.9;
                 utterance.pitch = 1.0;
                 
-                // ตรวจสอบว่ามีเสียงภาษาสเปนในเครื่องไหม
-                const voices = window.speechSynthesis.getVoices();
-                const spanishVoice = voices.find(v => v.lang.startsWith('es'));
-                if (spanishVoice) utterance.voice = spanishVoice;
+                // ใช้เสียงที่ Cache ไว้เพื่อลด Latency
+                if (cachedSpanishVoice) {
+                    utterance.voice = cachedSpanishVoice;
+                } else {
+                    initVoices();
+                    if (cachedSpanishVoice) utterance.voice = cachedSpanishVoice;
+                }
 
                 window.speechSynthesis.speak(utterance);
             } else {
@@ -323,9 +347,13 @@
         }
 
         // โหลดเสียงไว้ล่วงหน้า (Chrome ต้องการสิ่งนี้)
-        window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+        window.speechSynthesis.onvoiceschanged = initVoices;
 
-        window.onload = () => { loadState(); renderCalendar(); };
+        window.onload = () => { 
+            loadState(); 
+            renderCalendar(); 
+            setTimeout(initVoices, 500); // ดีเลย์โหลดเสียงเพื่อไม่ให้บล็อกการแสดงผลตอนเข้าแอปครั้งแรก
+        };
     </script>
 </body>
 </html>
