@@ -72,7 +72,7 @@
 </head>
 <body class="text-slate-800 p-4 md:p-6 min-h-[100dvh] flex flex-col items-center overflow-x-hidden selection:bg-blue-200">
 
-    <div class="w-full max-w-xl space-y-5 pb-8">
+    <div class="w-full max-w-xl space-y-5 pb-24">
         
         <!-- Header Section -->
         <header class="glass-panel rounded-[2rem] p-5 md:p-7 relative overflow-hidden">
@@ -189,7 +189,24 @@
     <!-- Safe area padding for newer iPhones -->
     <style>
         .pb-safe { padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); }
+        .pb-nav-safe { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
     </style>
+
+    <!-- Bottom Navigation App Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 pb-nav-safe shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
+        <div class="max-w-xl mx-auto flex justify-around items-center h-[4.5rem] px-2">
+            <!-- ปุ่มปฏิทิน -->
+            <a href="#calendar" target="_blank" class="flex flex-col items-center justify-center w-full h-full text-blue-600 active:scale-95 transition-transform">
+                <i class="ph-fill ph-calendar-blank text-2xl mb-1"></i>
+                <span class="text-[10px] font-bold">ปฏิทิน</span>
+            </a>
+            <!-- ปุ่มคุยสนทนา -->
+            <a href="#chat" target="_blank" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-blue-500 active:scale-95 transition-transform">
+                <i class="ph-bold ph-chat-circle-dots text-2xl mb-1"></i>
+                <span class="text-[10px] font-bold">คุยสนทนา</span>
+            </a>
+        </div>
+    </nav>
 
     <script>
         const VOCAB_PER_SESSION = 20;
