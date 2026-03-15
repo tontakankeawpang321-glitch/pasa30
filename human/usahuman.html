@@ -646,16 +646,14 @@ document.getElementById('start-btn').addEventListener('click', () => {
     }, 500);
 });
 
-micBtn.addEventListener('click', async () => {
+micBtn.addEventListener('click', () => {
     if (isListening) { recognition.stop(); return; }
     try {
-        if (navigator.mediaDevices?.getUserMedia) {
-            const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-            s.getTracks().forEach(t => t.stop());
-        }
         recognition.start();
     } catch (e) {
-        setStatus('Mic access blocked.', true);
+        // Already started or other error — reinitialize and retry
+        initRecognition();
+        try { recognition.start(); } catch (_) {}
     }
 });
 </script>
