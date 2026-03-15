@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D American Virtual Avatar</title>
+    <title>3D American Worker Avatar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
@@ -59,14 +59,14 @@
         
         <!-- Header -->
         <div class="p-4 bg-gradient-to-b from-gray-900/80 to-transparent pt-8">
-            <h1 class="text-xl font-medium text-center text-blue-400 drop-shadow-md">Chloe 3D</h1>
+            <h1 class="text-xl font-medium text-center text-blue-400 drop-shadow-md">Worker 3D</h1>
             <p class="text-xs text-center text-gray-400">Your Virtual Assistant</p>
         </div>
 
         <!-- Chat History -->
         <div id="chat-history" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 pb-24 pointer-events-auto">
             <div class="chat-bubble-bot p-3 max-w-[80%] text-sm shadow-lg">
-                Hi there! I'm Chloe. Tap the mic button and let's chat! 👋
+                Hi there! I'm Worker. Tap the mic button and let's chat! 👋
             </div>
         </div>
 
@@ -278,7 +278,7 @@
 
         let recognition;
         let isListening = false;
-        const apiKey = "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"; // OpenRouter API Key
+        const WORKER_URL = "https://your-worker-name.your-subdomain.workers.dev"; // ใส่ URL ของ Worker ที่นี่
 
         // Initialize Speech Recognition
         function initSpeech() {
@@ -353,16 +353,15 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        // --- 3. OpenRouter API Call ---
+        // --- 3. Cloudflare Worker API Call ---
         async function askGemini(userText) {
             try {
-                const url = "https://openrouter.ai/api/v1/chat/completions";
                 const payload = {
                     model: "google/gemini-2.5-flash",  // หรือ model อื่นใน OpenRouter
                     messages: [
                         {
                             role: "system",
-                            content: "You are a 3D virtual assistant, a human female named 'Chloe'. Answer questions using short, concise, natural, and friendly American English, as if talking to a friend. Keep it to 2-3 sentences maximum. Do not use Markdown or special characters."
+                            content: "You are a 3D virtual assistant, a human female named 'Worker'. Answer questions using short, concise, natural, and friendly American English, as if talking to a friend. Keep it to 2-3 sentences maximum. Do not use Markdown or special characters."
                         },
                         {
                             role: "user",
@@ -372,13 +371,11 @@
                 };
                 let retries = 3;
                 while (retries > 0) {
-                    const response = await fetch(url, {
+                    const response = await fetch(WORKER_URL, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`,
-                            'HTTP-Referer': 'https://your-app-name.com', // ใส่ชื่อแอปได้
-                            'X-Title': 'Chloe 3D Avatar'
+                            'Content-Type': 'application/json'
+                            // ไม่ต้องใส่ API Key ที่นี่แล้ว (Worker จะเป็นคนจัดการใส่ API Key ให้)
                         },
                         body: JSON.stringify(payload)
                     });
@@ -391,7 +388,7 @@
                 }
                 return "Sorry, my brain is a little fuzzy right now. Could you try asking again?";
             } catch (error) {
-                console.error("OpenRouter API Error:", error);
+                console.error("Worker API Error:", error);
                 return "Oops! I ran into a connection error. Please try again later.";
             }
         }
