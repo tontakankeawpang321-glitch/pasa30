@@ -57,7 +57,7 @@
         }
     </style>
 </head>
-<body class="text-slate-800 p-3 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-slate-800 p-3 md:p-8 pb-24 md:pb-28 min-h-screen flex flex-col items-center">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
@@ -166,6 +166,20 @@
             </div>
         </div>
     </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t border-rose-100 z-40" style="padding-bottom: env(safe-area-inset-bottom);">
+        <div class="max-w-md mx-auto flex justify-around items-center px-6 py-3">
+            <a href="?page=calendar" target="_blank" class="flex flex-col items-center gap-1 text-red-600 transition-colors btn-interact">
+                <i class="ph-fill ph-calendar-blank text-2xl"></i>
+                <span class="text-[10px] font-bold font-heading tracking-wide">ปฏิทิน</span>
+            </a>
+            <a href="?page=chat" target="_blank" class="flex flex-col items-center gap-1 text-slate-400 hover:text-red-500 transition-colors btn-interact">
+                <i class="ph-bold ph-chats text-2xl"></i>
+                <span class="text-[10px] font-bold font-heading tracking-wide">คุยสนทนา</span>
+            </a>
+        </div>
+    </nav>
 
     <script>
         const VOCAB_PER_SESSION = 20;
