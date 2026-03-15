@@ -59,9 +59,14 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5 L45 80 L35 95 L65 95 L55 80 Z' fill='none' stroke='%23e11d48' stroke-width='0.5' opacity='0.05'/%3E%3C/svg%3E");
             background-size: 150px 150px;
         }
+
+        /* Bottom Nav shadow */
+        .nav-shadow {
+            box-shadow: 0 -10px 25px -5px rgba(225, 29, 72, 0.1), 0 -8px 10px -6px rgba(225, 29, 72, 0.05);
+        }
     </style>
 </head>
-<body class="text-slate-800 p-3 md:p-8 min-h-screen flex flex-col items-center eiffel-bg">
+<body class="text-slate-800 p-3 md:p-8 pb-28 min-h-screen flex flex-col items-center eiffel-bg">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6 relative">
         
@@ -137,6 +142,22 @@
 
     </div>
 
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl nav-shadow border-t border-rose-100 z-40 px-6 py-3 rounded-t-[2rem] flex justify-around items-center max-w-4xl mx-auto">
+        <button onclick="goToToday()" class="flex flex-col items-center gap-1 text-rose-500 transition-all">
+            <div class="bg-rose-50 p-2 px-6 rounded-2xl">
+                <i class="ph-fill ph-calendar-blank text-2xl"></i>
+            </div>
+            <span class="text-[10px] font-black uppercase tracking-widest">ปฏิทิน</span>
+        </button>
+        <button onclick="openChat()" class="flex flex-col items-center gap-1 text-slate-400 hover:text-rose-500 transition-all">
+            <div class="p-2 px-6 rounded-2xl">
+                <i class="ph-bold ph-chat-circle-dots text-2xl"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-widest">คุยสนทนา</span>
+        </button>
+    </nav>
+
     <!-- Dialog / Modal -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden overflow-hidden">
         <div class="absolute inset-0 bg-indigo-950/60 backdrop-blur-sm transition-opacity" onclick="closeDialog()"></div>
@@ -205,7 +226,7 @@
             { word: "Salut (ซาลู)", meaning: "หวัดดี/ลาก่อน", english: "Hi/Bye", icon: "👋", example: "Salut! Ça va?" },
             { word: "Merci (แมร์ซี่)", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Merci beaucoup pour l'aide." },
             { word: "De rien (เดอ รีแย็ง)", meaning: "ไม่เป็นไร", english: "You're welcome", icon: "😊", example: "C'est un plaisir, de rien!" },
-            { word: "S'il vous plaît (ซีล วู เปล)", meaning: "กรุณา", english: "Please", icon: "✨", example: "Un café, s'il vous plaît." },
+            { word: "S'il vous plaît (ซีล วู เเปล)", meaning: "กรุณา", english: "Please", icon: "✨", example: "Un café, s'il vous plaît." },
             { word: "Pardon (ปาร์ดง)", meaning: "ขอโทษ", english: "Excuse me", icon: "✋", example: "Pardon, où est le métro?" },
             { word: "Désolé (เดโซเล)", meaning: "ขอโทษ (เสียใจ)", english: "Sorry", icon: "😔", example: "Je suis désolé du retard." },
             { word: "Oui (อวี้)", meaning: "ใช่", english: "Yes", icon: "✅", example: "Oui, je suis d'accord." },
@@ -267,7 +288,7 @@
                 if (isDone) completedCount++;
 
                 let cls = isDone ? "bg-rose-50 border-rose-200 text-rose-900 shadow-sm" : 
-                         (isNow ? "bg-indigo-950 border-transparent text-white shadow-lg today-pulse" : "bg-white border-slate-100 text-slate-400 hover:border-rose-300");
+                         (isNow ? "bg-indigo-950 border-transparent text-white shadow-xl today-pulse" : "bg-white border-slate-100 text-slate-400 hover:border-rose-300");
 
                 grid.innerHTML += `
                     <div class="calendar-day relative flex flex-col items-center justify-center p-2 md:p-5 rounded-xl md:rounded-[1.8rem] border-2 cursor-pointer shadow-sm min-h-[65px] md:min-h-[105px] ${cls}" onclick="openDayDialog(${year}, ${month}, ${day})">
@@ -307,8 +328,8 @@
                                 </button>
                             </div>
                             <div class="flex flex-wrap gap-2 mb-3">
-                                <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100">🇹🇭 ${v.meaning}</span>
-                                <span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-slate-200">🇬🇧 ${v.english}</span>
+                                <span class="bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100">🇹🇭 ${v.meaning}</span>
+                                <span class="bg-slate-100 text-slate-500 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-slate-200">🇬🇧 ${v.english}</span>
                             </div>
                             <div class="bg-rose-50/30 p-3 md:p-4 rounded-xl border-l-4 border-rose-200">
                                 <p class="text-xs md:text-sm text-slate-600 italic">"${v.example}"</p>
@@ -354,10 +375,15 @@
             });
         }
 
+        function openChat() {
+            // ปรับเปลี่ยน URL ตรงนี้ตามที่ต้องการ
+            window.open('https://www.google.com/search?q=learn+french+conversation', '_blank');
+        }
+
         function changeMonth(d) { currentDate.setMonth(currentDate.getMonth() + d); renderCalendar(); }
         function goToToday() { currentDate = new Date(); renderCalendar(); }
 
         window.onload = () => { loadState(); renderCalendar(); };
     </script>
 </body>
-</html>   
+</html>
