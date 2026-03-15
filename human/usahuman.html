@@ -278,7 +278,7 @@
 
         let recognition;
         let isListening = false;
-        const apiKey = ""; // Gemini API Key is provided by environment
+        const apiKey = "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"; // OpenRouter API Key
 
         // Initialize Speech Recognition
         function initSpeech() {
@@ -308,7 +308,7 @@
                 // Stop listening UI visually
                 stopListeningUI();
 
-                // Call Gemini API
+                // Call OpenRouter API
                 const botReply = await askGemini(transcript);
                 
                 appendMessage('bot', botReply);
@@ -353,39 +353,45 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        // --- 3. Gemini API Call ---
+        // --- 3. OpenRouter API Call ---
         async function askGemini(userText) {
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-                
+                const url = "https://openrouter.ai/api/v1/chat/completions";
                 const payload = {
-                    contents: [{ parts: [{ text: userText }] }],
-                    systemInstruction: { 
-                        parts: [{ 
-                            text: "You are a 3D virtual assistant, a human female named 'Chloe'. Answer questions using short, concise, natural, and friendly American English, as if talking to a friend. Keep it to 2-3 sentences maximum. Do not use Markdown or special characters." 
-                        }] 
-                    }
+                    model: "google/gemini-2.5-flash",  // หรือ model อื่นใน OpenRouter
+                    messages: [
+                        {
+                            role: "system",
+                            content: "You are a 3D virtual assistant, a human female named 'Chloe'. Answer questions using short, concise, natural, and friendly American English, as if talking to a friend. Keep it to 2-3 sentences maximum. Do not use Markdown or special characters."
+                        },
+                        {
+                            role: "user",
+                            content: userText
+                        }
+                    ]
                 };
-
-                // Simple exponential backoff retry for robustness
                 let retries = 3;
                 while (retries > 0) {
                     const response = await fetch(url, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`,
+                            'HTTP-Referer': 'https://your-app-name.com', // ใส่ชื่อแอปได้
+                            'X-Title': 'Chloe 3D Avatar'
+                        },
                         body: JSON.stringify(payload)
                     });
-
                     if (response.ok) {
                         const data = await response.json();
-                        return data.candidates[0].content.parts[0].text.trim();
+                        return data.choices[0].message.content.trim();
                     }
                     retries--;
-                    await new Promise(r => setTimeout(r, 1000)); // wait 1s
+                    await new Promise(r => setTimeout(r, 1000));
                 }
                 return "Sorry, my brain is a little fuzzy right now. Could you try asking again?";
             } catch (error) {
-                console.error("Gemini API Error:", error);
+                console.error("OpenRouter API Error:", error);
                 return "Oops! I ran into a connection error. Please try again later.";
             }
         }
