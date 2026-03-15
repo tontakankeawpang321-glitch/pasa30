@@ -58,7 +58,8 @@
         .today-pulse { animation: softPulse 2s infinite; }
     </style>
 </head>
-<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-screen flex flex-col items-center overflow-x-hidden">
+<!-- เพิ่ม padding-bottom (pb-24) เพื่อไม่ให้เนื้อหาโดน Bottom Nav บัง -->
+<body class="text-slate-800 p-2 sm:p-4 md:p-8 pb-24 md:pb-28 min-h-screen flex flex-col items-center overflow-x-hidden">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
@@ -136,6 +137,27 @@
         </div>
 
     </div>
+
+    <!-- Bottom Navigation (App Style) -->
+    <nav class="fixed bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-green-100 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] z-40 pb-safe">
+        <div class="max-w-md mx-auto px-6 py-2 flex justify-around items-center">
+            <!-- Calendar Link -->
+            <a href="calendar.html" target="_blank" class="flex flex-col items-center gap-1 text-green-600 group transition-all w-20">
+                <div class="p-1.5 rounded-xl bg-green-50 group-hover:bg-green-100 transition-colors">
+                    <i class="ph-fill ph-calendar-blank text-2xl md:text-3xl"></i>
+                </div>
+                <span class="text-[10px] md:text-xs font-bold">ปฏิทิน</span>
+            </a>
+            
+            <!-- Chat Link -->
+            <a href="chat.html" target="_blank" class="flex flex-col items-center gap-1 text-slate-400 hover:text-green-600 group transition-all w-20">
+                <div class="p-1.5 rounded-xl group-hover:bg-green-50 transition-colors">
+                    <i class="ph-bold ph-chats-circle text-2xl md:text-3xl group-hover:ph-fill"></i>
+                </div>
+                <span class="text-[10px] md:text-xs font-bold">คุยสนทนา</span>
+            </a>
+        </div>
+    </nav>
 
     <!-- Dialog / Modal for Vocabulary -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
