@@ -489,7 +489,8 @@
             
             const myanmarVoice = voices.find(v => v.lang === 'my-MM') 
                               || voices.find(v => v.lang.startsWith('my'));
-            const thaiVoice    = voices.find(v => v.lang === 'th-TH');
+            const thaiVoice    = voices.find(v => v.lang === 'th-TH')
+                              || voices.find(v => v.lang.startsWith('th'));
             const fallback     = voices.find(v => v.lang === 'en-US') || voices[0];
             
             // ถ้ามีเสียงพม่า → อ่านพม่า
@@ -500,8 +501,20 @@
                               : word;
             
             const utterance = new SpeechSynthesisUtterance(textToSpeak);
-            utterance.rate = 0.7;
-            utterance.voice = myanmarVoice || thaiVoice || fallback;
+            utterance.rate = 0.75; // ปรับความเร็วให้ฟังชัดขึ้นเล็กน้อย
+            
+            // สิ่งสำคัญที่ทำให้เสียงไม่ตรง: ต้องบังคับระบุ lang ควบคู่กับ voice เสมอ
+            // ไม่งั้นเบราว์เซอร์จะเอาเอนจินภาษาอื่นมาอ่านตัวหนังสือพม่า ทำให้เสียงเพี้ยน
+            if (myanmarVoice) {
+                utterance.voice = myanmarVoice;
+                utterance.lang = myanmarVoice.lang || 'my-MM';
+            } else if (thaiVoice) {
+                utterance.voice = thaiVoice;
+                utterance.lang = thaiVoice.lang || 'th-TH';
+            } else if (fallback) {
+                utterance.voice = fallback;
+                utterance.lang = fallback.lang || 'en-US';
+            }
             
             window.currentUtterance = utterance;
             window.speechSynthesis.speak(utterance);
