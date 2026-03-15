@@ -66,7 +66,7 @@
         .safe-pb { padding-bottom: env(safe-area-inset-bottom, 16px); }
     </style>
 </head>
-<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-[100dvh] flex flex-col items-center">
+<body class="text-slate-800 p-2 sm:p-4 md:p-8 pb-20 sm:pb-28 min-h-[100dvh] flex flex-col items-center">
 
     <div class="w-full max-w-4xl space-y-3 sm:space-y-6">
         
@@ -145,6 +145,23 @@
         </div>
 
     </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-rose-100 shadow-[0_-8px_20px_-15px_rgba(225,29,72,0.2)] z-40 pb-[env(safe-area-inset-bottom)]">
+        <div class="flex justify-around items-center h-[68px] sm:h-20 max-w-md mx-auto px-2">
+            <!-- Calendar Tab (Active) -->
+            <a href="index.html" target="_blank" class="flex flex-col items-center justify-center w-full h-full text-rose-500 transition-colors active:scale-95">
+                <i class="ph-fill ph-calendar-blank text-[26px] sm:text-3xl mb-0.5"></i>
+                <span class="text-[10px] sm:text-xs font-bold">ปฏิทิน</span>
+            </a>
+            
+            <!-- Chat Tab (Inactive) -->
+            <a href="chat.html" target="_blank" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-rose-500 transition-colors active:scale-95 group">
+                <i class="ph-bold ph-chats-circle text-[26px] sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform"></i>
+                <span class="text-[10px] sm:text-xs font-bold">คุยสนทนา</span>
+            </a>
+        </div>
+    </nav>
 
     <!-- Dialog / Modal for Vocabulary -->
     <!-- เปลี่ยนจาก items-center เป็น items-end ในจอมือถือ เพื่อให้แอนิเมชันเนียนตา และเปลี่ยน h เป็น 100dvh -->
