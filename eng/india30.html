@@ -56,11 +56,17 @@
             .day-text { font-size: 1rem !important; }
             .calendar-day { min-height: 70px !important; padding: 0.5rem !important; }
         }
+
+        /* Bottom Nav shadow */
+        .nav-shadow {
+            box-shadow: 0 -4px 20px -5px rgba(0, 128, 128, 0.1);
+        }
     </style>
 </head>
 <body class="text-slate-800 antialiased overflow-x-hidden">
 
-    <div class="max-w-4xl mx-auto p-4 md:p-8 space-y-6">
+    <!-- Main Container with padding for bottom nav -->
+    <div class="max-w-4xl mx-auto p-4 md:p-8 space-y-6 pb-28">
         <!-- Header -->
         <header class="india-card rounded-[2.5rem] p-6 shadow-xl shadow-teal-900/5 flex flex-col sm:flex-row items-center gap-6 border border-white/50">
             <div class="flex items-center gap-4 text-center sm:text-left">
@@ -114,6 +120,23 @@
             💡 กดที่วันที่เพื่อเปิดการ์ดคำศัพท์ | 🦚 แตะไอคอนลำโพงเพื่อฟังเสียง
         </p>
     </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-teal-50 px-6 py-3 pb-6 sm:pb-3 flex justify-around items-center nav-shadow">
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="flex flex-col items-center gap-1 text-teal-600 group">
+            <div class="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center transition-all group-active:scale-90">
+                <i class="ph-fill ph-calendar text-2xl"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-widest">ปฏิทิน</span>
+        </button>
+        
+        <a href="https://gemini.google.com" target="_blank" class="flex flex-col items-center gap-1 text-slate-400 hover:text-orange-500 group transition-colors">
+            <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center transition-all group-active:scale-90 group-hover:bg-orange-50">
+                <i class="ph-bold ph-chat-centered-text text-2xl"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-widest">คุยสนทนา</span>
+        </a>
+    </nav>
 
     <!-- Mobile-Optimized Dialog -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -169,11 +192,11 @@
             { word: "पानी (ปา-นี)", meaning: "น้ำ", english: "Water", icon: "💧", example: "मुझे पानी चाहिए।" },
             { word: "खाना (กา-นา)", meaning: "อาหาร", english: "Food", icon: "🍛", example: "खाना बहुत स्वादिष्ट है।" },
             { word: "चाय (ชาย)", meaning: "ชา", english: "Tea", icon: "☕", example: "एक कप चाय, प्लीज।" },
-            { word: "बहुत (บะ-ฮุต)", meaning: "มาก", english: "Very", icon: "📉", example: "आज बहुत गर्मी है।" },
+            { word: "बहुत (บะ-ฮุต)", meaning: "มาก", english: "Very", icon: "📈", example: "आज बहुत गर्मी है।" },
             { word: "सुंदर (ซุน-ดัร)", meaning: "สวย", english: "Beautiful", icon: "🌹", example: "यह बहुत सुंदर है।" },
             { word: "घर (กัร)", meaning: "บ้าน", english: "Home", icon: "🏠", example: "मैं घर जा रहा हूँ।" },
             { word: "समय (ซะ-มัย)", meaning: "เวลา", english: "Time", icon: "⏰", example: "क्या समय हुआ है?" },
-            { word: "सीखना (ซีค-นา)", meaning: "เรียนรู้", english: "Learn", icon: "🎓", example: "मैं हिंदी सीख रहा हूँ।" },
+            { word: "सीขना (ซีค-นา)", meaning: "เรียนรู้", english: "Learn", icon: "🎓", example: "मैं हिंदी सीख रहा हूँ।" },
             { word: "दोस्त (โดสต์)", meaning: "เพื่อน", english: "Friend", icon: "👫", example: "वह मेरा दोस्त है।" },
             { word: "शुभकामनाएं", meaning: "โชคดีนะ", english: "Best wishes", icon: "🍀", example: "आपको शुभकामनाएं।" },
             { word: "जल्दी (จัล-ดี)", meaning: "เร็วๆ", english: "Quickly", icon: "🏃", example: "जल्दी आओ!" },
@@ -182,7 +205,6 @@
             { word: "कितना?", meaning: "เท่าไหร่?", english: "How much?", icon: "💰", example: "इसका दाम कितना है?" },
             { word: "स्वाद", meaning: "รสชาติ", english: "Taste", icon: "👅", example: "इसका स्वाद अच्छा है।" },
             { word: "मदद", meaning: "ช่วย", english: "Help", icon: "🆘", example: "क्या आप मेरी मदद करेंगे?" }
-            // ... เพิ่มเติมตามความเหมาะสม
         ];
 
         function loadState() {
