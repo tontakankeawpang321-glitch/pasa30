@@ -56,7 +56,7 @@
         .today-pulse { animation: softPulse 2s infinite; }
     </style>
 </head>
-<body class="text-slate-800 p-3 sm:p-4 md:p-8 min-h-screen flex flex-col items-center overflow-x-hidden">
+<body class="text-slate-800 p-3 sm:p-4 md:p-8 pb-24 sm:pb-24 md:pb-32 min-h-screen flex flex-col items-center overflow-x-hidden">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
@@ -134,6 +134,29 @@
         </div>
 
     </div>
+
+    <!-- Bottom Navigation Bar (App-like) -->
+    <nav class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 transform-gpu shadow-[0_-5px_15px_rgba(0,0,0,0.03)]" style="padding-bottom: env(safe-area-inset-bottom);">
+        <div class="max-w-md mx-auto flex justify-around items-center px-4 py-2 md:py-3">
+            <!-- ปุ่ม ปฏิทิน -->
+            <!-- ใส่ URL หน้าปฏิทินแทนเครื่องหมาย # ได้เลย -->
+            <a href="#" target="_blank" class="flex flex-col items-center justify-center text-emerald-600 transition-colors active:scale-95 w-20 py-1">
+                <div class="relative">
+                    <i class="ph-fill ph-calendar text-2xl md:text-3xl mb-0.5"></i>
+                    <!-- จุดแจ้งเตือนสีทอง (แสดงว่าเป็นหน้าปัจจุบัน หรือมีอัปเดต) -->
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full border-2 border-white"></span>
+                </div>
+                <span class="text-[10px] md:text-xs font-bold font-sarabun mt-0.5">ปฏิทิน</span>
+            </a>
+            
+            <!-- ปุ่ม คุยสนทนา -->
+            <!-- ใส่ URL หน้าคุยสนทนาแทนเครื่องหมาย # ได้เลย -->
+            <a href="#" target="_blank" class="flex flex-col items-center justify-center text-slate-400 hover:text-emerald-500 transition-colors active:scale-95 w-20 py-1 group">
+                <i class="ph-bold ph-chats-circle text-2xl md:text-3xl mb-0.5 group-hover:scale-110 transition-transform"></i>
+                <span class="text-[10px] md:text-xs font-bold font-sarabun mt-0.5">คุยสนทนา</span>
+            </a>
+        </div>
+    </nav>
 
     <!-- Dialog / Modal for Vocabulary -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
