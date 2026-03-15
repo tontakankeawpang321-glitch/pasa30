@@ -472,17 +472,28 @@
                 recognition.stop();
             } else {
                 try {
-                    // Pre-request microphone permission to prevent 'not-allowed' error in embedded iframes
-                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    // ตรวจว่าอยู่ใน Android WebView ไหม
+                    const isAndroid = /Android/i.test(navigator.userAgent);
+                    
+                    if (!isAndroid && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        // Desktop browser เท่านั้น — ขอ permission ผ่าน getUserMedia
                         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        // We just need the permission check, so immediately stop tracks
                         stream.getTracks().forEach(track => track.stop());
                     }
                     
+                    // Android ข้ามมาตรงนี้เลย — ใช้ Android Bridge จัดการ permission
                     recognition.start();
                 } catch (e) {
                     console.error("Mic access error or already started:", e);
-                    statusText.innerText = "Mic access blocked. Please allow permissions.";
+                    if (e.name === 'NotFoundError') {
+                        statusText.innerText = "No microphone found.";
+                    } else if (e.name === 'NotAllowedError') {
+                        statusText.innerText = "Mic access blocked. Please allow permissions.";
+                    } else {
+                        statusText.innerText = "Mic error: " + (e.name || "Unknown");
+                    }
+                    
+                    // คืนค่าปุ่มไมค์กลับสู่สถานะปกติ
                     micBtn.classList.remove('pulse-animation');
                     micBtn.classList.replace('bg-red-500', 'bg-blue-600');
                 }
