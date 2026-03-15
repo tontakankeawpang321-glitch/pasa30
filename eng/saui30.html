@@ -490,17 +490,30 @@
         }
 
         function speakWord(word) {
-            // ใช้ Google Translate TTS API สำหรับภาษาอาหรับ (tl=ar)
-            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=ar&client=tw-ob`;
+            // หยุดเสียง Web Speech API เดิมที่อาจจะค้างอยู่
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+
+            // เปลี่ยน Endpoint เป็น translate.googleapis.com ซึ่งเสถียรกว่าและไม่ค่อยติดปัญหา Block/CORS
+            const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=ar&q=${encodeURIComponent(word)}`;
             const audio = new Audio(url);
             
             audio.play().catch(error => {
-                console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
+                console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้ ลองใช้เสียงสำรอง:", error);
                 // ระบบสำรอง: ใช้เสียงของเบราว์เซอร์ สำเนียงซาอุฯ (ar-SA)
                 if ('speechSynthesis' in window) {
                     const utterance = new SpeechSynthesisUtterance(word);
                     utterance.lang = 'ar-SA'; 
                     utterance.rate = 0.8; 
+                    
+                    // พยายามหาเสียงภาษาอาหรับในเครื่อง (เผื่อ OS ไม่รองรับ ar-SA ให้ใช้ ar แทน)
+                    const voices = window.speechSynthesis.getVoices();
+                    const arabicVoice = voices.find(voice => voice.lang.startsWith('ar'));
+                    if (arabicVoice) {
+                        utterance.voice = arabicVoice;
+                    }
+                    
                     window.speechSynthesis.speak(utterance);
                 }
             });
