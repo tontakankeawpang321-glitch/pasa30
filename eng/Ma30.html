@@ -55,7 +55,7 @@
         .today-pulse { animation: softPulse 2s infinite; }
     </style>
 </head>
-<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-slate-800 p-2 sm:p-4 md:p-8 pb-24 sm:pb-28 min-h-screen flex flex-col items-center">
 
     <div class="w-full max-w-4xl space-y-4 sm:space-y-6">
         
@@ -133,6 +133,29 @@
         </div>
 
     </div>
+
+    <!-- Bottom Navigation (App-like) -->
+    <nav class="fixed bottom-0 left-0 w-full z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)]">
+        <div class="max-w-md mx-auto px-6 py-2 sm:py-3 flex justify-around items-center">
+            <!-- Calendar Link (Active) -->
+            <a href="index.html" target="_blank" class="flex flex-col items-center gap-1 p-2 text-teal-600 transition-colors">
+                <div class="relative">
+                    <i class="ph-fill ph-calendar-blank text-2xl sm:text-3xl"></i>
+                    <!-- จุดไข่ปลาแสดงสถานะหน้าปัจจุบัน -->
+                    <span class="absolute -bottom-1.5 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-teal-500 rounded-full"></span>
+                </div>
+                <span class="text-[10px] sm:text-xs font-bold">ปฏิทิน</span>
+            </a>
+
+            <!-- Chat Link -->
+            <a href="chat.html" target="_blank" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-teal-500 transition-colors">
+                <div class="relative">
+                    <i class="ph-bold ph-chats text-2xl sm:text-3xl"></i>
+                </div>
+                <span class="text-[10px] sm:text-xs font-medium">คุยสนทนา</span>
+            </a>
+        </div>
+    </nav>
 
     <!-- Dialog / Modal for Vocabulary -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden flex items-center justify-center">
