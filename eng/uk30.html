@@ -41,7 +41,8 @@
         .wiggle-on-hover:hover { animation: wiggle 0.5s ease-in-out infinite; }
     </style>
 </head>
-<body class="text-slate-800 p-3 md:p-8 min-h-screen flex flex-col items-center">
+<!-- เพิ่ม pb-24 md:pb-28 เพื่อเว้นพื้นที่ให้ Bottom Nav ไม่บังปฏิทินแถวล่างสุด -->
+<body class="text-slate-800 p-3 md:p-8 pb-24 md:pb-28 min-h-screen flex flex-col items-center">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
@@ -140,15 +141,39 @@
             
             <!-- Modal Footer -->
             <div class="px-4 md:px-6 py-4 md:py-5 bg-white flex justify-end gap-2 md:gap-3 border-t border-slate-100">
-                <button onclick="closeDialog()" class="px-4 md:px-6 py-2.5 md:py-3 text-sm md:text-base text-slate-500 font-bold font-mali hover:bg-slate-100 rounded-xl md:rounded-2xl transition-colors">
-                    พักก่อน 😴
+                <button onclick="closeDialog()" class="px-4 md:px-6 py-2.5 md:py-3 text-sm md:text-base text-slate-600 font-medium hover:bg-slate-100 rounded-xl transition-colors">
+                    ปิดหน้าต่าง
                 </button>
-                <button id="btn-complete-day" class="px-5 md:px-8 py-2.5 md:py-3 text-sm md:text-base bg-gradient-to-r from-emerald-400 to-teal-500 text-white font-bold font-mali hover:from-emerald-500 hover:to-teal-600 rounded-xl md:rounded-2xl shadow-lg shadow-teal-500/30 transition-all active:scale-95 flex items-center gap-2">
-                    <i class="ph-bold ph-check-circle text-lg md:text-xl"></i> ท่องเสร็จแล้ว!
+                <button id="btn-complete-day" class="px-5 md:px-6 py-2.5 md:py-3 text-sm md:text-base bg-blue-600 text-white font-medium hover:bg-blue-700 rounded-xl shadow-md shadow-blue-600/20 transition-all active:scale-95 flex items-center gap-2">
+                    <i class="ph-bold ph-check-circle text-lg md:text-xl"></i> ท่องเสร็จแล้ว
                 </button>
             </div>
         </div>
     </div>
+
+    <!-- Bottom Navigation แบบแอพ -->
+    <nav class="fixed bottom-0 left-0 right-0 w-full bg-white/90 backdrop-blur-md border-t border-indigo-100 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-40">
+        <!-- ใส่ safe-area padding สำหรับมือถือที่มีขีดด้านล่าง (เช่น iPhone) -->
+        <div class="max-w-md mx-auto flex justify-evenly items-center py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+            
+            <!-- ปุ่มปฏิทิน (สถานะกำลังใช้งาน - สีเข้ม) -->
+            <a href="index.html" target="_blank" class="flex flex-col items-center justify-center w-full py-1 text-indigo-600 transition-all active:scale-95">
+                <div class="bg-indigo-50 p-1.5 rounded-2xl mb-0.5">
+                    <i class="ph-fill ph-calendar-check text-[26px]"></i>
+                </div>
+                <span class="text-[12px] font-bold font-mali leading-none mt-1">ปฏิทิน</span>
+            </a>
+            
+            <!-- ปุ่มคุยสนทนา (สถานะปกติ - สีอ่อน) -->
+            <a href="chat.html" target="_blank" class="flex flex-col items-center justify-center w-full py-1 text-slate-400 hover:text-indigo-500 transition-all active:scale-95 group">
+                <div class="p-1.5 rounded-2xl mb-0.5 group-hover:bg-indigo-50 transition-colors">
+                    <i class="ph ph-chat-teardrop-dots text-[26px] group-hover:fill-indigo-500"></i>
+                </div>
+                <span class="text-[12px] font-bold font-mali leading-none mt-1 group-hover:text-indigo-500">คุยสนทนา</span>
+            </a>
+            
+        </div>
+    </nav>
 
     <script>
         // --- Constants & Variables ---
@@ -366,12 +391,12 @@
             });
 
             if (isCompleted) {
-                btnComplete.innerHTML = `<i class="ph-bold ph-check text-lg md:text-xl"></i> ทบทวนเสร็จแล้ว`;
-                btnComplete.className = "px-5 md:px-8 py-2.5 md:py-3 text-sm md:text-base bg-gradient-to-r from-slate-400 to-slate-500 text-white font-bold font-mali hover:from-slate-500 hover:to-slate-600 rounded-xl md:rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-2";
+                btnComplete.innerHTML = `<i class="ph-bold ph-check text-lg md:text-xl"></i> ทบทวนเสร็จสิ้น (อ่านแล้ว)`;
+                btnComplete.className = "px-5 md:px-6 py-2.5 md:py-3 text-sm md:text-base bg-green-500 text-white font-medium hover:bg-green-600 rounded-xl shadow-md shadow-green-500/20 transition-all active:scale-95 flex items-center gap-2";
                 btnComplete.onclick = closeDialog;
             } else {
-                btnComplete.innerHTML = `<i class="ph-bold ph-star text-lg md:text-xl"></i> ท่องเสร็จแล้ว!`;
-                btnComplete.className = "px-5 md:px-8 py-2.5 md:py-3 text-sm md:text-base bg-gradient-to-r from-amber-400 to-orange-500 text-white font-bold font-mali hover:from-amber-500 hover:to-orange-600 rounded-xl md:rounded-2xl shadow-lg shadow-orange-500/30 transition-all active:scale-95 flex items-center gap-2";
+                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-lg md:text-xl"></i> ท่องเสร็จแล้ว (บันทึก)`;
+                btnComplete.className = "px-5 md:px-6 py-2.5 md:py-3 text-sm md:text-base bg-blue-600 text-white font-medium hover:bg-blue-700 rounded-xl shadow-md shadow-blue-600/20 transition-all active:scale-95 flex items-center gap-2";
                 btnComplete.onclick = markDayAsComplete;
             }
 
