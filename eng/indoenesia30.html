@@ -269,6 +269,7 @@
         }
 
         function closeDialog() { document.getElementById('vocab-dialog').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+        
         function markComplete() {
             if (selectedDateString && !appState.completedDates.includes(selectedDateString)) {
                 appState.completedDates.push(selectedDateString);
@@ -277,9 +278,20 @@
             }
             closeDialog();
         }
+
+        // แก้ไขระบบเสียงจาก Google Translate URL เป็น Web Speech API
         function speak(text) {
-            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=id&client=tw-ob`;
-            new Audio(url).play();
+            if ('speechSynthesis' in window) {
+                // ยกเลิกเสียงที่กำลังพูดอยู่ (ถ้ามี)
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID'; // กำหนดให้เป็นภาษาอินโดนีเซีย
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.error("เบราว์เซอร์นี้ไม่รองรับระบบ Speech Synthesis");
+            }
         }
 
         window.onload = () => { 
