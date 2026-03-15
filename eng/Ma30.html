@@ -184,11 +184,8 @@
         let currentDate = new Date(); 
         let today = new Date(); 
         let selectedDateString = null; 
+        let cachedVoices = [];
         
-        // --- Audio Manager (Optimized for Mobile) ---
-        // ใช้ Audio ออบเจ็กต์ตัวเดียวเพื่อประหยัดหน่วยความจำ และกันเสียงทับกัน
-        const globalAudio = new Audio();
-
         // --- State Management ---
         let appState = {
             completedDates: [] 
@@ -398,7 +395,7 @@
                                             <span>${v.myanmarOnly}</span>
                                             <span class="text-xs text-slate-400 font-normal mt-0.5">(${v.thaiReading})</span>
                                         </h4>
-                                        <button onclick="speakWord('${v.myanmarOnly}')" class="absolute top-0 right-0 bg-teal-50 text-teal-600 p-2 rounded-lg shadow-sm active:scale-90" title="ฟังเสียง">
+                                        <button onclick="speakWord('${v.myanmarOnly}', '${v.thaiReading}')" class="absolute top-0 right-0 bg-teal-50 text-teal-600 p-2 rounded-lg shadow-sm active:scale-90" title="ฟังเสียง">
                                             <i class="ph-fill ph-speaker-high text-lg"></i>
                                         </button>
                                     </div>
@@ -459,28 +456,45 @@
             closeDialog();
         }
 
-        function speakWord(word) {
-            // หยุดเสียงเดิมที่กำลังเล่น
-            globalAudio.pause();
-            globalAudio.currentTime = 0;
-
-            // บังคับใช้ API ของ Google เสมอ (ลบระบบของเครื่องทิ้งทั้งหมด เพื่อแก้ปัญหาเสียงเพี้ยน/โดนตัด)
-            // ใช้ client=gtx เป็นตัวหลัก เพราะเสถียรสุดบนอุปกรณ์พกพา
-            const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=my&q=${encodeURIComponent(word)}`;
-            globalAudio.src = url;
+        function speakWord(word, thaiReading = '') {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
             
-            globalAudio.play().catch(e => {
-                console.warn("Primary TTS failed, trying fallback...", e);
-                // ระบบสำรอง หากเซิร์ฟเวอร์หลักบล็อก 
-                const fallbackUrl = `https://translate.googleapis.com/translate_tts?client=tw-ob&ie=UTF-8&tl=my&q=${encodeURIComponent(word)}`;
-                globalAudio.src = fallbackUrl;
-                globalAudio.play().catch(err => console.error("All TTS options failed.", err));
-            });
+            const voices = cachedVoices.length > 0 
+                ? cachedVoices 
+                : window.speechSynthesis.getVoices();
+            
+            const myanmarVoice = voices.find(v => v.lang === 'my-MM') 
+                              || voices.find(v => v.lang.startsWith('my'));
+            const thaiVoice    = voices.find(v => v.lang === 'th-TH');
+            const fallback     = voices.find(v => v.lang === 'en-US') || voices[0];
+            
+            // ถ้ามีเสียงพม่า → อ่านพม่า
+            // ถ้ามีเสียงไทย → อ่านคำอ่านไทย
+            // ถ้าไม่มีเลย → อ่าน english fallback
+            const textToSpeak = myanmarVoice ? word 
+                              : thaiVoice    ? thaiReading 
+                              : word;
+            
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.rate = 0.7;
+            utterance.voice = myanmarVoice || thaiVoice || fallback;
+            
+            window.currentUtterance = utterance;
+            window.speechSynthesis.speak(utterance);
         }
 
         window.onload = () => {
             loadState();
             renderCalendar();
+            
+            const loadVoices = () => {
+                const v = window.speechSynthesis.getVoices();
+                if (v.length > 0) cachedVoices = v;
+            };
+            
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
         };
 
         document.addEventListener('keydown', (e) => {
