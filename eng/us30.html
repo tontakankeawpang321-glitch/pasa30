@@ -46,7 +46,7 @@
         .today-pulse { animation: softPulse 2s infinite; }
     </style>
 </head>
-<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-slate-800 p-2 sm:p-4 md:p-8 pb-24 md:pb-32 min-h-screen flex flex-col items-center">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
@@ -151,19 +151,33 @@
             </div>
             
             <!-- Modal Footer -->
-            <div class="px-4 md:px-8 py-4 md:py-5 border-t border-slate-200/60 bg-white flex justify-between items-center gap-3">
-                <div class="text-3xl hidden md:block">🎉</div>
-                <div class="flex gap-2 md:gap-3 w-full md:w-auto justify-end">
-                    <button onclick="closeDialog()" class="px-4 md:px-6 py-2.5 md:py-3 text-slate-600 font-bold text-sm md:text-base hover:bg-slate-100 rounded-xl md:rounded-2xl transition-colors">
-                        ปิดไว้ก่อน
-                    </button>
-                    <button id="btn-complete-day" class="px-5 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold hover:from-indigo-600 hover:to-violet-600 rounded-xl md:rounded-2xl shadow-lg shadow-indigo-500/30 transition-all active:scale-95 flex items-center gap-1.5 md:gap-2 text-sm md:text-lg">
-                        <i class="ph-bold ph-check-circle text-lg md:text-xl"></i> ท่องเสร็จแล้ว!
-                    </button>
-                </div>
+            <div class="px-4 md:px-8 py-4 md:py-5 border-t border-slate-200/60 bg-white flex justify-between items-center gap-4">
+                <button onclick="closeDialog()" class="flex flex-col items-center justify-center text-slate-500 font-bold text-sm md:text-base hover:bg-slate-50 px-2 py-2 rounded-xl transition-colors shrink-0 min-w-[80px]">
+                    พักก่อน <span class="text-xl mt-0.5">😴</span>
+                </button>
+                <button id="btn-complete-day" class="flex-1 py-3.5 md:py-4 bg-[#2C3345] text-white font-bold hover:bg-[#1E2532] rounded-xl md:rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 text-base md:text-lg">
+                    <i class="ph-bold ph-check text-xl"></i> ทบทวนเสร็จแล้ว
+                </button>
             </div>
         </div>
     </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.1)] z-40 pb-[env(safe-area-inset-bottom)]">
+        <div class="max-w-lg mx-auto flex justify-around items-center h-16 sm:h-20">
+            <!-- ปฏิทิน (สถานะกำลังเลือก) -->
+            <a href="index.html" target="_blank" class="flex flex-col items-center justify-center w-full h-full text-indigo-600 relative group">
+                <div class="absolute top-0 w-10 sm:w-12 h-1.5 bg-indigo-600 rounded-b-full"></div>
+                <i class="ph-fill ph-calendar-check text-2xl sm:text-3xl mb-0.5 sm:mb-1 group-hover:scale-110 transition-transform"></i>
+                <span class="text-[10px] sm:text-xs font-bold">ปฏิทิน</span>
+            </a>
+            <!-- คุยสนทนา -->
+            <a href="chat.html" target="_blank" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-indigo-500 transition-colors group">
+                <i class="ph-bold ph-chat-centered-dots text-2xl sm:text-3xl mb-0.5 sm:mb-1 group-hover:scale-110 transition-transform"></i>
+                <span class="text-[10px] sm:text-xs font-bold">คุยสนทนา</span>
+            </a>
+        </div>
+    </nav>
 
     <!-- Hidden Audio element for fallback TTS -->
     <audio id="fallback-audio" class="hidden"></audio>
@@ -410,12 +424,12 @@
             content.innerHTML = vocabHTML;
 
             if (isCompleted) {
-                btnComplete.innerHTML = `<i class="ph-bold ph-star text-yellow-300 text-lg md:text-xl"></i> ทบทวนเสร็จแล้ว (เยี่ยมมาก!)`;
-                btnComplete.className = "px-5 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-sm md:text-lg hover:from-emerald-600 hover:to-teal-600 rounded-xl md:rounded-2xl shadow-lg shadow-emerald-500/30 transition-all active:scale-95 flex items-center gap-1.5 md:gap-2";
+                btnComplete.innerHTML = `<i class="ph-bold ph-check text-lg md:text-xl"></i> ทบทวนเสร็จแล้ว`;
+                btnComplete.className = "flex-1 py-3.5 md:py-4 bg-[#4B5563] text-white/80 font-bold rounded-xl md:rounded-2xl shadow-sm flex items-center justify-center gap-1.5 md:gap-2 text-base md:text-lg cursor-default opacity-90";
                 btnComplete.onclick = closeDialog; 
             } else {
-                btnComplete.innerHTML = `<i class="ph-bold ph-check-circle text-lg md:text-xl"></i> ท่องเสร็จแล้ว!`;
-                btnComplete.className = "px-5 md:px-8 py-2.5 md:py-3 bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold text-sm md:text-lg hover:from-indigo-600 hover:to-violet-600 rounded-xl md:rounded-2xl shadow-lg shadow-indigo-500/30 transition-all active:scale-95 flex items-center gap-1.5 md:gap-2";
+                btnComplete.innerHTML = `<i class="ph-bold ph-check text-lg md:text-xl"></i> ทบทวนเสร็จแล้ว`;
+                btnComplete.className = "flex-1 py-3.5 md:py-4 bg-[#2C3345] text-white font-bold hover:bg-[#1E2532] rounded-xl md:rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 md:gap-2 text-base md:text-lg";
                 btnComplete.onclick = markDayAsComplete; 
             }
 
@@ -516,4 +530,4 @@
         });
     </script>
 </body>
-</html>    
+</html>
