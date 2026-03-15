@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- เพิ่ม meta referrer เพื่อป้องกัน Google API บล็อกคำขอเสียง (แก้ปัญหา NotSupportedError) -->
+    <meta name="referrer" content="no-referrer">
     <title>ท่องกัมพูชา — Calendar Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Fredoka:wght@400;500;600&family=Battambang:wght@400;700;900&display=swap" rel="stylesheet">
@@ -244,7 +246,7 @@
             { word: "សប្បាយ (ซับบาย)", meaning: "สนุก / ดีใจ", english: "Happy / Fun", icon: "😄", example: "ខ្ញុំសប្បាយចិត្តណាស់ដែលបានជួបអ្នក (ฉันดีใจมากที่ได้พบคุณ)" },
             { word: "ពិបាកចិត្ត (ปิบากจิด)", meaning: "เศร้า / กลุ้มใจ", english: "Sad", icon: "😢", example: "ហេតុអ្វីអ្នកពិបាកចិត្ត? (ทำไมคุณถึงเศร้า?)" },
             { word: "ចាំបន្តិច (จัมบันติจ)", meaning: "รอแป๊บหนึ่ง", english: "Wait a minute", icon: "⏱️", example: "ចាំបន្តិច ខ្ញុំចេញទៅឥឡូវហើយ (รอเดี๋ยวนะ ฉันกำลังออกไป)" },
-            { word: "ជួយខ្ញុំផង (จวยคญมพอง)", meaning: "ช่วยด้วย", english: "Help me", icon: "🆘", example: "សូមជួយខ្ញុំផង! (ได้โปรดช่วยฉันด้วย!)" },
+            { word: "ជួយខ្ញុំផង (จวยคญมพอง)", meaning: "ช่วยด้วย", english: "Help me", icon: "🆘", example: "សូមជួយខ្ញុំផង! (បានប្រោសជួយខ្ញុំផង!)" },
             { word: "នៅឯណា? (เนิวแอณา?)", meaning: "อยู่ที่ไหน?", english: "Where?", icon: "📍", example: "បន្ទប់ទឹកនៅឯណា? (ห้องน้ำอยู่ไหนคะ?)" },
             { word: "ពេលណា? (เปลณา?)", meaning: "เมื่อไหร่?", english: "When?", icon: "📅", example: "តើអ្នកទៅពេលណា? (คุณจะไปเมื่อไหร่?)" },
             { word: "អ្វី? (อฺเวย?)", meaning: "อะไร?", english: "What?", icon: "❓", example: "នេះជាអ្វី? (นี่คืออะไร?)" },
@@ -473,28 +475,38 @@
             closeDialog();
         }
 
-        function speakWord(word) {
-            // ใช้ Google Translate TTS API (endpoint: gtx) ซึ่งเป็น API ฟรีที่เสถียรกว่าและไม่ติดบล็อกง่าย
-            const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=km&q=${encodeURIComponent(word)}`;
-            const audio = new Audio(url);
-            
-            audio.play().catch(error => {
-                console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
+        function playFallbackTTS(word) {
+            if ('speechSynthesis' in window) {
+                // ยกเลิกเสียงที่กำลังพูดอยู่ (ถ้ามี)
+                window.speechSynthesis.cancel();
                 
-                // ระบบสำรอง (Fallback): ใช้เสียงของเบราว์เซอร์ (Web Speech API) ฟรี 100% ไม่จำกัดจำนวน
-                if ('speechSynthesis' in window) {
-                    // ยกเลิกเสียงที่กำลังพูดอยู่ (ถ้ามี)
-                    window.speechSynthesis.cancel();
-                    
-                    const utterance = new SpeechSynthesisUtterance(word);
-                    utterance.lang = 'km-KH'; // สำเนียงกัมพูชา
-                    utterance.rate = 0.85; // ปรับความเร็วให้ฟังง่ายขึ้นเล็กน้อย
-                    
-                    window.speechSynthesis.speak(utterance);
-                } else {
-                    alert("ขออภัย อุปกรณ์หรือเบราว์เซอร์ของคุณไม่รองรับระบบเสียง");
-                }
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'km-KH'; // สำเนียงกัมพูชา
+                utterance.rate = 0.85; // ปรับความเร็วให้ฟังง่ายขึ้นเล็กน้อย
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("ขออภัย อุปกรณ์หรือเบราว์เซอร์ของคุณไม่รองรับระบบเสียง");
+            }
+        }
+
+        function speakWord(word) {
+            // ใช้ Google Translate TTS API (เปลี่ยนเป็น tw-ob เพื่อเสถียรภาพในการเล่นผ่าน Web Audio)
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=km&client=tw-ob`;
+            const audio = new Audio();
+            audio.src = url;
+            
+            // พยายามเล่นเสียงจาก API
+            audio.play().catch(error => {
+                console.warn("ไม่สามารถเล่นเสียงจาก API ได้ กำลังสลับไปใช้ระบบสำรอง:", error);
+                playFallbackTTS(word);
             });
+
+            // ดักจับกรณีโหลด source ไม่ได้ (แก้ปัญหา Error สีแดงใน Console)
+            audio.onerror = () => {
+                console.warn("Media failed to load. Switching to browser TTS fallback.");
+                playFallbackTTS(word);
+            };
         }
 
         window.onload = () => {
