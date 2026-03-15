@@ -22,6 +22,8 @@
             background-size: 24px 24px, 100% 100%;
             background-attachment: fixed;
             -webkit-tap-highlight-color: transparent;
+            /* เพิ่ม padding ด้านล่างเพื่อให้แถบเมนูไม่บังเนื้อหา */
+            padding-bottom: 80px;
         }
 
         h1, h2, h3, .font-accent { font-family: 'Outfit', sans-serif; }
@@ -63,6 +65,11 @@
                 border: none;
             }
         }
+
+        /* Bottom Navigation Styling */
+        .bottom-nav {
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
 <body class="text-slate-800 p-3 md:p-8 min-h-screen flex flex-col items-center overflow-x-hidden">
@@ -99,8 +106,8 @@
             </div>
         </header>
 
-        <!-- Calendar -->
-        <main class="bg-white/90 backdrop-blur-md rounded-[2rem] p-4 md:p-8 shadow-xl shadow-blue-900/5 border border-white">
+        <!-- Calendar Section -->
+        <main id="view-calendar" class="bg-white/90 backdrop-blur-md rounded-[2rem] p-4 md:p-8 shadow-xl shadow-blue-900/5 border border-white">
             <div class="flex justify-between items-center mb-6 px-1">
                 <h2 id="month-year-display" class="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Month Year</h2>
                 <div class="flex gap-2 bg-slate-100 p-1 rounded-xl">
@@ -129,6 +136,22 @@
             </p>
         </footer>
     </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 z-40 px-6 py-2 pb-safe flex justify-around items-center h-20">
+        <button onclick="scrollToTop()" class="flex flex-col items-center gap-1 text-blue-600">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center transition-all active:scale-90">
+                <i class="ph-fill ph-calendar-blank text-2xl"></i>
+            </div>
+            <span class="text-[10px] font-bold">ปฏิทิน</span>
+        </button>
+        <button onclick="openChat()" class="flex flex-col items-center gap-1 text-slate-400">
+            <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center transition-all active:scale-90 active:bg-blue-50 active:text-blue-600">
+                <i class="ph-fill ph-chat-circle-dots text-2xl"></i>
+            </div>
+            <span class="text-[10px] font-bold">คุยสนทนา</span>
+        </button>
+    </nav>
 
     <!-- Modal Vocab -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden flex items-center justify-center p-0 sm:p-4">
@@ -305,6 +328,17 @@
 
         function changeMonth(dir) { currentDate.setMonth(currentDate.getMonth() + dir); renderCalendar(); }
         function goToToday() { currentDate = new Date(); renderCalendar(); }
+
+        // Navigation Functions
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openChat() {
+            // ใส่ URL สำหรับหน้าแชทหรือสนทนาที่ต้องการที่นี่
+            const chatUrl = "https://www.google.com"; // ตัวอย่าง URL
+            window.open(chatUrl, '_blank');
+        }
 
         window.onload = () => { loadState(); renderCalendar(); };
     </script>
