@@ -356,45 +356,48 @@
         }
 
         // --- 3. Cloudflare Worker API Call ---
-        async function askGemini(userText) {
-            try {
-                const payload = {
-                    model: "google/gemini-2.5-flash",  // หรือ model อื่นใน OpenRouter
-                    messages: [
-                        {
-                            role: "system",
-                            // ปรับ Prompt เป็นภาษาไทย
-                            content: "You are a 3D virtual assistant, a human female named 'Worker'. Answer questions using short, concise, natural, and friendly Thai language, as if talking to a friend. Keep it to 2-3 sentences maximum. Do not use Markdown or special characters."
-                        },
-                        {
-                            role: "user",
-                            content: userText
-                        }
-                    ]
-                };
-                let retries = 3;
-                while (retries > 0) {
-                    const response = await fetch(WORKER_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                            // ไม่ต้องใส่ API Key ที่นี่แล้ว (Worker จะเป็นคนจัดการใส่ API Key ให้)
-                        },
-                        body: JSON.stringify(payload)
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        return data.choices[0].message.content.trim();
-                    }
-                    retries--;
-                    await new Promise(r => setTimeout(r, 1000));
-                }
-                return "ขออภัยค่ะ ตอนนี้ระบบมีปัญหาเล็กน้อย ลองใหม่อีกครั้งนะคะ"; 
-            } catch (error) {
-                console.error("Worker API Error:", error);
-                return "ขออภัยค่ะ เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบค่ะ"; 
-            }
+       async function askGemini(userText) {
+    try {
+        const payload = {
+            model: "google/gemini-2.5-flash",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a 3D virtual assistant, a human female named 'Worker'. Answer questions using short, concise, natural, and friendly Thai language, as if talking to a friend. Keep it to 2-3 sentences maximum. Do not use Markdown or special characters."
+                },
+                { role: "user", content: userText }
+            ]
+        };
+
+        statusText.innerText = "Calling Worker..."; // เพิ่ม debug status
+
+        const response = await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        // ดู status code จริงๆ
+        console.log("Response status:", response.status);
+        statusText.innerText = "Status: " + response.status;
+
+        const raw = await response.text(); // อ่านเป็น text ก่อน
+        console.log("Raw response:", raw);
+
+        if (!response.ok) {
+            appendMessage('bot', "Error " + response.status + ": " + raw);
+            return "เกิดข้อผิดพลาด: " + response.status;
         }
+
+        const data = JSON.parse(raw);
+        return data.choices[0].message.content.trim();
+
+    } catch (error) {
+        console.error("Worker API Error:", error);
+        appendMessage('bot', "Fetch error: " + error.message);
+        return "ขออภัยค่ะ เกิดข้อผิดพลาดในการเชื่อมต่อค่ะ";
+    }
+}
 
         // --- 4. Text to Speech (TTS) Browser API (Free) ---
         function speakText(text) {
