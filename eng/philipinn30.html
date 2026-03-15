@@ -55,7 +55,7 @@
         .today-pulse { animation: softPulse 2s infinite; }
     </style>
 </head>
-<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-screen flex flex-col items-center pb-24 sm:pb-28 md:pb-32">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
@@ -128,11 +128,35 @@
         </div>
         
         <!-- Footer info -->
-        <div class="text-center text-slate-500 text-xs md:text-sm font-medium">
+        <div class="text-center text-slate-500 text-xs md:text-sm font-medium mb-4">
             <p>💡 Tip: กดที่วันที่เพื่อเริ่มท่องศัพท์ตากาล็อกได้เลย! (ลองกดฟังเสียงดูนะ)</p>
         </div>
 
     </div>
+
+    <!-- Bottom Navigation (App Style) -->
+    <nav class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-lg border-t border-amber-100 shadow-[0_-5px_20px_-5px_rgba(245,158,11,0.15)] z-40 pb-safe">
+        <div class="max-w-md mx-auto flex justify-around items-center h-16 sm:h-20 px-2">
+            <!-- ปุ่ม ปฏิทิน (Active) -->
+            <a href="index.html" target="_blank" class="flex flex-col items-center justify-center w-full h-full text-amber-600 transition-transform active:scale-95">
+                <div class="relative">
+                    <i class="ph-fill ph-calendar-check text-2xl sm:text-3xl"></i>
+                    <!-- จุดแจ้งเตือนสีส้มกะพริบ -->
+                    <span class="absolute -top-1 -right-1.5 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-orange-500"></span>
+                    </span>
+                </div>
+                <span class="text-[10px] sm:text-xs font-bold mt-1 font-target">ปฏิทิน</span>
+            </a>
+            
+            <!-- ปุ่ม คุยสนทนา (Inactive) -->
+            <a href="chat.html" target="_blank" class="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-amber-500 transition-all active:scale-95 group">
+                <i class="ph-bold ph-chats text-2xl sm:text-3xl group-hover:ph-fill transition-all"></i>
+                <span class="text-[10px] sm:text-xs font-bold mt-1 font-target">คุยสนทนา</span>
+            </a>
+        </div>
+    </nav>
 
     <!-- Dialog / Modal for Vocabulary -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
