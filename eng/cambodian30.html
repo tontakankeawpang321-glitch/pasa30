@@ -59,9 +59,12 @@
         * { -webkit-tap-highlight-color: transparent; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         @media (min-width: 640px) { .custom-scrollbar::-webkit-scrollbar { width: 8px; } }
+        
+        /* ระยะขอบล่างที่ปลอดภัยสำหรับมือถือจอไร้ขอบ (iPhone ฯลฯ) */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-screen flex flex-col items-center overflow-x-hidden selection:bg-orange-200 selection:text-orange-900">
+<body class="text-slate-800 p-2 sm:p-4 md:p-8 pb-24 md:pb-28 min-h-screen flex flex-col items-center overflow-x-hidden selection:bg-orange-200 selection:text-orange-900">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
@@ -498,5 +501,23 @@
             }
         });
     </script>
+
+    <!-- Bottom Navigation App Bar -->
+    <div class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-orange-100 shadow-[0_-10px_30px_-15px_rgba(245,158,11,0.2)] z-40 pb-safe">
+        <div class="max-w-md mx-auto flex justify-evenly px-2 py-2">
+            <!-- Calendar Link (ปฏิทิน) -->
+            <a href="index.html" target="_blank" class="flex flex-col items-center gap-1 p-2 text-orange-500 w-24 rounded-2xl hover:bg-orange-50 transition-all active:scale-95 touch-manipulation">
+                <i class="ph-fill ph-calendar-check text-2xl sm:text-3xl"></i>
+                <span class="text-[10px] sm:text-xs font-bold tracking-wide">ปฏิทิน</span>
+            </a>
+            
+            <!-- Chat / Conversation Link (คุยสนทนา) -->
+            <!-- *ใส่ url ของหน้าแชทตรง href="chat.html"* -->
+            <a href="chat.html" target="_blank" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-orange-500 w-24 rounded-2xl hover:bg-orange-50 transition-all active:scale-95 touch-manipulation">
+                <i class="ph-fill ph-chats-circle text-2xl sm:text-3xl"></i>
+                <span class="text-[10px] sm:text-xs font-bold tracking-wide">คุยสนทนา</span>
+            </a>
+        </div>
+    </div>
 </body>
 </html>
