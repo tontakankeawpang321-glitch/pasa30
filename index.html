@@ -201,6 +201,13 @@
                     <div class="relative flex flex-col">
                         <textarea id="text-source" class="w-full h-36 md:h-48 p-4 pb-16 bg-white/60 border border-slate-300 rounded-xl outline-none resize-none text-base md:text-xl placeholder:text-slate-400 placeholder:italic focus:border-slate-500 transition-colors shadow-inner" placeholder="ป้อนข้อความ..."></textarea>
                         
+                        <!-- ปุ่มไมโครโฟนพิมพ์ด้วยเสียง -->
+                        <button id="btn-mic" class="absolute bottom-3 left-3 bg-slate-200 text-slate-700 p-2.5 rounded-full hover:bg-slate-300 active:scale-95 transition-all shadow-sm z-10" title="พิมพ์ด้วยเสียง">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                        </button>
+
                         <button id="btn-translate" class="absolute bottom-3 right-3 bg-slate-800 text-white px-4 py-2.5 md:px-5 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-slate-700 active:scale-95 transition-all shadow-md z-10">
                             แปลภาษา
                         </button>
@@ -208,10 +215,17 @@
                     
                     <!-- Target Output -->
                     <div class="relative flex flex-col">
-                        <div id="text-target" class="w-full h-36 md:h-48 p-4 bg-slate-100/50 border border-slate-300 rounded-xl overflow-y-auto text-base md:text-xl text-slate-800 italic shadow-inner">
+                        <div id="text-target" class="w-full h-36 md:h-48 p-4 pb-16 bg-slate-100/50 border border-slate-300 rounded-xl overflow-y-auto text-base md:text-xl text-slate-800 italic shadow-inner">
                             <span class="text-slate-400 opacity-60">คำแปลจะปรากฏที่นี่...</span>
                         </div>
                         
+                        <!-- ปุ่มฟังเสียง (Text-to-Speech) -->
+                        <button id="btn-speak-target" class="absolute bottom-3 left-3 bg-slate-200 text-slate-700 p-2.5 rounded-full hover:bg-slate-300 active:scale-95 transition-all shadow-sm z-10" title="อ่านออกเสียงคำแปล">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+                            </svg>
+                        </button>
+
                         <!-- Loading Indicator -->
                         <div id="translate-loading" class="hidden absolute inset-0 bg-slate-100/80 rounded-xl flex items-center justify-center z-20">
                             <svg class="animate-spin h-8 w-8 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -440,7 +454,10 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!response.ok) throw new Error("API Error");
+                    if (!response.ok) {
+                        if (response.status === 403) throw new Error("403 Forbidden");
+                        throw new Error("API Error");
+                    }
 
                     const result = await response.json();
                     
@@ -457,7 +474,12 @@
                 } catch (error) {
                     console.error("Image translation error:", error);
                     textSource.value = "เกิดข้อผิดพลาดในการอ่านรูปภาพ";
-                    textTarget.innerHTML = `<span class="text-red-500">ไม่สามารถเชื่อมต่อระบบวิเคราะห์รูปภาพได้</span>`;
+                    
+                    if (error.message.includes("403")) {
+                        textTarget.innerHTML = `<span class="text-red-500">ข้อผิดพลาด 403: กรุณาใส่ API Key ของ Gemini ในโค้ด (บรรทัด const apiKey = "") หากนำไปรันบนเซิร์ฟเวอร์ของคุณเอง</span>`;
+                    } else {
+                        textTarget.innerHTML = `<span class="text-red-500">ไม่สามารถเชื่อมต่อระบบวิเคราะห์รูปภาพได้</span>`;
+                    }
                 } finally {
                     textSource.placeholder = "ป้อนข้อความ...";
                     translateLoading.classList.add('hidden');
@@ -521,6 +543,102 @@
                 translateLoading.classList.add('hidden');
             }
         });
+
+        // --- 4.1 Speech to Text (พิมพ์ด้วยเสียง) ---
+        const btnMic = document.getElementById('btn-mic');
+        let recognition = null;
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                btnMic.classList.remove('bg-slate-200', 'text-slate-700');
+                btnMic.classList.add('bg-red-500', 'text-white', 'animate-pulse');
+                textSource.placeholder = "กำลังฟังเสียงของคุณ...";
+            };
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                textSource.value += (textSource.value ? ' ' : '') + transcript;
+            };
+
+            recognition.onerror = function(event) {
+                console.error("เกิดข้อผิดพลาดในการรับเสียง", event.error);
+                resetMicUI();
+            };
+
+            recognition.onend = function() {
+                resetMicUI();
+            };
+
+            btnMic.addEventListener('click', () => {
+                let langCode = selSource.value;
+                if (langCode === 'th') langCode = 'th-TH';
+                else if (langCode === 'en') langCode = 'en-US';
+                
+                recognition.lang = langCode;
+
+                try {
+                    recognition.start();
+                } catch (e) {
+                    recognition.stop();
+                }
+            });
+        } else if (btnMic) {
+            btnMic.style.display = 'none';
+        }
+
+        function resetMicUI() {
+            if (btnMic) {
+                btnMic.classList.add('bg-slate-200', 'text-slate-700');
+                btnMic.classList.remove('bg-red-500', 'text-white', 'animate-pulse');
+            }
+            textSource.placeholder = "ป้อนข้อความ...";
+        }
+
+        // --- 4.2 Text to Speech (อ่านออกเสียงข้อความที่แปลแล้ว) ---
+        const btnSpeakTarget = document.getElementById('btn-speak-target');
+        if (btnSpeakTarget) {
+            btnSpeakTarget.addEventListener('click', () => {
+                const textToSpeak = textTarget.innerText.trim();
+                if (!textToSpeak || textToSpeak === 'คำแปลจะปรากฏที่นี่...') return;
+
+                let langCode = selTarget.value;
+                // ปรับรหัสภาษาให้ API ออกเสียงได้ตรงตามประเทศ
+                if (langCode === 'th') langCode = 'th-TH';
+                else if (langCode === 'en') langCode = 'en-US';
+                else if (langCode === 'zh') langCode = 'zh-CN';
+                else if (langCode === 'ja') langCode = 'ja-JP';
+
+                // ใช้ Web Speech API (TTS ในตัวเบราว์เซอร์ ใช้ฟรีและเป็นของ Google หากรันบน Chrome/Android)
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel(); 
+                    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                    utterance.lang = langCode;
+                    utterance.rate = 0.9;
+                    
+                    // ใส่แอนิเมชันกระพริบสีฟ้าให้ปุ่มเวลาอ่าน
+                    btnSpeakTarget.classList.add('bg-blue-500', 'text-white', 'animate-pulse');
+                    btnSpeakTarget.classList.remove('bg-slate-200', 'text-slate-700');
+                    
+                    utterance.onend = () => {
+                        btnSpeakTarget.classList.remove('bg-blue-500', 'text-white', 'animate-pulse');
+                        btnSpeakTarget.classList.add('bg-slate-200', 'text-slate-700');
+                    };
+                    
+                    utterance.onerror = () => {
+                        btnSpeakTarget.classList.remove('bg-blue-500', 'text-white', 'animate-pulse');
+                        btnSpeakTarget.classList.add('bg-slate-200', 'text-slate-700');
+                    };
+
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    alert("เบราว์เซอร์ของคุณไม่รองรับระบบเสียงอ่าน (Text-to-Speech)");
+                }
+            });
+        }
 
         // --- 5. Chatbot Setup ---
         const WORKER_URL = "https://your-worker-name.your-subdomain.workers.dev";
