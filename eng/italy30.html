@@ -54,9 +54,14 @@
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
         .today-pulse { animation: pulse-red 2s infinite; }
+
+        /* Bottom Nav shadow */
+        .nav-shadow {
+            box-shadow: 0 -4px 20px -5px rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
-<body class="text-stone-800 p-3 sm:p-6 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-stone-800 p-3 sm:p-6 md:p-8 min-h-screen flex flex-col items-center pb-24 sm:pb-32">
 
     <div class="w-full max-w-4xl space-y-4 sm:space-y-8">
         
@@ -132,6 +137,23 @@
         </div>
     </div>
 
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-stone-100 flex justify-around items-center px-4 py-3 pb-safe z-40 nav-shadow">
+        <button onclick="location.reload()" class="flex flex-col items-center gap-1 text-emerald-600 group">
+            <div class="p-1 sm:p-2 rounded-2xl bg-emerald-50 group-active:scale-90 transition-transform">
+                <i class="ph-fill ph-calendar-blank text-2xl sm:text-3xl"></i>
+            </div>
+            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-widest">ปฏิทิน</span>
+        </button>
+        
+        <a href="https://example.com/conversation" target="_blank" class="flex flex-col items-center gap-1 text-stone-400 hover:text-rose-500 group">
+            <div class="p-1 sm:p-2 rounded-2xl bg-transparent group-active:scale-90 transition-transform">
+                <i class="ph-fill ph-chats-circle text-2xl sm:text-3xl"></i>
+            </div>
+            <span class="text-[10px] sm:text-xs font-bold uppercase tracking-widest">คุยสนทนา</span>
+        </a>
+    </nav>
+
     <!-- Modal -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden flex items-center justify-center">
         <div class="absolute inset-0 bg-stone-900/60 backdrop-blur-sm" onclick="closeDialog()"></div>
@@ -184,7 +206,7 @@
             localStorage.setItem('italian_calendar_v1', JSON.stringify(appState));
         }
 
-        // Vocabulary Pool (Same as before)
+        // Vocabulary Pool
         const vocabPool = [
             { word: "Ciao (เชา)", meaning: "สวัสดี / ลาก่อน", english: "Hello / Goodbye", icon: "👋", example: "Ciao! Come stai? (สวัสดี! สบายดีไหม?)" },
             { word: "Grazie (กราตเซีย)", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Grazie mille per l'aiuto. (ขอบคุณมากๆ สำหรับความช่วยเหลือ)" },
@@ -227,7 +249,7 @@
             { word: "Mare (มาเร)", meaning: "ทะเล", english: "Sea", icon: "🌊", example: "Andiamo al mare? (พวกเราไปทะเลกันไหม?)" },
             { word: "Sole (โซเล)", meaning: "ดวงอาทิตย์", english: "Sun", icon: "☀️", example: "C'è un bel sole oggi. (วันนี้แดดดีมาก)" },
             { word: "Luna (ลูนา)", meaning: "ดวงจันทร์", english: "Moon", icon: "🌙", example: "Guarda la luna! (ดูดวงจันทร์สิ!)" },
-            { word: "Tempo (เตมโป)", meaning: "เวลา / อากาศ", english: "Time / Weather", icon: "🕒", example: "Non ho tempoวันนี้ (Non ho tempo oggi.)" },
+            { word: "Tempo (เตมโป)", meaning: "เวลา / อากาศ", english: "Time / Weather", icon: "🕒", example: "Non ho tempo oggi. (Non ho tempo oggi.)" },
             { word: "Soldi (โซลดี้)", meaning: "เงิน", english: "Money", icon: "💸", example: "Non ho molti soldi. (ฉันไม่มีเงินเยอะหรอกนะ)" },
             { word: "Lavoro (ลาโวโร)", meaning: "งาน", english: "Work", icon: "💼", example: "Vado al lavoro. (ฉันไปทำงานก่อนนะ)" },
             { word: "Scuola (สกูโอลา)", meaning: "โรงเรียน", english: "School", icon: "🏫", example: "I bambini vanno a scuola. (เด็กๆ ไปโรงเรียน)" },
