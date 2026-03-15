@@ -59,9 +59,12 @@
         
         /* Lock body scroll when modal open */
         body.modal-open { overflow: hidden; touch-action: none; }
+        
+        /* Safe area for mobile nav */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
-<body class="text-slate-800 p-3 sm:p-4 md:p-8 min-h-screen flex flex-col items-center selection:bg-rose-200">
+<body class="text-slate-800 p-3 sm:p-4 md:p-8 pb-24 sm:pb-28 md:pb-32 min-h-screen flex flex-col items-center selection:bg-rose-200">
 
     <div class="w-full max-w-4xl space-y-4 sm:space-y-6">
         
@@ -181,6 +184,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-rose-100 shadow-[0_-10px_40px_-15px_rgba(225,29,72,0.15)] z-40 pb-safe">
+        <div class="max-w-md mx-auto px-2 h-16 sm:h-20 flex justify-around items-center">
+            <!-- ปุ่ม ปฏิทิน -->
+            <a href="index.html" target="_blank" class="flex-1 flex flex-col items-center justify-center h-full text-rose-500 group">
+                <div class="flex flex-col items-center justify-center transition-transform active:scale-90">
+                    <i class="ph-fill ph-calendar-heart text-2xl sm:text-3xl mb-0.5 group-hover:-translate-y-1 transition-transform"></i>
+                    <span class="text-[10px] sm:text-xs font-bold">ปฏิทิน</span>
+                </div>
+            </a>
+            <!-- ปุ่ม คุยสนทนา -->
+            <a href="chat.html" target="_blank" class="flex-1 flex flex-col items-center justify-center h-full text-slate-400 hover:text-rose-400 transition-colors group">
+                <div class="flex flex-col items-center justify-center transition-transform active:scale-90">
+                    <i class="ph-bold ph-chat-teardrop-dots text-2xl sm:text-3xl mb-0.5 group-hover:-translate-y-1 transition-transform"></i>
+                    <span class="text-[10px] sm:text-xs font-bold">คุยสนทนา</span>
+                </div>
+            </a>
+        </div>
+    </nav>
 
     <script>
         // --- Constants & Variables ---
