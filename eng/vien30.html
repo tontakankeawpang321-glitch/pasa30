@@ -59,9 +59,16 @@
             overscroll-behavior-y: contain;
             -webkit-overflow-scrolling: touch;
         }
+
+        /* Safe area padding for mobile app nav */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .nav-safe-bottom {
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+        }
     </style>
 </head>
-<body class="text-slate-800 p-2 sm:p-4 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-slate-800 p-2 sm:p-4 md:p-8 pb-28 md:pb-32 min-h-screen flex flex-col items-center">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
@@ -140,6 +147,29 @@
 
     </div>
 
+    <!-- Bottom Navigation App-like -->
+    <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-xl border-t border-emerald-100 shadow-[0_-10px_40px_-10px_rgba(16,185,129,0.15)] z-40 nav-safe-bottom">
+        <div class="max-w-md mx-auto flex justify-around items-center px-4 py-2 md:py-3">
+            
+            <!-- Calendar Button (Active state) -->
+            <a href="calendar_page.html" target="_blank" class="flex flex-col items-center justify-center w-20 group transition-all active:scale-95 cursor-pointer">
+                <div class="bg-gradient-to-tr from-emerald-400 to-teal-400 text-white p-2.5 rounded-2xl shadow-md shadow-emerald-200 mb-1">
+                    <i class="ph-fill ph-calendar-check text-2xl"></i>
+                </div>
+                <span class="text-[10px] md:text-xs font-bold text-emerald-600">ปฏิทิน</span>
+            </a>
+
+            <!-- Chat Button (Inactive state) -->
+            <a href="chat_page.html" target="_blank" class="flex flex-col items-center justify-center w-20 group transition-all active:scale-95 cursor-pointer">
+                <div class="text-slate-400 p-2.5 rounded-2xl group-hover:bg-emerald-50 group-hover:text-emerald-500 transition-colors mb-1">
+                    <i class="ph-bold ph-chats-circle text-2xl"></i>
+                </div>
+                <span class="text-[10px] md:text-xs font-medium text-slate-500 group-hover:text-emerald-600">คุยสนทนา</span>
+            </a>
+
+        </div>
+    </nav>
+
     <!-- Dialog / Modal for Vocabulary -->
     <div id="vocab-dialog" class="fixed inset-0 z-50 hidden">
         <!-- Backdrop -->
@@ -208,58 +238,58 @@
             localStorage.setItem('vietnamese_calendar_v1', JSON.stringify(appState));
         }
 
-        // --- Vocabulary Pool (ภาษาเวียดนาม) ---
+        // --- Vocabulary Pool (ภาษาเวียดนาม) - ปรับปรุงเสียงคำอ่านให้แม่นยำขึ้น ---
         const vocabPool = [
-            { word: "Xin chào (ซินจ่าว)", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Xin chào, rất vui được gặp bạn. (สวัสดี ยินดีที่ได้รู้จัก)" },
-            { word: "Cảm ơn (ก๋ามเอิน)", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Cảm ơn bạn rất nhiều. (ขอบคุณมากๆ)" },
-            { word: "Xin lỗi (ซินโหลย)", meaning: "ขอโทษ", english: "Sorry", icon: "🥺", example: "Xin lỗi vì tôi đến trễ. (ขอโทษที่ฉันมาสาย)" },
-            { word: "Vâng / Dạ (เวิง / หยะ)", meaning: "ใช่ / ครับ,ค่ะ", english: "Yes", icon: "👍", example: "Dạ, tôi hiểu rồi. (ค่ะ ฉันเข้าใจแล้ว)" },
+            { word: "Xin chào (ซิน จ่าว)", meaning: "สวัสดี", english: "Hello", icon: "👋", example: "Xin chào, rất vui được gặp bạn. (สวัสดี ยินดีที่ได้รู้จัก)" },
+            { word: "Cảm ơn (ก๋าม เอิน)", meaning: "ขอบคุณ", english: "Thank you", icon: "🙏", example: "Cảm ơn bạn rất nhiều. (ขอบคุณมากๆ)" },
+            { word: "Xin lỗi (ซิน โหลย)", meaning: "ขอโทษ", english: "Sorry", icon: "🥺", example: "Xin lỗi vì tôi đến trễ. (ขอโทษที่ฉันมาสาย)" },
+            { word: "Vâng / Dạ (เวิง / ย่ะ)", meaning: "ใช่ / ครับ,ค่ะ", english: "Yes", icon: "👍", example: "Dạ, tôi hiểu rồi. (ค่ะ ฉันเข้าใจแล้ว)" },
             { word: "Không (คง)", meaning: "ไม่", english: "No", icon: "👎", example: "Không, cảm ơn. (ไม่ครับ/ค่ะ ขอบคุณ)" },
-            { word: "Tạm biệt (ต๋ามเบียต)", meaning: "ลาก่อน", english: "Goodbye", icon: "👋", example: "Tạm biệt, hẹn gặp lại! (ลาก่อน ไว้พบกันใหม่!)" },
-            { word: "Bao nhiêu tiền? (บาวเญียวเตี่ยน?)", meaning: "เท่าไหร่?", english: "How much?", icon: "💰", example: "Cái này bao nhiêu tiền? (อันนี้ราคาเท่าไหร่?)" },
-            { word: "Mắc quá (มักกว๊า)", meaning: "แพงไป", english: "Too expensive", icon: "💸", example: "Cái này mắc quá! (อันนี้แพงเกินไป!)" },
-            { word: "Rẻ (แระ)", meaning: "ถูก (ราคา)", english: "Cheap", icon: "🏷️", example: "Ở đây bán rất rẻ. (ที่นี่ขายถูกมาก)" },
-            { word: "Tên bạn là gì? (เตนบานหล่าสี่?)", meaning: "คุณชื่ออะไร?", english: "What's your name?", icon: "📛", example: "Xin lỗi, tên bạn là gì? (ขอโทษนะคะ คุณชื่ออะไร?)" },
-            { word: "Tôi tên là... (ตอยเตนหล่า...)", meaning: "ฉันชื่อ...", english: "My name is...", icon: "👤", example: "Tôi tên là Nam. (ฉันชื่อนาม)" },
-            { word: "Bạn khỏe không? (บานแขวคง?)", meaning: "สบายดีไหม?", english: "How are you?", icon: "😊", example: "Lâu quá không gặp, bạn khỏe không? (ไม่เจอกันนาน สบายดีไหม?)" },
-            { word: "Tôi khỏe (ตอยแขว)", meaning: "ฉันสบายดี", english: "I'm fine", icon: "💪", example: "Tôi khỏe, cảm ơn bạn. (ฉันสบายดี ขอบคุณค่ะ)" },
-            { word: "Bạn ăn cơm chưa? (บานอันเกิมเจือ?)", meaning: "กินข้าวหรือยัง?", english: "Have you eaten?", icon: "🍚", example: "Trưa nay bạn ăn cơm chưa? (เที่ยงนี้กินข้าวหรือยัง?)" },
-            { word: "Ngon lắm (งอนล้ำ)", meaning: "อร่อยมาก", english: "Very delicious", icon: "😋", example: "Món này ngon lắm! (อาหารจานนี้อร่อยมาก!)" },
-            { word: "Nước (เนือก)", meaning: "น้ำ", english: "Water", icon: "💧", example: "Cho tôi một ly nước. (ขอน้ำให้ฉันหนึ่งแก้ว)" },
-            { word: "Cà phê (ก่าเฟ)", meaning: "กาแฟ", english: "Coffee", icon: "☕", example: "Tôi thích uống cà phê sữa đá. (ฉันชอบดื่มกาแฟใส่นมใส่น้ำแข็ง)" },
-            { word: "Trà sữa (จ่าเสือ)", meaning: "ชานม", english: "Milk tea", icon: "🧋", example: "Đi uống trà sữa không? (ไปกินชานมไข่มุกไหม?)" },
+            { word: "Tạm biệt (ต่าม เบียต)", meaning: "ลาก่อน", english: "Goodbye", icon: "👋", example: "Tạm biệt, hẹn gặp lại! (ลาก่อน ไว้พบกันใหม่!)" },
+            { word: "Bao nhiêu tiền? (บาว เญียว เตี่ยน?)", meaning: "เท่าไหร่?", english: "How much?", icon: "💰", example: "Cái này bao nhiêu tiền? (อันนี้ราคาเท่าไหร่?)" },
+            { word: "Mắc quá (มั๊ก กว๊า)", meaning: "แพงไป", english: "Too expensive", icon: "💸", example: "Cái này mắc quá! (อันนี้แพงเกินไป!)" },
+            { word: "Rẻ (แร๋)", meaning: "ถูก (ราคา)", english: "Cheap", icon: "🏷️", example: "Ở đây bán rất rẻ. (ที่นี่ขายถูกมาก)" },
+            { word: "Tên bạn là gì? (เตน บ่าน หล่า หยี่?)", meaning: "คุณชื่ออะไร?", english: "What's your name?", icon: "📛", example: "Xin lỗi, tên bạn là gì? (ขอโทษนะคะ คุณชื่ออะไร?)" },
+            { word: "Tôi tên là... (ตอย เตน หล่า...)", meaning: "ฉันชื่อ...", english: "My name is...", icon: "👤", example: "Tôi tên là Nam. (ฉันชื่อนาม)" },
+            { word: "Bạn khỏe không? (บ่าน แขว๋ คง?)", meaning: "สบายดีไหม?", english: "How are you?", icon: "😊", example: "Lâu quá không gặp, bạn khỏe không? (ไม่เจอกันนาน สบายดีไหม?)" },
+            { word: "Tôi khỏe (ตอย แขว๋)", meaning: "ฉันสบายดี", english: "I'm fine", icon: "💪", example: "Tôi khỏe, cảm ơn bạn. (ฉันสบายดี ขอบคุณค่ะ)" },
+            { word: "Bạn ăn cơm chưa? (บ่าน อัน เกิม เจือ?)", meaning: "กินข้าวหรือยัง?", english: "Have you eaten?", icon: "🍚", example: "Trưa nay bạn ăn cơm chưa? (เที่ยงนี้กินข้าวหรือยัง?)" },
+            { word: "Ngon lắm (งอน ลั้ม)", meaning: "อร่อยมาก", english: "Very delicious", icon: "😋", example: "Món này ngon lắm! (อาหารจานนี้อร่อยมาก!)" },
+            { word: "Nước (เนื้อก)", meaning: "น้ำ", english: "Water", icon: "💧", example: "Cho tôi một ly nước. (ขอน้ำให้ฉันหนึ่งแก้ว)" },
+            { word: "Cà phê (ก่า เฟ)", meaning: "กาแฟ", english: "Coffee", icon: "☕", example: "Tôi thích uống cà phê sữa đá. (ฉันชอบดื่มกาแฟใส่นมใส่น้ำแข็ง)" },
+            { word: "Trà sữa (จ่า เสื้อ)", meaning: "ชานม", english: "Milk tea", icon: "🧋", example: "Đi uống trà sữa không? (ไปกินชานมไข่มุกไหม?)" },
             { word: "Phở (เฝอ)", meaning: "ก๋วยเตี๋ยวเฝอ", english: "Pho noodles", icon: "🍜", example: "Tôi muốn ăn phở bò. (ฉันอยากกินเฝอเนื้อ)" },
-            { word: "Bánh mì (บั๊ญหมี่)", meaning: "แซนด์วิชเวียดนาม", english: "Banh mi", icon: "🥖", example: "Bánh mì Việt Nam rất ngon. (บั๊ญหมี่เวียดนามอร่อยมาก)" },
-            { word: "Đi chơi (ดีเจอย)", meaning: "ไปเที่ยว / ไปเล่น", english: "Go out", icon: "🚶", example: "Cuối tuần mình đi chơi nhé. (สุดสัปดาห์ไปเที่ยวกันเถอะ)" },
-            { word: "Đẹp quá (แด็บกว๊า)", meaning: "สวยมาก", english: "So beautiful", icon: "✨", example: "Cảnh ở đây đẹp quá. (วิวที่นี่สวยมากเลย)" },
-            { word: "Tôi yêu bạn (ตอยเอียวบาน)", meaning: "ฉันรักคุณ", english: "I love you", icon: "❤️", example: "Tôi yêu bạn rất nhiều. (ฉันรักคุณมากๆ)" },
-            { word: "Nhớ bạn (เญ้อบาน)", meaning: "คิดถึงคุณ", english: "Miss you", icon: "💭", example: "Tôi rất nhớ bạn. (ฉันคิดถึงคุณมาก)" },
-            { word: "Đói bụng (ด๊อยบุง)", meaning: "หิวข้าว", english: "Hungry", icon: "🤤", example: "Tôi đói bụng rồi. (ฉันหิวข้าวแล้ว)" },
-            { word: "Mệt (เมต)", meaning: "เหนื่อย", english: "Tired", icon: "😩", example: "Hôm nay tôi rất mệt. (วันนี้ฉันเหนื่อยมาก)" },
+            { word: "Bánh mì (บั๊ญ หมี่)", meaning: "แซนด์วิชเวียดนาม", english: "Banh mi", icon: "🥖", example: "Bánh mì Việt Nam rất ngon. (บั๊ญหมี่เวียดนามอร่อยมาก)" },
+            { word: "Đi chơi (ดี เจอย)", meaning: "ไปเที่ยว / ไปเล่น", english: "Go out", icon: "🚶", example: "Cuối tuần mình đi chơi nhé. (สุดสัปดาห์ไปเที่ยวกันเถอะ)" },
+            { word: "Đẹp quá (แด็บ กว๊า)", meaning: "สวยมาก", english: "So beautiful", icon: "✨", example: "Cảnh ở đây đẹp quá. (วิวที่นี่สวยมากเลย)" },
+            { word: "Tôi yêu bạn (ตอย เอียว บ่าน)", meaning: "ฉันรักคุณ", english: "I love you", icon: "❤️", example: "Tôi yêu bạn rất nhiều. (ฉันรักคุณมากๆ)" },
+            { word: "Nhớ bạn (เญ้อ บ่าน)", meaning: "คิดถึงคุณ", english: "Miss you", icon: "💭", example: "Tôi rất nhớ bạn. (ฉันคิดถึงคุณมาก)" },
+            { word: "Đói bụng (ด๊อย บุ่ง)", meaning: "หิวข้าว", english: "Hungry", icon: "🤤", example: "Tôi đói bụng rồi. (ฉันหิวข้าวแล้ว)" },
+            { word: "Mệt (เหม็ด)", meaning: "เหนื่อย", english: "Tired", icon: "😩", example: "Hôm nay tôi rất mệt. (วันนี้ฉันเหนื่อยมาก)" },
             { word: "Nóng (น๊อง)", meaning: "ร้อน", english: "Hot", icon: "🥵", example: "Thời tiết hôm nay nóng quá. (อากาศวันนี้ร้อนจัง)" },
-            { word: "Lạnh (หลั่น)", meaning: "หนาว", english: "Cold", icon: "🥶", example: "Bên ngoài rất lạnh. (ข้างนอกหนาวมาก)" },
+            { word: "Lạnh (แหล่น)", meaning: "หนาว", english: "Cold", icon: "🥶", example: "Bên ngoài rất lạnh. (ข้างนอกหนาวมาก)" },
             { word: "Vui (วุย)", meaning: "สนุก / ดีใจ", english: "Happy / Fun", icon: "😄", example: "Tôi rất vui khi gặp bạn. (ฉันดีใจมากที่ได้พบคุณ)" },
             { word: "Buồn (บ่วน)", meaning: "เศร้า", english: "Sad", icon: "😢", example: "Tại sao bạn buồn? (ทำไมคุณถึงเศร้า?)" },
-            { word: "Chờ một chút (เจ่อมตจุ๊ต)", meaning: "รอแป๊บหนึ่ง", english: "Wait a minute", icon: "⏱️", example: "Chờ một chút, tôi ra ngay. (รอเดี๋ยวนะ ฉันกำลังออกไป)" },
-            { word: "Giúp tôi với (ซุ้บตอยเว้ย)", meaning: "ช่วยด้วย", english: "Help me", icon: "🆘", example: "Làm ơn giúp tôi với! (ได้โปรดช่วยฉันด้วย!)" },
-            { word: "Ở đâu? (เอ๋อเดา?)", meaning: "อยู่ที่ไหน?", english: "Where?", icon: "📍", example: "Nhà vệ sinh ở đâu? (ห้องน้ำอยู่ไหนคะ?)" },
-            { word: "Khi nào? (คีหน่าว?)", meaning: "เมื่อไหร่?", english: "When?", icon: "📅", example: "Khi nào bạn đi? (คุณจะไปเมื่อไหร่?)" },
-            { word: "Cái gì? (ก๊ายสี่?)", meaning: "อะไร?", english: "What?", icon: "❓", example: "Cái này là cái gì? (อันนี้คืออะไร?)" },
+            { word: "Chờ một chút (เจ่อ หมด จุ๊ต)", meaning: "รอแป๊บหนึ่ง", english: "Wait a minute", icon: "⏱️", example: "Chờ một chút, tôi ra ngay. (รอเดี๋ยวนะ ฉันกำลังออกไป)" },
+            { word: "Giúp tôi với (ซุ๊ป ตอย เว๊ย)", meaning: "ช่วยด้วย", english: "Help me", icon: "🆘", example: "Làm ơn giúp tôi với! (ได้โปรดช่วยฉันด้วย!)" },
+            { word: "Ở đâu? (เอ๋อ เดา?)", meaning: "อยู่ที่ไหน?", english: "Where?", icon: "📍", example: "Nhà vệ sinh ở đâu? (ห้องน้ำอยู่ไหนคะ?)" },
+            { word: "Khi nào? (คี หน่าว?)", meaning: "เมื่อไหร่?", english: "When?", icon: "📅", example: "Khi nào bạn đi? (คุณจะไปเมื่อไหร่?)" },
+            { word: "Cái gì? (ก๊าย หยี่?)", meaning: "อะไร?", english: "What?", icon: "❓", example: "Cái này là cái gì? (อันนี้คืออะไร?)" },
             { word: "Ai? (อาย?)", meaning: "ใคร?", english: "Who?", icon: "👤", example: "Người kia là ai? (คนนั้นคือใคร?)" },
-            { word: "Tại sao? (ต๋ายซาว?)", meaning: "ทำไม?", english: "Why?", icon: "🤔", example: "Tại sao bạn không đến? (ทำไมคุณถึงไม่มา?)" },
-            { word: "Nhà vệ sinh (หญ่าเหวะซิน)", meaning: "ห้องน้ำ", english: "Toilet", icon: "🚽", example: "Cho hỏi nhà vệ sinh ở đâu? (ขอโทษนะคะ ห้องน้ำไปทางไหน?)" },
+            { word: "Tại sao? (ต๋าย ซาว?)", meaning: "ทำไม?", english: "Why?", icon: "🤔", example: "Tại sao bạn không đến? (ทำไมคุณถึงไม่มา?)" },
+            { word: "Nhà vệ sinh (หญ่า เหว่ ซิน)", meaning: "ห้องน้ำ", english: "Toilet", icon: "🚽", example: "Cho hỏi nhà vệ sinh ở đâu? (ขอโทษนะคะ ห้องน้ำไปทางไหน?)" },
             { word: "Chợ (เจอะ)", meaning: "ตลาด", english: "Market", icon: "🛒", example: "Tôi muốn đi chợ. (ฉันอยากไปตลาด)" },
-            { word: "Bệnh viện (เบ๊ญเหวี่ยน)", meaning: "โรงพยาบาล", english: "Hospital", icon: "🏥", example: "Gần đây có bệnh viện không? (แถวนี้มีโรงพยาบาลไหม?)" },
-            { word: "Sân bay (เซินบัย)", meaning: "สนามบิน", english: "Airport", icon: "✈️", example: "Đưa tôi đến sân bay. (ไปส่งฉันที่สนามบินหน่อย)" },
-            { word: "Khách sạn (คั้กซ่าน)", meaning: "โรงแรม", english: "Hotel", icon: "🏨", example: "Khách sạn của bạn tên gì? (โรงแรมของคุณชื่ออะไร?)" },
-            { word: "Nhà hàng (หญ่าห่าง)", meaning: "ร้านอาหาร", english: "Restaurant", icon: "🍽️", example: "Nhà hàng này thức ăn rất ngon. (ร้านนี้อาหารอร่อยมาก)" },
-            { word: "Tính tiền (ติ๊ญเตี่ยน)", meaning: "เก็บเงิน / เช็คบิล", english: "Check bill", icon: "🧾", example: "Em ơi, tính tiền! (น้องคะ เช็คบิลด้วย!)" },
-            { word: "Không hiểu (คงเหียว)", meaning: "ไม่เข้าใจ", english: "Don't understand", icon: "🤷", example: "Tôi không hiểu bạn nói gì. (ฉันไม่เข้าใจที่คุณพูด)" },
-            { word: "Nói chậm lại (น๊อยเจิ่มหลาย)", meaning: "พูดช้าลงหน่อย", english: "Speak slowly", icon: "🐢", example: "Xin vui lòng nói chậm lại. (กรุณาพูดช้าลงหน่อยค่ะ)" },
-            { word: "Lặp lại (หลับหลาย)", meaning: "พูดซ้ำอีกที", english: "Repeat", icon: "🔁", example: "Bạn có thể lặp lại được không? (คุณช่วยพูดซ้ำอีกทีได้ไหม?)" },
-            { word: "Không sao (คงซาว)", meaning: "ไม่เป็นไร", english: "No problem", icon: "👌", example: "Dạ không sao đâu. (ค่ะ ไม่เป็นไรหรอก)" },
-            { word: "Chúc ngủ ngon (จุ๊กหงูงอน)", meaning: "ฝันดี / ราตรีสวัสดิ์", english: "Good night", icon: "🌙", example: "Chúc bạn ngủ ngon. (นอนหลับฝันดีนะ)" },
-            { word: "Cố lên (ก๊อเลน)", meaning: "สู้ๆ", english: "Fighting", icon: "💪", example: "Cố lên! Bạn làm được mà. (สู้ๆ! คุณทำได้อยู่แล้ว)" }
+            { word: "Bệnh viện (เบิ่ญ เหวี่ยน)", meaning: "โรงพยาบาล", english: "Hospital", icon: "🏥", example: "Gần đây có bệnh viện không? (แถวนี้มีโรงพยาบาลไหม?)" },
+            { word: "Sân bay (เซิน ไบ)", meaning: "สนามบิน", english: "Airport", icon: "✈️", example: "Đưa tôi đến sân bay. (ไปส่งฉันที่สนามบินหน่อย)" },
+            { word: "Khách sạn (คั๊ก ส่าน)", meaning: "โรงแรม", english: "Hotel", icon: "🏨", example: "Khách sạn của bạn tên gì? (โรงแรมของคุณชื่ออะไร?)" },
+            { word: "Nhà hàng (หญ่า ห่าง)", meaning: "ร้านอาหาร", english: "Restaurant", icon: "🍽️", example: "Nhà hàng này thức ăn rất ngon. (ร้านนี้อาหารอร่อยมาก)" },
+            { word: "Tính tiền (ติ๊ญ เตี่ยน)", meaning: "เก็บเงิน / เช็คบิล", english: "Check bill", icon: "🧾", example: "Em ơi, tính tiền! (น้องคะ เช็คบิลด้วย!)" },
+            { word: "Không hiểu (คง เหี๋ยว)", meaning: "ไม่เข้าใจ", english: "Don't understand", icon: "🤷", example: "Tôi không hiểu bạn nói gì. (ฉันไม่เข้าใจที่คุณพูด)" },
+            { word: "Nói chậm lại (น๊อย เจิ่ม หล่าย)", meaning: "พูดช้าลงหน่อย", english: "Speak slowly", icon: "🐢", example: "Xin vui lòng nói chậm lại. (กรุณาพูดช้าลงหน่อยค่ะ)" },
+            { word: "Lặp lại (หลับ หล่าย)", meaning: "พูดซ้ำอีกที", english: "Repeat", icon: "🔁", example: "Bạn có thể lặp lại được không? (คุณช่วยพูดซ้ำอีกทีได้ไหม?)" },
+            { word: "Không sao (คง ซาว)", meaning: "ไม่เป็นไร", english: "No problem", icon: "👌", example: "Dạ không sao đâu. (ค่ะ ไม่เป็นไรหรอก)" },
+            { word: "Chúc ngủ ngon (จุ๊ก หงู งอน)", meaning: "ฝันดี / ราตรีสวัสดิ์", english: "Good night", icon: "🌙", example: "Chúc bạn ngủ ngon. (นอนหลับฝันดีนะ)" },
+            { word: "Cố lên (โก๊ เลน)", meaning: "สู้ๆ", english: "Fighting", icon: "💪", example: "Cố lên! Bạn làm được mà. (สู้ๆ! คุณทำได้อยู่แล้ว)" }
         ];
 
         function shuffleArray(array) {
