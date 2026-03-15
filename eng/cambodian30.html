@@ -474,18 +474,25 @@
         }
 
         function speakWord(word) {
-            // ใช้ Google Translate TTS API สำหรับภาษากัมพูชา (tl=km)
-            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=km&client=tw-ob`;
+            // ใช้ Google Translate TTS API (endpoint: gtx) ซึ่งเป็น API ฟรีที่เสถียรกว่าและไม่ติดบล็อกง่าย
+            const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=km&q=${encodeURIComponent(word)}`;
             const audio = new Audio(url);
             
             audio.play().catch(error => {
                 console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
-                // ระบบสำรอง: ใช้เสียงของเบราว์เซอร์
+                
+                // ระบบสำรอง (Fallback): ใช้เสียงของเบราว์เซอร์ (Web Speech API) ฟรี 100% ไม่จำกัดจำนวน
                 if ('speechSynthesis' in window) {
+                    // ยกเลิกเสียงที่กำลังพูดอยู่ (ถ้ามี)
+                    window.speechSynthesis.cancel();
+                    
                     const utterance = new SpeechSynthesisUtterance(word);
                     utterance.lang = 'km-KH'; // สำเนียงกัมพูชา
-                    utterance.rate = 0.8; 
+                    utterance.rate = 0.85; // ปรับความเร็วให้ฟังง่ายขึ้นเล็กน้อย
+                    
                     window.speechSynthesis.speak(utterance);
+                } else {
+                    alert("ขออภัย อุปกรณ์หรือเบราว์เซอร์ของคุณไม่รองรับระบบเสียง");
                 }
             });
         }
