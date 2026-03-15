@@ -496,16 +496,20 @@
         }
 
         function speakWord(word) {
-            // ใช้ Google Translate TTS API สำหรับภาษาสวีเดน (tl=sv)
-            const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=sv&client=tw-ob`;
+            // ทำความสะอาดคำศัพท์ก่อนส่งไปอ่าน
+            const cleanWord = word.trim();
+            
+            // เปลี่ยนมาใช้ Googleapis (client=gtx) ซึ่งเสถียรกว่าและบังคับเสียงสวีเดน (tl=sv) ได้แม่นยำกว่า
+            const url = `https://translate.googleapis.com/translate_tts?client=gtx&ie=UTF-8&tl=sv&q=${encodeURIComponent(cleanWord)}`;
             const audio = new Audio(url);
             
             audio.play().catch(error => {
                 console.error("ไม่สามารถเล่นเสียงจาก Google TTS ได้:", error);
                 // ระบบสำรอง: ใช้เสียงของเบราว์เซอร์
                 if ('speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance(word);
-                    utterance.lang = 'sv-SE'; // สำเนียงสวีเดน
+                    window.speechSynthesis.cancel(); // เคลียร์คิวเสียงเก่าก่อน
+                    const utterance = new SpeechSynthesisUtterance(cleanWord);
+                    utterance.lang = 'sv-SE'; // บังคับสำเนียงสวีเดนให้ชัดเจน
                     utterance.rate = 0.8; 
                     window.speechSynthesis.speak(utterance);
                 }
