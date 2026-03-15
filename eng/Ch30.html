@@ -55,9 +55,12 @@
             100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
         }
         .today-pulse { animation: softPulse 2s infinite; }
+
+        /* ปรับระยะปลอดภัยสำหรับมือถือรุ่นใหม่ (Safe Area) ด้านล่างสุด */
+        .pb-safe { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
     </style>
 </head>
-<body class="text-slate-800 p-3 sm:p-4 md:p-8 min-h-screen flex flex-col items-center">
+<body class="text-slate-800 p-3 sm:p-4 md:p-8 pb-24 md:pb-32 min-h-screen flex flex-col items-center relative">
 
     <div class="w-full max-w-4xl space-y-4 md:space-y-6">
         
@@ -495,5 +498,28 @@
             }
         });
     </script>
+
+    <!-- Bottom Navigation Bar (สไตล์แอปพลิเคชัน) -->
+    <div class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-md border-t border-rose-100 shadow-[0_-4px_20px_-10px_rgba(225,29,72,0.15)] z-40 px-2 pt-2 pb-safe">
+        <div class="max-w-md mx-auto flex justify-around items-center">
+            
+            <!-- เมนู: ปฏิทิน (ปุ่มที่เลือกอยู่) -->
+            <a href="index.html" target="_blank" class="flex flex-col items-center gap-1 w-1/2 group">
+                <div class="bg-rose-100 text-rose-600 p-2 md:p-2.5 rounded-2xl group-hover:bg-rose-200 transition-colors shadow-sm">
+                    <i class="ph-fill ph-calendar-check text-2xl md:text-3xl"></i>
+                </div>
+                <span class="text-[10px] md:text-xs font-bold text-rose-600 tracking-wide">ปฏิทิน</span>
+            </a>
+            
+            <!-- เมนู: คุยสนทนา -->
+            <a href="chat.html" target="_blank" class="flex flex-col items-center gap-1 w-1/2 group text-slate-400 hover:text-rose-500 transition-colors">
+                <div class="p-2 md:p-2.5 rounded-2xl group-hover:bg-rose-50 transition-colors">
+                    <i class="ph-bold ph-chats-circle text-2xl md:text-3xl"></i>
+                </div>
+                <span class="text-[10px] md:text-xs font-bold tracking-wide">คุยสนทนา</span>
+            </a>
+
+        </div>
+    </div>
 </body>
 </html>
