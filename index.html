@@ -6,6 +6,7 @@
     <title>Crow Studio - Classic Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Anuphan:wght@300;500&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --ink: #1e293b;
@@ -276,7 +277,7 @@
     </div>
 
     <!-- ============================================== -->
-    <!-- BOTTOM NAVIGATION BAR                            -->
+    <!-- BOTTOM NAVIGATION BAR                          -->
     <!-- ============================================== -->
     <nav class="fixed bottom-0 left-0 w-full bg-[#f4f1ea] border-t border-slate-300 z-50 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
         <div class="flex justify-around items-center h-14 md:h-16 max-w-md mx-auto">
@@ -323,9 +324,12 @@
             { id: 'sa', name: 'Saudi Arabia', transCode: 'ar', url: 'eng/saui30.html' },
             { id: 'br', name: 'Brazil', transCode: 'pt', url: 'eng/brazile30.html' },
             { id: 'se', name: 'Sweden', transCode: 'sv', url: 'eng/sweden30.html' },
-            { id: 'pl', name: 'Poland', transCode: 'pl', url: 'eng/poland30.html.html' },
-            { id: 'ph', name: 'Philippines', transCode: 'tl', url: 'eng/philipinn30.html},
-           { id: 'el', name: 'itsalael', transCode: 'el', url: 'eng/isalael.html'},
+            // FIXED: Removed extra .html from Poland
+            { id: 'pl', name: 'Poland', transCode: 'pl', url: 'eng/poland30.html' },
+            // FIXED: Added missing closing quote to Philippines
+            { id: 'ph', name: 'Philippines', transCode: 'tl', url: 'eng/philipinn30.html'},
+            // FIXED: Corrected Israel data (id: 'il' for flag, name: 'Israel', transCode: 'he' for Hebrew)
+            { id: 'il', name: 'Israel', transCode: 'he', url: 'eng/isalael.html'},
         ];
 
         // --- 2. Navigation Logic ---
@@ -636,7 +640,12 @@
 
                     window.speechSynthesis.speak(utterance);
                 } else {
-                    alert("เบราว์เซอร์ของคุณไม่รองรับระบบเสียงอ่าน (Text-to-Speech)");
+                    // FIXED: Removed alert(), used UI notification instead
+                    const prevText = textTarget.innerText;
+                    textTarget.innerHTML = '<span class="text-red-500 text-sm">เบราว์เซอร์ของคุณไม่รองรับระบบเสียงอ่าน (Text-to-Speech)</span>';
+                    setTimeout(() => {
+                        textTarget.innerText = prevText;
+                    }, 3000);
                 }
             });
         }
